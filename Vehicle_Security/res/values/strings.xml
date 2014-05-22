@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Vehicle_Security</string>
+    <string name="app_name">Vehicle Security</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_register_">Register_Activity</string>
+    <string name="title_activity_login_">Login_Activity</string>
+    <string name="title_activity_disclaimer_">Disclaimer_Activity</string>
+    <string name="title_activity_homescreen">HomescreenActivity</string>
+    <string name="app_id">590575301050112</string>
+    
 
 </resources>

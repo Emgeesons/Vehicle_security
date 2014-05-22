@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="title">
+        <item>Report Sighting</item>
+        <item>File New Report</item>
+        <item>About Us</item>
+    </string-array>
+    <string-array name="sub_title">
+        <item>Suspicious Activity or Possible stolen Vehicle</item>
+        <item>Theft and Vandalism</item>
+        <item>Crime stoppers South Australia</item>
+    </string-array>
+
+</resources>
