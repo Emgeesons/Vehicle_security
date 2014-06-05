@@ -41,7 +41,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String profile_gender = "gender";
 	private static final String profile_licenseNo = "licenseNo";
 	private static final String profile_street = "street";
-	private static final String profile_suburb = "suburb";
+	private static final String profile_address = "address";
 	private static final String profile_postcode = "postcode";
 	private static final String profile_dtModified = "dtModified";
 	private static final String profile_fbId = "fbId";
@@ -49,6 +49,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String profile_cname = "contact_name";
 	private static final String profile_cnumber = "contact_number";
 	private static final String profile_pin = "pin";
+	private static final String profile_squs = "squs";
+	private static final String profile_ans = "sans";
 
 	/**
 	 * Constructor Takes and keeps a reference of the passed context in order to
@@ -199,7 +201,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(profile_gender, data.getgender());
 		values.put(profile_licenseNo, data.getlicenseNo());
 		values.put(profile_street, data.getstreet());
-		values.put(profile_suburb, data.getsuburb());
+		values.put(profile_address, data.getaddress());
 		values.put(profile_postcode, data.getpostcode());
 		values.put(profile_dtModified, data.getdtModified());
 		values.put(profile_fbId, data.getfbId());
@@ -207,6 +209,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(profile_cname, data.getcname());
 		values.put(profile_cnumber, data.getcnumber());
 		values.put(profile_pin, data.getpin());
+		values.put(profile_squs, data.getsqus());
+		values.put(profile_ans, data.getsans());
 
 		// Inserting Row
 		// db.insert(TABLE_profile, null, values);
@@ -235,7 +239,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						cursor.getString(10), cursor.getString(11),
 						cursor.getString(12), cursor.getString(13),
 						cursor.getString(14), cursor.getString(15),
-						cursor.getString(16), cursor.getString(17));
+						cursor.getString(16), cursor.getString(17),
+						cursor.getString(18), cursor.getString(19));
 				con.add(data);
 			} while (cursor.moveToNext());
 		}

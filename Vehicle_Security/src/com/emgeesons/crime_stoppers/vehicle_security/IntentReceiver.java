@@ -3,40 +3,73 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
-import com.urbanairship.actions.ActionUtils;
-import com.urbanairship.actions.DeepLinkAction;
-import com.urbanairship.actions.LandingPageAction;
-import com.urbanairship.actions.OpenExternalUrlAction;
+import com.urbanairship.UAirship;
 import com.urbanairship.push.PushManager;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
+
 public class IntentReceiver extends BroadcastReceiver {
-	// A set of actions that launch activities when a push is opened. Update
-	// with any custom actions that also start activities when a push is opened.
-	private static String[] ACTIVITY_ACTIONS = new String[] {
-			DeepLinkAction.DEFAULT_REGISTRY_NAME,
-			OpenExternalUrlAction.DEFAULT_REGISTRY_NAME,
-			LandingPageAction.DEFAULT_REGISTRY_NAME };
 
-	@Override
-	public void onReceive(Context context, Intent intent) {
+    private static final String logTag = "PushSample";
 
-		if (PushManager.ACTION_PUSH_RECEIVED.equals(intent.getAction())) {
-			// Push received
-		} else if (PushManager.ACTION_NOTIFICATION_OPENED.equals(intent
-				.getAction())) {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+        Log.i(logTag, "Received intent: " + intent.toString());
+        String action = intent.getAction();
 
-			// Push opened
+        if (action.equals(PushManager.ACTION_PUSH_RECEIVED)) {
 
-			// Only launch the main activity if the payload does not contain any
-			// actions that might have already opened an activity
-			if (!ActionUtils.containsRegisteredActions(intent.getExtras(),
-					ACTIVITY_ACTIONS)) {
-				Intent launch = new Intent(Intent.ACTION_MAIN);
-				launch.setClass(context, LoginActivity.class);
-				launch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				context.startActivity(launch);
-			}
-		}
-	}
+            int id = intent.getIntExtra(PushManager.EXTRA_NOTIFICATION_ID, 0);
+
+            Log.i(logTag, "Received push notification. Alert: "
+                    + intent.getStringExtra(PushManager.EXTRA_ALERT)
+                    + " [NotificationID="+id+"]");
+
+            logPushExtras(intent);
+
+        } else if (action.equals(PushManager.ACTION_NOTIFICATION_OPENED)) {
+
+            Log.i(logTag, "User clicked notification. Message: " + intent.getStringExtra(PushManager.EXTRA_ALERT));
+
+            logPushExtras(intent);
+
+            Intent launch = new Intent(Intent.ACTION_MAIN);
+            launch.setClass(UAirship.shared().getApplicationContext(), LoginActivity.class);
+            launch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+            UAirship.shared().getApplicationContext().startActivity(launch);
+
+        } else if (action.equals(PushManager.ACTION_REGISTRATION_FINISHED)) {
+            Log.i(logTag, "Registration complete. APID:" + intent.getStringExtra(PushManager.EXTRA_APID)
+                    + ". Valid: " + intent.getBooleanExtra(PushManager.EXTRA_REGISTRATION_VALID, false));
+        } 
+
+    }
+
+    /**
+* Log the values sent in the payload's "extra" dictionary.
+*
+* @param intent A PushManager.ACTION_NOTIFICATION_OPENED or ACTION_PUSH_RECEIVED intent.
+*/
+    private void logPushExtras(Intent intent) {
+        Set<String> keys = intent.getExtras().keySet();
+        for (String key : keys) {
+
+            //ignore standard C2DM extra keys
+            List<String> ignoredKeys = (List<String>)Arrays.asList(
+                    "collapse_key",//c2dm collapse key
+                    "from",//c2dm sender
+                    PushManager.EXTRA_NOTIFICATION_ID,//int id of generated notification (ACTION_PUSH_RECEIVED only)
+                    PushManager.EXTRA_PUSH_ID,//internal UA push id
+                    PushManager.EXTRA_ALERT);//ignore alert
+            if (ignoredKeys.contains(key)) {
+                continue;
+            }
+            Log.i(logTag, "Push Notification Extra: ["+key+" : " + intent.getStringExtra(key) + "]");
+        }
+    }
 }

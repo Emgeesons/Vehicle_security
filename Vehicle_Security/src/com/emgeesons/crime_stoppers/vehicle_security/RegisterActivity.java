@@ -34,9 +34,10 @@ import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnFocusChangeListener;
+import android.view.View.OnKeyListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -49,10 +50,12 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-public class RegisterActivity extends SherlockActivity implements TextWatcher {
-	EditText fname, lname, email, number, dob, gender, pin1, pin2, pin3, pin4;
+public class RegisterActivity extends SherlockActivity implements TextWatcher,
+		OnKeyListener {
+	EditText fname, lname, email, number, gender, pin1, pin2, pin3, pin4,
+			otherqus, answer;
 	ImageView male, female;
-	TextView pint;
+	TextView pint, qus, dob;
 	Button submit;
 	String title = "Male";
 	CheckBox showpin;
@@ -64,13 +67,17 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 	private AsyncTask<Void, Void, Void> regcheck;
 	ProgressDialog pDialog;
 	boolean bfname, blname, bemail, bnumber, bdob, bgender, bpin1, bpin2,
-			bpin3, bpin4;
+			bpin3, bpin4, bans, bqus;
 	String input_date;
-	String register_url = "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/register.php";
+	String register_url = Data.url + "register.php";
 	Data info;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	SharedPreferences atPrefs;
+	static int buffKey = 0;
+	static CharSequence[] secqus;
+	int tqus;
+	int qusvalue;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +106,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 		lname = (EditText) findViewById(R.id.lname);
 		email = (EditText) findViewById(R.id.email);
 		number = (EditText) findViewById(R.id.number);
-		dob = (EditText) findViewById(R.id.age);
+		dob = (TextView) findViewById(R.id.age);
 		pin1 = (EditText) findViewById(R.id.pin1);
 		pin2 = (EditText) findViewById(R.id.pin2);
 		pin3 = (EditText) findViewById(R.id.pin3);
@@ -109,6 +116,9 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 		submit = (Button) findViewById(R.id.submit);
 		showpin = (CheckBox) findViewById(R.id.pin);
 		pint = (TextView) findViewById(R.id.textView1);
+		qus = (TextView) findViewById(R.id.sec_qus);
+		otherqus = (EditText) findViewById(R.id.sec_other_qus);
+		answer = (EditText) findViewById(R.id.sec_ans);
 		fname.addTextChangedListener(this);
 		lname.addTextChangedListener(this);
 		number.addTextChangedListener(this);
@@ -118,6 +128,12 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 		pin2.addTextChangedListener(this);
 		pin3.addTextChangedListener(this);
 		pin4.addTextChangedListener(this);
+		pin1.setOnKeyListener(this);
+		pin2.setOnKeyListener(this);
+		pin3.setOnKeyListener(this);
+		pin4.setOnKeyListener(this);
+
+		secqus = getResources().getStringArray(R.array.sec_qus);
 		bgender = true;
 		male.setOnClickListener(new OnClickListener() {
 
@@ -141,7 +157,6 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				isDialogOpen = true;
 				Calendar c = Calendar.getInstance();
 				years = c.get(Calendar.YEAR);
@@ -150,20 +165,20 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 				showDialog(DATE_DIALOG_ID);
 			}
 		});
-		dob.setOnFocusChangeListener(new OnFocusChangeListener() {
-
-			@Override
-			public void onFocusChange(View arg0, boolean hasFocus) {
-				if (hasFocus) {
-					isDialogOpen = true;
-					Calendar c = Calendar.getInstance();
-					years = c.get(Calendar.YEAR);
-					months = c.get(Calendar.MONTH);
-					date = c.get(Calendar.DAY_OF_MONTH);
-					showDialog(DATE_DIALOG_ID);
-				}
-			}
-		});
+		// dob.setOnFocusChangeListener(new OnFocusChangeListener() {
+		//
+		// @Override
+		// public void onFocusChange(View arg0, boolean hasFocus) {
+		// if (hasFocus) {
+		// isDialogOpen = true;
+		// Calendar c = Calendar.getInstance();
+		// years = c.get(Calendar.YEAR);
+		// months = c.get(Calendar.MONTH);
+		// date = c.get(Calendar.DAY_OF_MONTH);
+		// showDialog(DATE_DIALOG_ID);
+		// }
+		// }
+		// });
 
 		showpin.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -241,6 +256,30 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 								R.color.red));
 						bdob = false;
 					}
+
+					if (answer.getText().toString().isEmpty()) {
+						answer.setTextColor(getResources()
+								.getColor(R.color.red));
+						answer.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bans = false;
+					}
+					if (otherqus.getVisibility() == View.VISIBLE
+							&& otherqus.getText().toString().isEmpty()) {
+
+						otherqus.setTextColor(getResources().getColor(
+								R.color.red));
+						otherqus.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bqus = false;
+					}
+					if (qus.getText().toString().isEmpty()) {
+
+						qus.setTextColor(getResources().getColor(R.color.red));
+						qus.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bqus = false;
+					}
 					if (pin1.getText().toString().isEmpty()
 							|| pin2.getText().toString().isEmpty()
 							|| pin3.getText().toString().isEmpty()
@@ -253,10 +292,11 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 
 					}
 
-					if (bfname == true & blname == true & bemail == true
-							& bnumber == true & bdob == true & bgender == true
-							& bpin1 == true & bpin2 == true & bpin3 == true
-							& bpin4 == true) {
+					if (bfname == true && blname == true && bemail == true
+							&& bnumber == true && bdob == true
+							&& bgender == true && bpin1 == true
+							&& bpin2 == true && bpin3 == true && bpin4 == true
+							&& bans == true && bqus == true) {
 
 						regcheck = new regloginid().execute();
 
@@ -266,6 +306,99 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 			}
 		});
 
+		qus.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						RegisterActivity.this);
+				builder.setTitle("Security Questions");
+
+				builder.setSingleChoiceItems(secqus, tqus,
+						new DialogInterface.OnClickListener() {
+
+							@Override
+							public void onClick(DialogInterface dialog,
+									int which) {
+								buffKey = which;
+								qus.setText(secqus[buffKey]);
+								qus.setTextColor(getResources().getColor(
+										R.color.black));
+								int selectedPosition = ((AlertDialog) dialog)
+										.getListView().getCheckedItemPosition();
+
+								tqus = buffKey;
+								if (qus.getText().toString()
+										.equalsIgnoreCase("Other")) {
+									otherqus.setVisibility(View.VISIBLE);
+								} else {
+									otherqus.setVisibility(View.GONE);
+								}
+							}
+						}).setCancelable(false)
+
+				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						qus.setText(secqus[buffKey]);
+						qus.setTextColor(getResources().getColor(R.color.black));
+						int selectedPosition = ((AlertDialog) dialog)
+								.getListView().getCheckedItemPosition();
+
+						tqus = buffKey;
+						if (qus.getText().toString().equalsIgnoreCase("Other")) {
+							otherqus.setVisibility(View.VISIBLE);
+						} else {
+							otherqus.setVisibility(View.GONE);
+						}
+
+					}
+				});
+
+				AlertDialog alert = builder.create();
+				alert.show();
+			}
+		});
+
+		// pin4.setOnKeyListener(new View.OnKeyListener() {
+		// @Override
+		// public boolean onKey(View v, int keyCode, KeyEvent event) {
+		// // You can identify which key pressed buy checking keyCode value
+		// // with KeyEvent.KEYCODE_
+		// if (keyCode == KeyEvent.KEYCODE_DEL) {
+		// pin4.setText("");
+		// // this is for backspace
+		// pin3.requestFocus();
+		// }
+		// return false;
+		// }
+		// });
+		// pin3.setOnKeyListener(new View.OnKeyListener() {
+		// @Override
+		// public boolean onKey(View v, int keyCode, KeyEvent event) {
+		// // You can identify which key pressed buy checking keyCode value
+		// // with KeyEvent.KEYCODE_
+		// if (keyCode == KeyEvent.KEYCODE_DEL) {
+		// // this is for backspace
+		// pin3.setText("");
+		// pin2.requestFocus();
+		// }
+		// return false;
+		// }
+		// });
+		// pin2.setOnKeyListener(new View.OnKeyListener() {
+		// @Override
+		// public boolean onKey(View v, int keyCode, KeyEvent event) {
+		// // You can identify which key pressed buy checking keyCode value
+		// // with KeyEvent.KEYCODE_
+		// if (keyCode == KeyEvent.KEYCODE_DEL) {
+		// // this is for backspace
+		// pin2.setText("");
+		// pin1.requestFocus();
+		// }
+		// return false;
+		// }
+		// });
 	}
 
 	@Override
@@ -273,7 +406,6 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 		switch (id) {
 		case DATE_DIALOG_ID:
 			// set time picker as current date
-
 			DatePickerDialog dialog = new DatePickerDialog(this,
 					datePickerListener, years, months, date);
 			dialog.getDatePicker().setMaxDate(new Date().getTime());
@@ -306,7 +438,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 			System.out.println(input_date);
 			int AGE = getAge(years, months, date);
 			// Log.d("My", "age is :" + AGE);
-			dob.setText(String.valueOf(AGE) + "Yrs");
+			dob.setText(String.valueOf(AGE) + " " + "Yrs");
 
 		}
 
@@ -334,13 +466,13 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 	}
 
 	private class regloginid extends AsyncTask<Void, Void, Void> {
-		String success, mess, response, id;
+		String success, mess, response, id, pin, qus;
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(RegisterActivity.this);
-			pDialog.setMessage("");
+			pDialog.setMessage("Register");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -352,6 +484,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
 			HttpPost postMethod = new HttpPost(register_url);
+			System.out.println(register_url);
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
@@ -362,13 +495,78 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 				json.put("dob", input_date);
 				json.put("email", email.getText().toString());
 				json.put("gender", title);
-				String pin = pin1.getText().toString()
-						+ pin2.getText().toString() + pin3.getText().toString()
-						+ pin4.getText().toString();
+				pin = pin1.getText().toString() + pin2.getText().toString()
+						+ pin3.getText().toString() + pin4.getText().toString();
 				json.put("pin", pin);
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
+				// if (otherqus.getVisibility() == View.GONE) {
+				// json.put("securityQuestion", qus);
+				// } else {
+				// json.put("securityQuestion", otherqus);
+				// }
+				switch (buffKey) {
+				case 0:
+					qus = "What’s your Passport Number ?";
+					// json.put("securityQuestion",
+					// "What’s your Passport Number ?");
+					break;
+				case 1:
+					qus = "What’s your License Number ?";
+					// json.put("securityQuestion",
+					// "What’s your License Number ?");
+					break;
+
+				case 2:
+					qus = "What’s your Mothers Maiden Name ?";
+					// json.put("securityQuestion",
+					// "What’s your Mothers Maiden Name ?");
+					break;
+
+				case 3:
+					qus = "What’s your First Pets Name ?";
+					// json.put("securityQuestion",
+					// "What’s your First Pets Name ?");
+					break;
+
+				case 4:
+					qus = "Who was your First Childhood Friend ?";
+					// json.put("securityQuestion",
+					// "Who was your First Childhood Friend ?");
+					break;
+				case 5:
+					qus = "What Primary School did you First Attend ?";
+					// json.put("securityQuestion",
+					// "What Primary School did you First Attend ?");
+					break;
+				case 6:
+					qus = "What was the Colour of your First Car ?";
+					// json.put("securityQuestion",
+					// "What was the Colour of your First Car ?");
+					break;
+				case 7:
+					qus = "What is your All Time Favourite Movie ?";
+					// json.put("securityQuestion",
+					// "What is your All Time Favourite Movie ?");
+					break;
+				case 8:
+					qus = "What was your First Paid Job ?";
+					// json.put("securityQuestion",
+					// "What was your First Paid Job ?");
+					break;
+				case 9:
+					qus = otherqus.getText().toString();
+					// json.put("securityQuestion",
+					// otherqus.getText().toString());
+					break;
+
+				default:
+					break;
+				}
+				json.put("securityQuestion", qus);
+				json.put("securityAnswer", answer.getText().toString());
+
 				System.out.println("Elements-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()
@@ -397,20 +595,27 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-
+						qusvalue = info.qusvalues(qus);
 						db = new DatabaseHandler(RegisterActivity.this);
 						PersonalData data = new PersonalData(id, fname
 								.getText().toString(), lname.getText()
 								.toString(), email.getText().toString(), number
 								.getText().toString(), input_date, title, "",
-								"", "", "", "", "", "", "", "", "");
+								"", "", "", "", "", "", "", "", pin,
+								String.valueOf(qusvalue), answer.getText()
+										.toString());
 						db.updateprofileData(data);
 						atPrefs.edit()
 								.putBoolean(SplashscreenActivity.checkllogin,
 										false).commit();
+//
+//						atPrefs.edit()
+//								.putInt(SplashscreenActivity.progress, 30)
+//								.commit();
 						Intent next = new Intent(RegisterActivity.this,
-								HomescreenActivity.class);
+								MainActivity.class);
 						startActivity(next);
+						finish();
 
 					}
 				});
@@ -425,12 +630,12 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 								RegisterActivity.this).create();
 						Dialog.setTitle("Error");
 						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage("Something went wrong.please try again later");
+						Dialog.setMessage(mess);
 						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int which) {
-										pDialog.dismiss();
+										Dialog.dismiss();
 									}
 								});
 						Dialog.setCancelable(true);
@@ -447,7 +652,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 								RegisterActivity.this).create();
 						Dialog.setTitle("Error");
 						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage("Something went wrong.please try again later");
+						Dialog.setMessage(mess);
 						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
@@ -487,8 +692,10 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 
 	@Override
 	public void afterTextChanged(Editable s) {
+		// go next
 		if (pin1.getText().toString().length() == 1) {
 			pin2.requestFocus();
+
 		}
 		if (pin2.getText().toString().length() == 1) {
 			pin3.requestFocus();
@@ -496,6 +703,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 		if (pin3.getText().toString().length() == 1) {
 			pin4.requestFocus();
 		}
+
 		// // hide keyboard
 		// if (pin4.getText().toString().length() == 1) {
 		// InputMethodManager imm = (InputMethodManager)
@@ -524,11 +732,17 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 		number.setTextColor(getResources().getColor(R.color.black));
 		email.setTextColor(getResources().getColor(R.color.black));
 		dob.setTextColor(getResources().getColor(R.color.black));
+		answer.setTextColor(getResources().getColor(R.color.black));
+		otherqus.setTextColor(getResources().getColor(R.color.black));
+
 		bfname = true;
 		blname = true;
 		bnumber = true;
 		bemail = true;
 		bdob = true;
+		bans = true;
+		bqus = true;
+
 	}
 
 	@Override
@@ -536,4 +750,43 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher {
 
 	}
 
+	@Override
+	public boolean onKey(View v, int keyCode, KeyEvent event) {
+		// go back
+
+		if (keyCode == KeyEvent.KEYCODE_DEL) {
+			if (pin4.hasFocus()) {
+				pin4.setText("");
+				pin3.requestFocus();
+			} else if (pin3.hasFocus()) {
+				pin3.setText("");
+				pin2.requestFocus();
+			} else if (pin2.hasFocus()) {
+				pin2.setText("");
+				pin1.requestFocus();
+
+			}
+
+		}
+		return false;
+	}
+
+	// @Override
+	// public boolean onKeyDown(int keyCode, KeyEvent event) {
+	// if (event.getKeyCode() == KeyEvent.KEYCODE_BACK) {
+	// Log.d("CDA", "onKeyDown Called");
+	// if (pin4.getText().toString().length() == 0) {
+	// pin3.requestFocus();
+	// }
+	// if (pin3.getText().toString().length() == 0) {
+	// pin2.requestFocus();
+	// }
+	// if (pin2.getText().toString().length() == 0) {
+	// pin1.requestFocus();
+	// }
+	//
+	// return true;
+	// }
+	// return super.onKeyDown(keyCode, event);
+	// }
 }

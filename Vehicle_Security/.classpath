@@ -6,5 +6,9 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.LIBRARIES"/>
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry exported="true" kind="lib" path="D:/git/lib/urbanairship-lib-4.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/git/lib/commons-lang3-3.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/git/lib/httpclient-4.3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/git/lib/httpcore-4.3.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/git/lib/httpmime-4.3.3.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

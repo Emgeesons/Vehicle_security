@@ -1,15 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="title">
-        <item>Report Sighting</item>
-        <item>File New Report</item>
-        <item>About Us</item>
-    </string-array>
-    <string-array name="sub_title">
-        <item>Suspicious Activity or Possible stolen Vehicle</item>
-        <item>Theft and Vandalism</item>
-        <item>Crime stoppers South Australia</item>
+    <string-array name="sec_qus">
+        <item>Passport Number</item>
+        <item>License Number</item>
+        <item>Mother\'s Maiden </item>
+        <item>First Pet\'s Name</item>
+        <item>First Childhood Friend</item>
+        <item>First Primary School </item>
+        <item>Colour of Your First Car </item>
+        <item>All Time Favourite Movie </item>
+        <item>First Paid Job</item>
+        <item>Other</item>
     </string-array>
 
 </resources>

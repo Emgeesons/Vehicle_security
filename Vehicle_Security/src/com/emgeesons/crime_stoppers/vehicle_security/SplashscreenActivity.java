@@ -15,6 +15,9 @@ public class SplashscreenActivity extends Activity {
 	static String agree = "agree";
 	static String checkllogin = "checkllogin";
 	static boolean fblogin = true;
+	static String progress = "progress";
+	static String profile_pic = "profile_pic";
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +56,7 @@ public class SplashscreenActivity extends Activity {
 							if (session != null && session.isOpened()) {
 								Intent next = new Intent(
 										getApplicationContext(),
-										HomescreenActivity.class);
+										MainActivity.class);
 								startActivity(next);
 								finish();
 							} else {
@@ -66,7 +69,7 @@ public class SplashscreenActivity extends Activity {
 
 						} else {
 							Intent next = new Intent(getApplicationContext(),
-									HomescreenActivity.class);
+									MainActivity.class);
 							startActivity(next);
 							finish();
 						}

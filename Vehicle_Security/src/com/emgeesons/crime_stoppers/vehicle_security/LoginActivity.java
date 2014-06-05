@@ -13,12 +13,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
@@ -27,9 +29,11 @@ import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -47,27 +51,33 @@ import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 import com.facebook.widget.LoginButton.OnErrorListener;
-import com.urbanairship.Logger;
+import com.urbanairship.push.PushManager;
 
-public class LoginActivity extends Activity implements TextWatcher {
+public class LoginActivity extends Activity implements TextWatcher,
+		OnKeyListener {
 	Button register, login;
-	RelativeLayout main, login_main, forgot_main;
+	RelativeLayout main, login_main, forgot_main, forgot_qus;
 	Animation slide_in_right, slide_in_left, slide_out_left, slide_out_right;
-	TextView skip;
+	TextView skip, pint;
 	private AsyncTask<Void, Void, Void> check;
 	ProgressDialog pDialog;
 	EditText id, pin1, pin2, pin3, pin4;
 	EditText forgot_id;
 	Connection_Detector cd = new Connection_Detector(this);
-	boolean IsInternetPresent;
-	String forgot_url = "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/forgotPin.php";
-	String login_url = "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/login.php";
-	String fb_url = "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/fbLoginRegister.php";
+	boolean IsInternetPresent, idcheck;
+	String forgot_url = Data.url + "forgotPinEmail.php";
+	String forgot_qusurl = Data.url + "forgotPinAnswer.php";
+
+	String login_url = Data.url + "login.php";
+	String fb_url = Data.url + "fbLoginRegister.php";
 	Data info = new Data();
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String fbemail, fbfname, fblname, fbdob, fbgender, fbid, fbtoken;
 	SharedPreferences atPrefs;
+	IntentFilter apidUpdateFilter;
+	String userid;
+	EditText ans;
 
 	// private SimpleFacebook mSimpleFacebook;
 	// protected static final String TAG = LoginActivity.class.getName();
@@ -81,8 +91,8 @@ public class LoginActivity extends Activity implements TextWatcher {
 		login = (Button) findViewById(R.id.login);
 		// facebook = (Button) findViewById(R.id.facebook);
 		main = (RelativeLayout) findViewById(R.id.mainl);
-		
-		
+		apidUpdateFilter = new IntentFilter();
+		apidUpdateFilter.addAction(PushManager.ACTION_REGISTRATION_FINISHED);
 		// mSimpleFacebook = SimpleFacebook.getInstance(LoginActivity.this);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(LoginActivity.this);
@@ -98,6 +108,9 @@ public class LoginActivity extends Activity implements TextWatcher {
 		forgot_main = (RelativeLayout) findViewById(R.id.forgot_main);
 		skip = (TextView) findViewById(R.id.skip);
 		login_main = (RelativeLayout) findViewById(R.id.login_main);
+		forgot_qus = (RelativeLayout) findViewById(R.id.forgot_sub);
+		pint = (TextView) findViewById(R.id.textView1);
+
 		slide_in_right = AnimationUtils.loadAnimation(getApplicationContext(),
 				R.anim.slide_in_right);
 		slide_in_left = AnimationUtils.loadAnimation(getApplicationContext(),
@@ -111,7 +124,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 			@Override
 			public void onClick(View arg0) {
 				Intent next = new Intent(getApplicationContext(),
-						HomescreenActivity.class);
+						MainActivity.class);
 				startActivity(next);
 				finish();
 			}
@@ -240,6 +253,40 @@ public class LoginActivity extends Activity implements TextWatcher {
 
 	}
 
+	@Override
+	public void onBackPressed() {
+
+		if (main.getVisibility() == View.VISIBLE) {
+
+			super.onBackPressed();
+		}
+
+		if (login_main.getVisibility() == View.VISIBLE) {
+			login_main.setVisibility(View.GONE);
+			login_main.startAnimation(slide_out_right);
+			main.setVisibility(View.VISIBLE);
+			main.startAnimation(slide_in_left);
+
+		}
+
+		if (forgot_main.getVisibility() == View.VISIBLE) {
+			forgot_main.setVisibility(View.GONE);
+			forgot_main.startAnimation(slide_out_right);
+			login_main.setVisibility(View.VISIBLE);
+			login_main.startAnimation(slide_in_left);
+
+		}
+
+		if (forgot_qus.getVisibility() == View.VISIBLE) {
+			forgot_qus.setVisibility(View.GONE);
+			forgot_qus.startAnimation(slide_out_right);
+			forgot_main.setVisibility(View.VISIBLE);
+			forgot_main.startAnimation(slide_in_left);
+
+		}
+
+	};
+
 	// Login listener
 	// final OnLoginListener onLoginListener = new OnLoginListener() {
 	//
@@ -316,6 +363,11 @@ public class LoginActivity extends Activity implements TextWatcher {
 		pin2.addTextChangedListener(this);
 		pin3.addTextChangedListener(this);
 		pin4.addTextChangedListener(this);
+		id.addTextChangedListener(this);
+		pin1.setOnKeyListener(this);
+		pin2.setOnKeyListener(this);
+		pin3.setOnKeyListener(this);
+		pin4.setOnKeyListener(this);
 
 		cancel.setOnClickListener(new OnClickListener() {
 
@@ -329,39 +381,36 @@ public class LoginActivity extends Activity implements TextWatcher {
 		});
 		login.setOnClickListener(new OnClickListener() {
 
+			@SuppressLint("ResourceAsColor")
 			@Override
 			public void onClick(View v) {
 				if (!id.getText()
 						.toString()
 						.matches(
-								"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")
-						|| pin1.getText().toString().isEmpty()
+								"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")) {
+					id.setTextColor(getResources().getColor(R.color.red));
+					id.setHintTextColor(getResources().getColor(R.color.red));
+					idcheck = false;
+
+				}
+				if (pin1.getText().toString().isEmpty()
 						|| pin2.getText().toString().isEmpty()
 						|| pin3.getText().toString().isEmpty()
 						|| pin4.getText().toString().isEmpty()) {
-					AlertDialog dialog = new AlertDialog.Builder(
-							LoginActivity.this).create();
-					// dialog.setTitle("Please Fill All fields");
-					// dialog.setIcon(R.drawable.ic_launcher);
-					dialog.setMessage("Please Fill All fields");
-					dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-								}
-							});
 
-					dialog.setCancelable(true);
-					dialog.show();
+					pint.setTextColor(getResources().getColor(R.color.red));
 
-				} else {
+				}
+				if (idcheck == true) {
 					IsInternetPresent = cd.isConnectingToInternet();
 					if (IsInternetPresent == false) {
 						cd.showNoInternetPopup();
 					} else {
 						check = new Loginid().execute();
 					}
+
 				}
+
 			}
 		});
 		forgot.setOnClickListener(new OnClickListener() {
@@ -387,10 +436,31 @@ public class LoginActivity extends Activity implements TextWatcher {
 
 	void forgotact() {
 		TextView cancel;
-
-		Button submit;
+		Button Proceed;
 		forgot_id = (EditText) findViewById(R.id.forgot_id);
-		submit = (Button) findViewById(R.id.Submit);
+		forgot_id.addTextChangedListener(new TextWatcher() {
+
+			@Override
+			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
+					int arg3) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence arg0, int arg1,
+					int arg2, int arg3) {
+				// TODO Auto-generated method stub
+				forgot_id.setTextColor(getResources().getColor(R.color.black));
+			}
+
+			@Override
+			public void afterTextChanged(Editable arg0) {
+				// TODO Auto-generated method stub
+
+			}
+		});
+		Proceed = (Button) findViewById(R.id.Proceed);
 		cancel = (TextView) findViewById(R.id.forgot_cancel);
 		cancel.setOnClickListener(new OnClickListener() {
 
@@ -402,7 +472,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 				forgot_main.startAnimation(slide_out_right);
 			}
 		});
-		submit.setOnClickListener(new OnClickListener() {
+		Proceed.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -412,21 +482,11 @@ public class LoginActivity extends Activity implements TextWatcher {
 						.toString()
 						.matches(
 								"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}")) {
+					forgot_id
+							.setTextColor(getResources().getColor(R.color.red));
+					forgot_id.setHintTextColor(getResources().getColor(
+							R.color.red));
 
-					AlertDialog dialog = new AlertDialog.Builder(
-							LoginActivity.this).create();
-					// dialog.setTitle("Please Fill All fields");
-					// dialog.setIcon(R.drawable.ic_launcher);
-					dialog.setMessage("Please Fill Email Id");
-					dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-								}
-							});
-
-					dialog.setCancelable(true);
-					dialog.show();
 				} else {
 
 					IsInternetPresent = cd.isConnectingToInternet();
@@ -441,7 +501,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 	}
 
 	private class forgotpin extends AsyncTask<Void, Void, Void> {
-		String success, mess, response;
+		String success, mess, response, qus;
 
 		@Override
 		protected void onPreExecute() {
@@ -462,7 +522,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
-				info.showInfo(LoginActivity.this);
+				info.device();
 				json.put("email", forgot_id.getText().toString());
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
@@ -479,6 +539,9 @@ public class LoginActivity extends Activity implements TextWatcher {
 				jsonMainArr = profile.getJSONArray("response");
 				success = profile.getString("status");
 				mess = profile.getString("message");
+				qus = jsonMainArr.getJSONObject(0).getString(
+						"security_question");
+				userid = jsonMainArr.getJSONObject(0).getString("userId");
 
 			} catch (JSONException e) {
 				System.out.println("JSONException");
@@ -495,22 +558,74 @@ public class LoginActivity extends Activity implements TextWatcher {
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								LoginActivity.this).create();
-						Dialog.setTitle("Email Sent");
-						Dialog.setIcon(R.drawable.ic_action_done);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
+
+						forgot_main.setVisibility(View.GONE);
+						forgot_main.startAnimation(slide_out_left);
+						forgot_qus.setVisibility(View.VISIBLE);
+						forgot_qus.startAnimation(slide_in_right);
+						final TextView qustion = (TextView) findViewById(R.id.qus);
+						Button submit = (Button) findViewById(R.id.Submit);
+						TextView cancel = (TextView) findViewById(R.id.forgotqus_cancel);
+						ans = (EditText) findViewById(R.id.answer);
+						qustion.setText(qus.toString());
+						cancel.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View arg0) {
+								forgot_main.setVisibility(View.VISIBLE);
+								forgot_main.startAnimation(slide_in_left);
+								forgot_qus.setVisibility(View.GONE);
+								forgot_qus.startAnimation(slide_out_right);
+							}
+						});
+						ans.addTextChangedListener(new TextWatcher() {
+
+							@Override
+							public void onTextChanged(CharSequence arg0,
+									int arg1, int arg2, int arg3) {
+								// TODO Auto-generated method stub
+
+							}
+
+							@Override
+							public void beforeTextChanged(CharSequence arg0,
+									int arg1, int arg2, int arg3) {
+								// TODO Auto-generated method stub
+								ans.setTextColor(getResources().getColor(
+										R.color.black));
+							}
+
+							@Override
+							public void afterTextChanged(Editable arg0) {
+								// TODO Auto-generated method stub
+
+							}
+						});
+						submit.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								if (ans.getText().toString().length() <= 2) {
+									ans.setTextColor(getResources().getColor(
+											R.color.red));
+									ans.setHintTextColor(getResources()
+											.getColor(R.color.red));
+
+								} else {
+
+									IsInternetPresent = cd
+											.isConnectingToInternet();
+									if (IsInternetPresent == false) {
+										cd.showNoInternetPopup();
+									} else {
+										check = new qusans().execute();
 									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
+								}
+							}
+						});
 
 					}
+
 				});
 			}
 			// response failure
@@ -522,6 +637,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 						final AlertDialog Dialog = new AlertDialog.Builder(
 								LoginActivity.this).create();
 						Dialog.setTitle("Incorrect Email");
+						Dialog.setIcon(R.drawable.ic_action_error);
 						Dialog.setMessage(mess);
 						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
 								new DialogInterface.OnClickListener() {
@@ -568,8 +684,143 @@ public class LoginActivity extends Activity implements TextWatcher {
 		}
 	}
 
+	private class qusans extends AsyncTask<Void, Void, Void> {
+		String success, mess, response;
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(LoginActivity.this);
+			pDialog.setMessage("Sending Info");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
+			HttpPost postMethod = new HttpPost(forgot_qusurl);
+			JSONArray jsonMainArr;
+			JSONObject json = new JSONObject();
+			try {
+				info.device();
+				json.put("userId", userid);
+				json.put("securityAnswer", ans.getText().toString());
+				json.put("make", info.manufacturer);
+				json.put("os", "Android" + " " + info.Version);
+				json.put("model", info.model);
+				System.out.println("Element1-->" + json);
+				postMethod.setHeader("Content-Type", "application/json");
+				postMethod.setEntity(new ByteArrayEntity(json.toString()
+						.getBytes("UTF8")));
+				String response = httpClient
+						.execute(postMethod, resonseHandler);
+				Log.e("response :", response);
+				JSONObject profile = new JSONObject(response);
+				jsonMainArr = profile.getJSONArray("response");
+				success = profile.getString("status");
+				mess = profile.getString("message");
+
+			} catch (JSONException e) {
+				System.out.println("JSONException");
+			} catch (ClientProtocolException e) {
+				System.out.println("ClientProtocolException");
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.out.println("IOException");
+				e.printStackTrace();
+			}
+
+			if (success.equals("success")) {
+
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						final AlertDialog Dialog = new AlertDialog.Builder(
+								LoginActivity.this).create();
+						Dialog.setTitle("Email Sent");
+						Dialog.setIcon(R.drawable.ic_action_done);
+						Dialog.setMessage(mess);
+						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										login_main.setVisibility(View.VISIBLE);
+										login_main
+												.startAnimation(slide_in_right);
+										forgot_qus.setVisibility(View.GONE);
+										forgot_qus
+												.startAnimation(slide_out_left);
+									}
+								});
+						Dialog.setCancelable(true);
+						Dialog.show();
+					}
+
+				});
+			}
+			// response failure
+			else if (success.equals("failure")) {
+
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						final AlertDialog Dialog = new AlertDialog.Builder(
+								LoginActivity.this).create();
+						Dialog.setTitle("Incorrect Answer");
+
+						Dialog.setIcon(R.drawable.ic_action_error);
+						Dialog.setMessage(mess);
+						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										pDialog.dismiss();
+									}
+								});
+						Dialog.setCancelable(true);
+						Dialog.show();
+					}
+				});
+
+			} else if (success.equals("invalid")) {
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						final AlertDialog Dialog = new AlertDialog.Builder(
+								LoginActivity.this).create();
+						Dialog.setTitle("Error");
+						Dialog.setMessage(mess);
+						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										pDialog.dismiss();
+									}
+								});
+						Dialog.setCancelable(true);
+						Dialog.show();
+					}
+				});
+
+			}
+
+			return null;
+
+		}
+
+		@Override
+		protected void onPostExecute(Void notUsed) {
+			pDialog.dismiss();
+
+		}
+	}
+
 	private class fb extends AsyncTask<Void, Void, Void> {
-		String success, mess, response, user_id, pin;
+		String success, mess, response, user_id, pin, email;
 
 		@Override
 		protected void onPreExecute() {
@@ -587,7 +838,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 			DefaultHttpClient httpClient = new DefaultHttpClient();
 			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
 			HttpPost postMethod = new HttpPost(fb_url);
-			JSONArray jsonMainArr;
+			JSONArray jsonMainArr = null;
 			JSONObject json = new JSONObject();
 			try {
 				info.device();
@@ -614,8 +865,6 @@ public class LoginActivity extends Activity implements TextWatcher {
 				jsonMainArr = profile.getJSONArray("response");
 				success = profile.getString("status");
 				mess = profile.getString("message");
-				user_id = jsonMainArr.getJSONObject(0).getString("user_id");
-				pin = jsonMainArr.getJSONObject(0).getString("pin");
 
 			} catch (JSONException e) {
 				System.out.println("JSONException");
@@ -629,6 +878,15 @@ public class LoginActivity extends Activity implements TextWatcher {
 
 			if (success.equals("success")) {
 
+				try {
+					pin = jsonMainArr.getJSONObject(0).getString("pin");
+					email = jsonMainArr.getJSONObject(0).getString("email");
+					user_id = jsonMainArr.getJSONObject(0).getString("user_id");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
 				runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -636,16 +894,41 @@ public class LoginActivity extends Activity implements TextWatcher {
 						db = new DatabaseHandler(LoginActivity.this);
 						PersonalData data = new PersonalData(user_id, fbfname,
 								fblname, fbemail, "", fbdob, fbgender, "", "",
-								"", "", "", fbid, fbtoken, "", "", pin);
+								"", "", "", fbid, fbtoken, "", "", pin,"","");
 						db.updateprofileData(data);
-						atPrefs.edit()
-								.putBoolean(SplashscreenActivity.checkllogin,
-										false).commit();
+ 
 						SplashscreenActivity.fblogin = false;
-						Intent next = new Intent(getApplicationContext(),
-								HomescreenActivity.class);
-						startActivity(next);
-						finish();
+						if (mess.equalsIgnoreCase("New User")) {
+							Intent next = new Intent(LoginActivity.this,
+									FbNewuser.class);
+							next.putExtra("userid", user_id);
+							next.putExtra("email", fbemail);
+							next.putExtra("oldpin", pin);
+
+							startActivity(next);
+							finish();
+
+						} else if (mess.equalsIgnoreCase("Complete Profile")) {
+
+							Intent next = new Intent(LoginActivity.this,
+									FbNewuser.class);
+							next.putExtra("userid", user_id);
+							next.putExtra("email", fbemail);
+							next.putExtra("oldpin", pin);
+
+							startActivity(next);
+							finish();
+
+						} else {
+							atPrefs.edit()
+									.putBoolean(
+											SplashscreenActivity.checkllogin,
+											false).commit();
+							Intent next = new Intent(getApplicationContext(),
+									MainActivity.class);
+							startActivity(next);
+							finish();
+						}
 
 					}
 				});
@@ -658,7 +941,8 @@ public class LoginActivity extends Activity implements TextWatcher {
 					public void run() {
 						final AlertDialog Dialog = new AlertDialog.Builder(
 								LoginActivity.this).create();
-						Dialog.setTitle("Email ");
+						Dialog.setTitle("Email already exists");
+						Dialog.setIcon(R.drawable.ic_action_error);
 						Dialog.setMessage(mess);
 						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
 								new DialogInterface.OnClickListener() {
@@ -709,7 +993,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 		String success, mess, response;
 		String user_id, fName, lName, email, mobileNumber, dob, gender,
 				licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-				cname, cnumber;
+				cname, cnumber,pin;
 
 		@Override
 		protected void onPreExecute() {
@@ -732,7 +1016,7 @@ public class LoginActivity extends Activity implements TextWatcher {
 			try {
 				info.device();
 				json.put("email", id.getText().toString());
-				String pin = pin1.getText().toString()
+				 pin = pin1.getText().toString()
 						+ pin2.getText().toString() + pin3.getText().toString()
 						+ pin4.getText().toString();
 				json.put("pin", pin);
@@ -795,13 +1079,13 @@ public class LoginActivity extends Activity implements TextWatcher {
 						PersonalData data = new PersonalData(user_id, fName,
 								lName, email, mobileNumber, dob, gender,
 								licenseNo, street, suburb, postcode,
-								dtModified, fbId, fbToken, cname, cnumber, "");
+								dtModified, fbId, fbToken, cname, cnumber, pin,"","");
 						db.updateprofileData(data);
 						atPrefs.edit()
 								.putBoolean(SplashscreenActivity.checkllogin,
 										false).commit();
 						Intent next = new Intent(LoginActivity.this,
-								HomescreenActivity.class);
+								MainActivity.class);
 						startActivity(next);
 						finish();
 
@@ -880,11 +1164,44 @@ public class LoginActivity extends Activity implements TextWatcher {
 			imm.hideSoftInputFromWindow(pin4.getWindowToken(), 0);
 		}
 
+		if (!(pin1.getText().toString().isEmpty()
+				|| pin2.getText().toString().isEmpty()
+				|| pin3.getText().toString().isEmpty() || pin4.getText()
+				.toString().isEmpty())) {
+			pint.setTextColor(getResources().getColor(R.color.black));
+
+		}
+
+	}
+
+	@Override
+	public boolean onKey(View v, int keyCode, KeyEvent event) {
+		// go back
+
+		if (keyCode == KeyEvent.KEYCODE_DEL) {
+			if (pin4.hasFocus()) {
+				pin4.setText("");
+				pin3.requestFocus();
+			} else if (pin3.hasFocus()) {
+				pin3.setText("");
+				pin2.requestFocus();
+			} else if (pin2.hasFocus()) {
+				pin2.setText("");
+				pin1.requestFocus();
+
+			}
+
+		}
+		return false;
 	}
 
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
+		id.setTextColor(getResources().getColor(R.color.black));
+		idcheck = true;
+		// forgot_id.setTextColor(getResources().getColor(R.color.black));
+		// ans.setTextColor(getResources().getColor(R.color.black));
 
 	}
 
@@ -901,4 +1218,5 @@ public class LoginActivity extends Activity implements TextWatcher {
 				resultCode, data);
 
 	}
+
 }

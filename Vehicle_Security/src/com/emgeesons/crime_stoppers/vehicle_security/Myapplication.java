@@ -13,7 +13,7 @@ public class Myapplication extends Application {
 
 	@Override
 	public void onCreate() {
-		
+
 		AirshipConfigOptions options = AirshipConfigOptions
 				.loadDefaultOptions(Myapplication.this);
 		UAirship.takeOff(this, options);
@@ -28,8 +28,6 @@ public class Myapplication extends Application {
 		PushManager.shared().setIntentReceiver(IntentReceiver.class);
 		String apid = PushManager.shared().getAPID();
 		Logger.info("My Application onCreate - App APID: " + apid);
-
-		
 
 	}
 }

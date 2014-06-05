@@ -2,14 +2,14 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 public class PersonalData {
 	private String user_id, fName, lName, email, mobileNumber, dob, gender,
-			licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-			cname, cnumber, pin;
+			licenseNo, street, address, postcode, dtModified, fbId, fbToken,
+			cname, cnumber, pin, squs, sans;
 
 	public PersonalData(String user_id, String fName, String lName,
 			String email, String mobileNumber, String dob, String gender,
-			String licenseNo, String street, String suburb, String postcode,
+			String licenseNo, String street, String address, String postcode,
 			String dtModified, String fbId, String fbToken, String cname,
-			String cnumber, String pin) {
+			String cnumber, String pin, String squs, String sans) {
 		this.user_id = user_id;
 		this.fName = fName;
 		this.lName = lName;
@@ -19,6 +19,7 @@ public class PersonalData {
 		this.gender = gender;
 		this.licenseNo = licenseNo;
 		this.street = street;
+		this.address = address;
 		this.postcode = postcode;
 		this.dtModified = dtModified;
 		this.fbId = fbId;
@@ -26,6 +27,8 @@ public class PersonalData {
 		this.cname = cname;
 		this.cnumber = cnumber;
 		this.pin = pin;
+		this.squs = squs;
+		this.sans = sans;
 
 	}
 
@@ -101,12 +104,12 @@ public class PersonalData {
 		this.street = street;
 	}
 
-	public String getsuburb() {
-		return this.suburb;
+	public String getaddress() {
+		return this.address;
 	}
 
-	public void suburb(String suburb) {
-		this.suburb = suburb;
+	public void address(String address) {
+		this.address = address;
 	}
 
 	public String getpostcode() {
@@ -165,4 +168,19 @@ public class PersonalData {
 		this.pin = pin;
 	}
 
+	public String getsqus() {
+		return this.squs;
+	}
+
+	public void setqus(String squs) {
+		this.squs = squs;
+	}
+
+	public String getsans() {
+		return this.sans;
+	}
+
+	public void setsans(String sans) {
+		this.sans = sans;
+	}
 }

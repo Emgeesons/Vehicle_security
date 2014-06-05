@@ -19,6 +19,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
     <!-- GCM requires a Google account. -->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -65,7 +66,7 @@
     <application
         android:name="com.emgeesons.crime_stoppers.vehicle_security.Myapplication"
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/ic_app"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
 
@@ -125,6 +126,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.MainActivity"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Main_Activity"
             android:label="@string/app_name" >
         </activity>
@@ -172,8 +177,48 @@
             </intent-filter>
         </activity>
 
-       
         <receiver android:name="com.emgeesons.crime_stoppers.vehicle_security.IntentReceiver" />
+
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.FilenewReport"
+            android:label="@string/title_activity_filenew_report" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.ReportSighting"
+            android:label="@string/title_activity_report_sighting" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.FbNewuser"
+            android:label="@string/title_activity_fb_newuser" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.EmergencyNumbers"
+            android:label="@string/title_activity_emergency_numbers" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.AboutUs"
+            android:label="@string/title_activity_about_us" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Website"
+            android:label="@string/title_activity_website" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Feedback"
+            android:label="@string/title_activity_feddback" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.ProfileScreen"
+            android:label="@string/title_activity_profile_screen" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.AddDetails"
+            android:label="@string/title_activity_add_details" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.EditInfo"
+            android:label="@string/title_activity_edit_info" >
+        </activity>
     </application>
 
 </manifest>
