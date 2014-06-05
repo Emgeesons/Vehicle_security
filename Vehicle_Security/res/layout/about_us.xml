@@ -1,0 +1,110 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AboutUs" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/im_about_us" />
+
+    <RelativeLayout
+        android:id="@+id/rel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/imageView1"
+        android:background="@color/blue"
+        android:paddingBottom="10dp" >
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="18dp"
+            android:src="@drawable/ic_call" />
+
+        <TextView
+            android:id="@+id/call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="3dp"
+            android:layout_marginTop="13dp"
+            android:layout_toRightOf="@+id/imageView2"
+            android:text="1800 333 000"
+            android:textColor="@color/white"
+            android:textSize="@dimen/medium_text" />
+
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="15dp"
+            android:layout_toRightOf="@+id/call"
+            android:src="@drawable/seperator" />
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="18dp"
+            android:layout_toRightOf="@+id/imageView3"
+            android:src="@drawable/ic_map" />
+
+        <TextView
+            android:id="@+id/website"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/call"
+            android:layout_alignBottom="@+id/call"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/imageView4"
+            android:text="sa.crimestoppers.com.au"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/rel"
+        android:fillViewport="true"
+        android:padding="10dp"
+        android:scrollbars="none" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/imageView1"
+            android:layout_marginTop="15dp"
+            android:text="Crime Stoppers South Australia began in 1996 and plays a critical role in encouraging people to come forward with information to help solve crimes. It also educates the community on topics such as personal safety, vehicle theft, cyber safety and much more.\n\n
+Crime Stoppers works with Police, businesses and the public to solve, reduce and prevent crime by providing secure ways for information about illegal activity and unsolved crimes to be reported to Police.\n\n
+Call the Crime Stoppers free hotline 1800 333 000 or fill in an online report if you see something or hear something about:  
+\n\n
+•	people wanted by the Police\n
+•	unsolved crimes\n
+•	any crime that is being planned\n
+•	people who have committed a criminal offence but haven’t been arrested\n
+•	suspicious or unusual activity\n\n
+
+You can remain anonymous and rewards are available.
+
+
+"
+            android:textSize="@dimen/medium_text" />
+    </ScrollView>
+
+</RelativeLayout>

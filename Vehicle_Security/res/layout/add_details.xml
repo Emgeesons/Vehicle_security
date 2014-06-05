@@ -1,0 +1,53 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="10dp"
+    tools:context=".AddDetails" >
+
+    <EditText
+        android:id="@+id/Licence"
+        android:layout_width="wrap_content"
+        android:layout_height="40sp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="26dp"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="Licence number"
+        android:paddingLeft="10dp"
+        android:singleLine="true" >
+    </EditText>
+
+    <EditText
+        android:id="@+id/address"
+        android:layout_width="wrap_content"
+        android:layout_height="40sp"
+        android:layout_alignLeft="@+id/Licence"
+        android:layout_alignRight="@+id/Licence"
+        android:layout_below="@+id/Licence"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="Address"
+        android:paddingLeft="10dp"
+        android:singleLine="true" />
+
+    <EditText
+        android:id="@+id/postcode"
+        android:layout_width="wrap_content"
+        android:layout_height="40sp"
+        android:layout_alignLeft="@+id/address"
+        android:layout_alignRight="@+id/address"
+        android:layout_below="@+id/address"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="postcode"
+        android:inputType="number"
+        android:paddingLeft="10dp"
+        android:singleLine="true" >
+    </EditText>
+
+</RelativeLayout>

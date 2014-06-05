@@ -1,0 +1,202 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ProfileScreen" >
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/default_profile_bg" />
+
+    <com.emgeesons.crime_stoppers.vehicle_security.CustomImageView
+        android:id="@+id/profile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/imageView1"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="17dp"
+        android:layout_marginLeft="16dp"
+        android:src="@drawable/default_profile" />
+
+    <RelativeLayout
+        android:id="@+id/points"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/imageView1"
+        android:background="#c7c7c7" >
+
+        <ImageView
+            android:id="@+id/imageView4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/points_design" />
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:text="Samaritan Points"
+            android:textColor="@color/light_black"
+            android:textSize="@dimen/big_text" />
+
+        <TextView
+            android:id="@+id/pts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/imageView4"
+            android:layout_alignTop="@+id/textView2"
+            android:layout_marginLeft="18dp"
+            android:layout_marginTop="15dp"
+            android:text="100"
+            android:textColor="@color/light_black"
+            android:textSize="@dimen/medium_text" />
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/male_female"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/profile"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/profile"
+        android:src="@drawable/ic_female" />
+
+    <TextView
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/male_female"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/male_female"
+        android:text="first name ,"
+        android:textColor="@color/white"
+        android:textSize="@dimen/medium_text" />
+
+    <TextView
+        android:id="@+id/age"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/name"
+        android:layout_alignBottom="@+id/name"
+        android:layout_marginLeft="5dp"
+        android:layout_toRightOf="@+id/name"
+        android:text="20Yrs"
+        android:textColor="@color/white" />
+
+    <TextView
+        android:id="@+id/number"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/name"
+        android:layout_below="@+id/name"
+        android:layout_marginTop="3dp"
+        android:text="988989898"
+        android:textColor="@color/white"
+        android:textSize="@dimen/medium_text" />
+
+    <TextView
+        android:id="@+id/email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/number"
+        android:layout_below="@+id/number"
+        android:layout_marginTop="3dp"
+        android:text="gg@gmail.com"
+        android:textColor="@color/white"
+        android:textSize="@dimen/medium_text" />
+
+    <ImageView
+        android:id="@+id/edit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/male_female"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/edit_white" />
+
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/points"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/profile_bar"
+        android:progress="100"
+        android:progressDrawable="@drawable/startbar" />
+
+    <TextView
+        android:id="@+id/profile_comp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/progress"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:text="Your profile is 30% Complete"
+        android:textColor="@color/blue_text"
+        android:textSize="@dimen/medium_text" />
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/profile_comp"
+        android:layout_alignRight="@+id/profile_comp"
+        android:layout_below="@+id/profile_comp"
+        android:layout_marginTop="5dp"
+        android:gravity="center"
+        android:text="Add more Details and Vechicles to complete your profile"
+        android:textSize="@dimen/regular_text" />
+
+    <LinearLayout
+        android:id="@+id/add"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:layout_marginTop="10dp"
+        android:gravity="center"
+        android:padding="10dp"
+        android:weightSum="2" >
+
+        <Button
+            android:id="@+id/adddetails"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/progress"
+            android:layout_below="@+id/textView1"
+            android:layout_weight="1"
+            android:background="@drawable/box_whiteb"
+            android:text="Add Details" />
+
+        <Button
+            android:id="@+id/addvehicle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/button1"
+            android:layout_alignBottom="@+id/button1"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/textView3"
+            android:layout_weight="1"
+            android:background="@drawable/box_whiteb"
+            android:text="Add Vehicle" />
+    </LinearLayout>
+
+</RelativeLayout>

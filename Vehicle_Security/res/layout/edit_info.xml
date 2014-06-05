@@ -1,0 +1,319 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp"
+        tools:context=".EditInfo" >
+
+        <LinearLayout
+            android:id="@+id/linearLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="2" >
+
+            <EditText
+                android:id="@+id/fname"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/box_gry"
+                android:ems="10"
+                android:hint="First name"
+                android:inputType="textPersonName"
+                android:nextFocusDown="@+id/lname"
+                android:paddingLeft="5dp" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/lname"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_weight="1"
+                android:background="@drawable/box_gry"
+                android:ems="10"
+                android:hint="Last name"
+                android:inputType="textPersonName"
+                android:paddingLeft="5dp" >
+            </EditText>
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/email"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/linearLayout1"
+            android:layout_alignRight="@+id/linearLayout1"
+            android:layout_below="@+id/linearLayout1"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="Email id"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="5dp" >
+        </EditText>
+
+        <TextView
+            android:id="@+id/age"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/email"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/male_female"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Age"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:singleLine="true" />
+
+        <ImageView
+            android:id="@+id/female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@+id/age"
+            android:layout_alignRight="@+id/email"
+            android:src="@drawable/female_inactive" />
+
+        <ImageView
+            android:id="@+id/male"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/female"
+            android:layout_toLeftOf="@+id/female"
+            android:src="@drawable/male_active" />
+
+        <TextView
+            android:id="@+id/male_female"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/male"
+            android:layout_marginRight="2dp"
+            android:layout_marginTop="10dp"
+            android:layout_toLeftOf="@+id/male"
+            android:text="Gender:"
+            android:textSize="@dimen/medium_text" />
+
+        <EditText
+            android:id="@+id/number"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/age"
+            android:layout_alignRight="@+id/female"
+            android:layout_below="@+id/age"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="Mobile number"
+            android:inputType="phone"
+            android:paddingLeft="5dp" />
+
+        <EditText
+            android:id="@+id/pin2"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_alignBaseline="@+id/pin1"
+            android:layout_alignBottom="@+id/pin1"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/pin1"
+            android:background="@drawable/box_gry"
+            android:digits="0123456789"
+            android:gravity="center"
+            android:inputType="numberPassword"
+            android:maxLength="1"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/pin3"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_alignBaseline="@+id/pin2"
+            android:layout_alignBottom="@+id/pin2"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/pin2"
+            android:background="@drawable/box_gry"
+            android:digits="0123456789"
+            android:gravity="center"
+            android:inputType="numberPassword"
+            android:maxLength="1"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/pin4"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_alignBaseline="@+id/pin3"
+            android:layout_alignBottom="@+id/pin3"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/pin3"
+            android:background="@drawable/box_gry"
+            android:digits="0123456789"
+            android:gravity="center"
+            android:inputType="numberPassword"
+            android:maxLength="1"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/pin1"
+            android:layout_alignBottom="@+id/pin1"
+            android:layout_alignLeft="@+id/editText1"
+            android:text="PIN:"
+            android:textSize="@dimen/medium_text" />
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout1"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/pin1"
+            android:layout_marginTop="10dp"
+            android:background="@color/gry" >
+        </RelativeLayout>
+
+        <CheckBox
+            android:id="@+id/pin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/textView1"
+            android:layout_below="@+id/relativeLayout1"
+            android:layout_marginTop="8dp"
+            android:text="Show PIN" />
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout2"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignLeft="@+id/relativeLayout1"
+            android:layout_below="@+id/pin"
+            android:layout_marginTop="10dp"
+            android:background="@color/gry" >
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/sec_qus"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/relativeLayout2"
+            android:layout_alignRight="@+id/relativeLayout2"
+            android:layout_below="@+id/relativeLayout2"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:hint="security question"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:singleLine="true"
+            android:textColor="@color/black" />
+
+        <EditText
+            android:id="@+id/sec_other_qus"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/sec_qus"
+            android:layout_alignRight="@+id/sec_qus"
+            android:layout_below="@+id/sec_qus"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:hint="enter question"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp"
+            android:singleLine="true"
+            android:textColor="@color/black"
+            android:visibility="gone" />
+
+        <EditText
+            android:id="@+id/sec_ans"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/sec_other_qus"
+            android:layout_alignRight="@+id/sec_other_qus"
+            android:layout_below="@+id/sec_other_qus"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:hint="answer"
+            android:paddingLeft="10dp"
+            android:paddingTop="5dp"
+            android:singleLine="true"
+            android:textColor="@color/black" />
+
+        <EditText
+            android:id="@+id/pin1"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_below="@+id/number"
+            android:layout_marginLeft="18dp"
+            android:layout_marginTop="14dp"
+            android:layout_toRightOf="@+id/textView1"
+            android:background="@drawable/box_gry"
+            android:digits="0123456789"
+            android:ems="10"
+            android:gravity="center"
+            android:inputType="numberPassword"
+            android:maxLength="1"
+            android:singleLine="true" >
+        </EditText>
+
+        <RelativeLayout
+            android:id="@+id/relativeLayout3"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_alignLeft="@+id/sec_ans"
+            android:layout_below="@+id/sec_ans"
+            android:layout_marginTop="10dp"
+            android:background="@color/gry" >
+        </RelativeLayout>
+
+        <EditText
+            android:id="@+id/Licence"
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+            android:layout_alignLeft="@+id/relativeLayout3"
+            android:layout_alignRight="@+id/relativeLayout3"
+            android:layout_below="@+id/relativeLayout3"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="Licence number"
+            android:paddingLeft="10dp" >
+        </EditText>
+
+        <EditText
+            android:id="@+id/address"
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+            android:layout_alignLeft="@+id/Licence"
+            android:layout_alignRight="@+id/Licence"
+            android:layout_below="@+id/Licence"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="Address"
+            android:paddingLeft="10dp" />
+
+        <EditText
+            android:id="@+id/postcode"
+            android:layout_width="wrap_content"
+            android:layout_height="40sp"
+            android:layout_alignLeft="@+id/address"
+            android:layout_alignRight="@+id/address"
+            android:layout_below="@+id/address"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="postcode"
+            android:inputType="number"
+            android:paddingLeft="10dp" >
+        </EditText>
+    </RelativeLayout>
+
+</ScrollView>
