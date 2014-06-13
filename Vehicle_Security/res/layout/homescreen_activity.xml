@@ -36,9 +36,18 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="I&apos;am Parking Here"
+                    android:text="I&apos;m Parking Here"
                     android:textColor="@color/blue_text"
                     android:textSize="@dimen/medium_text" />
+
+                <ImageView
+                    android:layout_width="2dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentBottom="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:background="@drawable/gry"
+                    android:scaleType="fitXY" />
 
                 <TextView
                     android:id="@+id/find"
@@ -46,8 +55,9 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center"
-                    android:text="Find my vehicle"
-                    android:textColor="@color/blue_text" />
+                    android:text="Find my car"
+                    android:textColor="@color/blue_text"
+                    android:textSize="@dimen/medium_text" />
             </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>
@@ -102,7 +112,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="14dp"
                 android:src="@drawable/ic_report_sighting" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -148,7 +157,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="14dp"
                 android:src="@drawable/ic_file_new_report" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -194,7 +202,6 @@
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="14dp"
                 android:src="@drawable/ic_about_us" />
-
         </RelativeLayout>
 
         <RelativeLayout
@@ -221,8 +228,8 @@
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
+                android:layout_marginLeft="14dp"
                 android:src="@drawable/ic_updates" />
-
         </RelativeLayout>
     </LinearLayout>
 

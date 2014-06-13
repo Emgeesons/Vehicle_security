@@ -189,7 +189,7 @@
                 android:layout_marginLeft="17sp"
                 android:layout_toRightOf="@+id/imageView1"
                 android:text="Suburban Taxis (metro area)"
-                android:textSize="@dimen/medium_text" />
+                android:textSize="@dimen/big_text" />
 
             <TextView
                 android:id="@+id/textView2"
@@ -201,7 +201,7 @@
                 android:layout_toRightOf="@+id/imageView2"
                 android:text="131 008"
                 android:textColor="@color/light_black"
-                android:textSize="@dimen/medium_text" />
+                android:textSize="@dimen/big_text" />
 
             <ImageView
                 android:id="@+id/imageView1"

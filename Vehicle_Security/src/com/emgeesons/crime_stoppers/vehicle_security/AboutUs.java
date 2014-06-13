@@ -13,13 +13,13 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-public class AboutUs extends SherlockActivity {
+public class AboutUs extends BaseActivity {
 	View view;
 	TextView call, website;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.about_us);
+		// setContentView(R.layout.about_us);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'>About Us</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -70,6 +70,12 @@ public class AboutUs extends SherlockActivity {
 			break;
 		}
 		return true;
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.about_us;
 	}
 
 }

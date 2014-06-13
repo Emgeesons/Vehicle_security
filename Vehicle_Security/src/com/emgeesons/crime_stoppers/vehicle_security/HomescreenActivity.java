@@ -88,6 +88,7 @@ public class HomescreenActivity extends SherlockFragment implements
 	downlaod d;
 	File sdRoot;
 	String dir;
+	JSONArray jsonVehicleArr;
 
 	@SuppressLint("ResourceAsColor")
 	@Override
@@ -134,7 +135,6 @@ public class HomescreenActivity extends SherlockFragment implements
 			@Override
 			public void onStatusChanged(String provider, int status,
 					Bundle extras) {
-				// TODO Auto-generated method stub
 
 			}
 
@@ -645,7 +645,6 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	@Override
 	public void onLocationChanged(Location location) {
-		// TODO Auto-generated method stub
 		LATITUDE = location.getLatitude();
 		LONGITUDE = location.getLongitude();
 
@@ -654,7 +653,6 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		// TODO Auto-generated method stub
 		// locationManager = (LocationManager) getActivity().getSystemService(
 		// Context.LOCATION_SERVICE);
 		// if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
@@ -669,7 +667,6 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		// TODO Auto-generated method stub
 		// locationManager = (LocationManager) getActivity().getSystemService(
 		// Context.LOCATION_SERVICE);
 		// if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
@@ -684,20 +681,18 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
 
 	}
 
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
 		inflater.inflate(R.menu.homescreen, menu);
-		menu.add("Notification").setIcon(R.drawable.default_profile)
+		menu.add("Notification").setIcon(R.drawable.default_profile_home)
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 						// login check
-						if (atPrefs.getBoolean(
-								SplashscreenActivity.checkllogin, true)) {
+						if (atPrefs.getBoolean(info.checkllogin, true)) {
 							Intent next = new Intent(getActivity(),
 									LoginActivity.class);
 							startActivity(next);
@@ -718,14 +713,18 @@ public class HomescreenActivity extends SherlockFragment implements
 		String success, mess, response;
 		String user_id, fName, lName, email, mobileNumber, dob, gender,
 				licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-				cname, cnumber, pin, sques, sans, photourl, photoname;
+				cname, cnumber, sques, sans, photourl, photoname, pin, points;
 		int profilecom;
+
+		// vehicle
+		int vid;
+		String vtype, vmake, vmodel, reg, vstatus;
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(getActivity());
-			pDialog.setMessage("Sending Info");
+			pDialog.setMessage("Updating Info");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -738,6 +737,7 @@ public class HomescreenActivity extends SherlockFragment implements
 			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
 			HttpPost postMethod = new HttpPost(profile_url);
 			JSONArray jsonMainArr;
+
 			JSONObject json = new JSONObject();
 			try {
 				info.device();
@@ -756,6 +756,7 @@ public class HomescreenActivity extends SherlockFragment implements
 
 				JSONObject profile = new JSONObject(response);
 				jsonMainArr = profile.getJSONArray("response");
+				jsonVehicleArr = profile.getJSONArray("vehicles");
 				success = profile.getString("status");
 
 				mess = profile.getString("message");
@@ -771,10 +772,11 @@ public class HomescreenActivity extends SherlockFragment implements
 				gender = jsonMainArr.getJSONObject(0).getString("gender");
 				licenseNo = jsonMainArr.getJSONObject(0)
 						.getString("license_no");
-				street = jsonMainArr.getJSONObject(0).getString("street");
+				// street = jsonMainArr.getJSONObject(0).getString("street");
 				// suburb = jsonMainArr.getJSONObject(0).getString("suburb");
 				postcode = jsonMainArr.getJSONObject(0).getString("postcode");
-				dtModified = jsonMainArr.getJSONObject(0).getString("dob");
+				dtModified = jsonMainArr.getJSONObject(0).getString(
+						"modified_at");
 				fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
 				fbToken = jsonMainArr.getJSONObject(0).getString("fb_token");
 				// cname = jsonMainArr.getJSONObject(0).getString(
@@ -787,9 +789,14 @@ public class HomescreenActivity extends SherlockFragment implements
 						.getString("security_answer");
 				profilecom = jsonMainArr.getJSONObject(0).getInt(
 						"profile_completed");
+				pin = jsonMainArr.getJSONObject(0).getString("pin");
+				points = jsonMainArr.getJSONObject(0).getString(
+						"samaritan_points");
 				photourl = jsonMainArr.getJSONObject(0).getString("photo_url");
 				int pos = photourl.lastIndexOf("/");
 				photoname = photourl.substring(pos + 1);
+
+				// vehicle info
 
 			} catch (ClientProtocolException e) {
 				System.out.println("ClientProtocolException");
@@ -811,27 +818,60 @@ public class HomescreenActivity extends SherlockFragment implements
 								lName, email, mobileNumber, dob, gender,
 								licenseNo, street, suburb, postcode,
 								dtModified, fbId, fbToken, cname, cnumber, pin,
-								sques, sans);
+								sques, sans, points);
 
 						db.updateprofileData(data);
 						atPrefs.edit()
 								.putInt(SplashscreenActivity.progress,
 										profilecom).commit();
-						atPrefs.edit()
-								.putBoolean(SplashscreenActivity.checkllogin,
-										false).commit();
+						atPrefs.edit().putBoolean(info.checkllogin, false)
+								.commit();
+						dbb.execSQL("delete from Vehicle_info");
+						for (int i = 0; i < jsonVehicleArr.length(); i++) {
+
+							try {
+								vid = jsonVehicleArr.getJSONObject(i).getInt(
+										"vehicle_id");
+								vtype = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_type");
+								vmake = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_make");
+								vmodel = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_model");
+								reg = jsonVehicleArr.getJSONObject(i)
+										.getString("registration_serial_no");
+								vstatus = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_status");
+
+								db = new DatabaseHandler(getActivity());
+								VehicleData datas = new VehicleData(vid, vtype,
+										vmake, vmodel, "", "", "", "", "", reg,
+										"", "", "", vstatus, "");
+								db.insertvehicleData(datas);
+							} catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+						}
 						Thread thread = new Thread(new Runnable() {
 							@Override
 							public void run() {
 								sdRoot = Environment
 										.getExternalStorageDirectory();
 								dir = "My Wheel/";
+								String dowlaod = "/My Wheel";
 								File photo = new File(sdRoot, dir + photoname);
 								if (photo.exists()) {
 
 								} else {
 									try {
-										d.DownloadFromUrl(photourl, photoname);
+										d.DownloadFromUrl(photourl, photoname,
+												dowlaod, dir);
+										atPrefs.edit()
+												.putString(
+														SplashscreenActivity.profile_pic,
+														photoname).commit();
 									} catch (Exception e) {
 										e.printStackTrace();
 									}

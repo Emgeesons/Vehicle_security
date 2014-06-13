@@ -1,0 +1,79 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="10dp"
+    tools:context=".AddInsurance" >
+
+    <TextView
+        android:id="@+id/cname"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="insurance company name"
+        android:padding="10dp" >
+    </TextView>
+
+    <EditText
+        android:id="@+id/other_cname"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/cname"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="insurance company name"
+        android:padding="10dp"
+        android:singleLine="true"
+        android:visibility="gone" >
+    </EditText>
+
+    <EditText
+        android:id="@+id/number"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/other_cname"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="insurance company number"
+        android:padding="10dp" >
+    </EditText>
+
+    <EditText
+        android:id="@+id/policyno"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/number"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="insurance policy no"
+        android:padding="10dp"
+        android:singleLine="true" >
+    </EditText>
+
+    <TextView
+        android:id="@+id/exp"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/policyno"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/box_gry"
+        android:ems="10"
+        android:hint="Expiry"
+        android:padding="10dp" >
+    </TextView>
+
+</RelativeLayout>

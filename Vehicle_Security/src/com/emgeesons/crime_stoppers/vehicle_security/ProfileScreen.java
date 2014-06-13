@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -27,14 +28,17 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Html;
@@ -45,16 +49,16 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-public class ProfileScreen extends SherlockActivity {
-	TextView name, age, number, email, profile_comp, pts, samaritan;
-	ImageView edit, gender;
+public class ProfileScreen extends BaseActivity {
+	TextView name, age, number, email, profile_comp, pts, samaritan, status;
+	ImageView edit, gender, bg;
 	Button adddetails, addvehicle;
 	CustomImageView profilepic;
 	RelativeLayout pointsrel;
@@ -69,6 +73,11 @@ public class ProfileScreen extends SherlockActivity {
 	private String uploadPhoto_url = Data.url + "uploadProfilePic.php";
 	private AsyncTask<Void, Void, Void> uploadPhoto;
 	String names;
+	List<VehicleData> vehicles;
+	SQLiteDatabase dbb;
+	DatabaseHandler db;
+	LinearLayout v;
+	 int count = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -82,14 +91,25 @@ public class ProfileScreen extends SherlockActivity {
 		getSupportActionBar().setIcon(R.drawable.ic_app);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(ProfileScreen.this);
+		db = new DatabaseHandler(getApplicationContext());
+		try {
+
+			db.createDataBase();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		dbb = db.openDataBase();
+		dbb = db.getReadableDatabase();
+		bg = (ImageView) findViewById(R.id.imageView1);
 		name = (TextView) findViewById(R.id.name);
 		age = (TextView) findViewById(R.id.age);
 		number = (TextView) findViewById(R.id.number);
 		email = (TextView) findViewById(R.id.email);
 		pts = (TextView) findViewById(R.id.pts);
+		status = (TextView) findViewById(R.id.textView1);
 		profile_comp = (TextView) findViewById(R.id.profile_comp);
 		profilepic = (CustomImageView) findViewById(R.id.profile);
-		edit = (ImageView) findViewById(R.id.edit);
+		// edit = (ImageView) findViewById(R.id.edit);
 		gender = (ImageView) findViewById(R.id.male_female);
 		adddetails = (Button) findViewById(R.id.adddetails);
 		addvehicle = (Button) findViewById(R.id.addvehicle);
@@ -101,6 +121,7 @@ public class ProfileScreen extends SherlockActivity {
 		name.setText(info.fName + "" + info.lName);
 		number.setText(info.mobileNumber);
 		email.setText(info.email);
+		pts.setText(info.spoints);
 		if (info.year == 0 || info.month == 0 || info.date == 0) {
 			age.setVisibility(View.GONE);
 		} else {
@@ -114,7 +135,8 @@ public class ProfileScreen extends SherlockActivity {
 			gender.setImageResource(R.drawable.ic_female);
 		}
 		if (!info.licenseNo.isEmpty()) {
-			adddetails.setVisibility(View.GONE);
+			adddetails.setText("Edit Details");
+
 			// newprogress = 50;
 			// atPrefs.edit()
 			// .putInt(SplashscreenActivity.progress,
@@ -122,6 +144,8 @@ public class ProfileScreen extends SherlockActivity {
 
 		} else {
 			adddetails.setVisibility(View.VISIBLE);
+			adddetails.setText("Add Details");
+
 			// newprogress = 30;
 			// atPrefs.edit()
 			// .putInt(SplashscreenActivity.progress,
@@ -158,10 +182,34 @@ public class ProfileScreen extends SherlockActivity {
 			samaritan.setTextColor(getResources().getColor(R.color.white));
 		} else {
 			pointsrel.setBackgroundColor(getResources().getColor(R.color.gry));
-			pts.setTextColor(getResources().getColor(R.color.gry));
-			samaritan.setTextColor(getResources().getColor(R.color.gry));
+			pts.setTextColor(getResources().getColor(R.color.black));
+			samaritan.setTextColor(getResources().getColor(R.color.black));
 
 		}
+		vehicles = db.getVehicleData();
+		if (!(vehicles.size() == 0)) {
+			addvehicle.setText("My Vehicle");
+		}
+
+		addvehicle.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				if (vehicles.size() == 0) {
+					Intent next = new Intent(getApplicationContext(),
+							Addvehicle.class);
+					startActivity(next);
+					finish();
+				} else {
+
+					Intent next = new Intent(getApplicationContext(),
+							VehicleInfo.class);
+					startActivity(next);
+					finish();
+				}
+
+			}
+		});
 		samaritan.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -185,22 +233,53 @@ public class ProfileScreen extends SherlockActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent next = new Intent(getApplicationContext(),
-						AddDetails.class);
-				startActivity(next);
+				if (adddetails.getText().toString()
+						.equalsIgnoreCase("Edit Details")) {
+					Intent next = new Intent(getApplicationContext(),
+							EditInfo.class);
+					startActivity(next);
+				} else {
+					Intent next = new Intent(getApplicationContext(),
+							AddDetails.class);
+					startActivity(next);
+				}
 
 			}
 		});
-		edit.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				Intent next = new Intent(getApplicationContext(),
-						EditInfo.class);
-				startActivity(next);
-
-			}
-		});
+		// edit.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View arg0) {
+		// Intent next = new Intent(getApplicationContext(),
+		// EditInfo.class);
+		// startActivity(next);
+		//
+		// }
+		// });
+//		File dir = new File(sdRoot + "/My Wheel");
+//
+//		
+//		final File file[] = dir.listFiles();
+//
+//		
+//		new Handler().postDelayed(new Runnable() {
+//			public void run() {
+//
+//				if (count < file.length) {
+//
+//					Drawable d = (Drawable) Drawable.createFromPath(file[count]
+//							.toString());
+//
+//					bg.setImageDrawable(d);
+//
+//					count++; // <<< increment counter here
+//				} else {
+//					// reset counter here
+//					count = 0;
+//				}
+//
+//			}
+//		}, 4000);
 
 		profilepic.setOnClickListener(new OnClickListener() {
 
@@ -242,24 +321,83 @@ public class ProfileScreen extends SherlockActivity {
 					R.drawable.startbar));
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
+			profile_comp.setText("Your Profile is 30% complete");
+			status.setText("Complete your profile and add vehicles");
 			anim.setDuration(1000);
 			progress.setAnimation(anim);
 		} else if (newprogress <= 50) {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.middlebar));
-			profile_comp.setText("Your profile is 50% Complete");
+			status.setText("Add vehicles to your profile");
+			profile_comp.setText("Your profile is 50% complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
 			progress.setAnimation(anim);
+		} else if (newprogress <= 80) {
+			progress.setProgressDrawable(getResources().getDrawable(
+					R.drawable.middlebar));
+			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
+					newprogress);
+			anim.setDuration(1000);
+			progress.setAnimation(anim);
+
 		} else {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.endbar));
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
+
 			anim.setDuration(1000);
 			progress.setAnimation(anim);
 		}
+		if (newprogress >= 100) {
+
+			progress.setVisibility(View.GONE);
+			status.setVisibility(View.GONE);
+			profile_comp.setVisibility(View.GONE);
+
+		}
+		if (newprogress > 50) {
+			if (info.licenseNo.isEmpty()) {
+				profile_comp.setText("Your profile is  " + newprogress + " % "
+						+ "Complete");
+				status.setText("Complete your profile and add information about your vehicle now");
+
+			} else {
+				profile_comp.setText("Your profile is  " + newprogress + " % "
+						+ "Complete");
+				status.setText("Add information about your vehicle now");
+			}
+
+		}
+
+		// v = (LinearLayout) findViewById(R.id.vehicles);
+		// LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+		// LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		// params.setMargins(5, 0, 0, 0);
+		// LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
+		// LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		//
+		// params.addRule(RelativeLayout.LEFT_OF, R.id.p);
+		// for (int i = 0; i < vehicles.size(); i++) {
+		// LinearLayout ll = new LinearLayout(this);
+		// ll.setOrientation(LinearLayout.VERTICAL);
+		//
+		// // Create TextView
+		// TextView product = new TextView(this);
+		// product.setText(" Product");
+		// ll.addView(product);
+		//
+		// ImageView p = new ImageView(this);
+		// p.setImageResource(R.drawable.ic_car);
+		// p.setId(i + 1);
+		//
+		// p.setLayoutParams(params);
+		// ll.addView(p);
+		// v.addView(ll);
+
+		// }
 
 	}
 
@@ -285,6 +423,14 @@ public class ProfileScreen extends SherlockActivity {
 		}
 
 	}
+
+	// @Override
+	// protected void onResume() {
+	// Intent n = new Intent(getApplicationContext(), PinLock.class);
+	// startActivity(n);
+	// super.onResume();
+	//
+	// };
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -511,5 +657,11 @@ public class ProfileScreen extends SherlockActivity {
 		Intent back = new Intent(getApplicationContext(), MainActivity.class);
 		startActivity(back);
 		finish();
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.profilescreen;
 	}
 }

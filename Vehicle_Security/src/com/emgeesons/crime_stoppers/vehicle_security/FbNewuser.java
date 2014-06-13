@@ -282,7 +282,8 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 			JSONObject json = new JSONObject();
 			try {
 				info.device();
-				
+				info.showInfo(getApplicationContext());
+
 				json.put("mobileNumber", number.getText().toString());
 				json.put("oldPin", oldpin);
 				json.put("userId", userid);
@@ -347,24 +348,24 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 
 				switch (buffKey) {
 				case 0:
-					quss = "What’s your Passport Number ?";
+					quss = "What's your Passport Number ?";
 					// json.put("securityQuestion",
 					// "What’s your Passport Number ?");
 					break;
 				case 1:
-					quss = "What’s your License Number ?";
+					quss = "What's your License Number ?";
 					// json.put("securityQuestion",
 					// "What’s your License Number ?");
 					break;
 
 				case 2:
-					quss = "What’s your Mothers Maiden Name ?";
+					quss = "What's your Mothers Maiden Name ?";
 					// json.put("securityQuestion",
 					// "What’s your Mothers Maiden Name ?");
 					break;
 
 				case 3:
-					quss = "What’s your First Pets Name ?";
+					quss = "What's your First Pets Name ?";
 					// json.put("securityQuestion",
 					// "What’s your First Pets Name ?");
 					break;
@@ -403,7 +404,8 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 				default:
 					break;
 				}
-				json.put("securityQuestion", qus);
+				json.put("securityQuestion", quss);
+				json.put("userId", userid);
 
 				json.put("securityAnswer", answer.getText().toString());
 
@@ -447,7 +449,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 						dbb = db.getReadableDatabase();
 
 						atPrefs.edit()
-								.putBoolean(SplashscreenActivity.checkllogin,
+								.putBoolean(info.checkllogin,
 										false).commit();
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						dbbb.execSQL("UPDATE profile SET mobileNumber = '"
@@ -462,6 +464,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 						Intent next = new Intent(FbNewuser.this,
 								MainActivity.class);
 						startActivity(next);
+						finish();
 
 					}
 				});

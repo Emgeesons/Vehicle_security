@@ -508,24 +508,24 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 				// }
 				switch (buffKey) {
 				case 0:
-					qus = "What’s your Passport Number ?";
+					qus = "What's your Passport Number ?";
 					// json.put("securityQuestion",
 					// "What’s your Passport Number ?");
 					break;
 				case 1:
-					qus = "What’s your License Number ?";
+					qus = "What's your License Number ?";
 					// json.put("securityQuestion",
 					// "What’s your License Number ?");
 					break;
 
 				case 2:
-					qus = "What’s your Mothers Maiden Name ?";
+					qus = "What's your Mothers Maiden Name ?";
 					// json.put("securityQuestion",
 					// "What’s your Mothers Maiden Name ?");
 					break;
 
 				case 3:
-					qus = "What’s your First Pets Name ?";
+					qus = "What's your First Pets Name ?";
 					// json.put("securityQuestion",
 					// "What’s your First Pets Name ?");
 					break;
@@ -603,15 +603,15 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 								.getText().toString(), input_date, title, "",
 								"", "", "", "", "", "", "", "", pin,
 								String.valueOf(qusvalue), answer.getText()
-										.toString());
+										.toString(),"");
 						db.updateprofileData(data);
 						atPrefs.edit()
-								.putBoolean(SplashscreenActivity.checkllogin,
+								.putBoolean(info.checkllogin,
 										false).commit();
-//
-//						atPrefs.edit()
-//								.putInt(SplashscreenActivity.progress, 30)
-//								.commit();
+						//
+						// atPrefs.edit()
+						// .putInt(SplashscreenActivity.progress, 30)
+						// .commit();
 						Intent next = new Intent(RegisterActivity.this,
 								MainActivity.class);
 						startActivity(next);

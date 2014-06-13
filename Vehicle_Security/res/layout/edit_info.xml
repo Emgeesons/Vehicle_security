@@ -284,7 +284,8 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="Licence number"
-            android:paddingLeft="10dp" >
+            android:paddingLeft="10dp"
+            android:singleLine="true" >
         </EditText>
 
         <EditText
@@ -298,7 +299,8 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="Address"
-            android:paddingLeft="10dp" />
+            android:paddingLeft="10dp"
+            android:singleLine="true" />
 
         <EditText
             android:id="@+id/postcode"

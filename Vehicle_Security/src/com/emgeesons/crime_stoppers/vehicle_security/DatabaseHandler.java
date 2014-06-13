@@ -23,6 +23,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "DATABASE";
 
 	static final String TABLE_profile = "profile";
+	static final String TABLE_Vehicle = "Vehicle_info";
 
 	//
 	private static String DB_PATH = "/data/data/com.emgeesons.crime_stoppers.vehicle_security/databases/";
@@ -51,10 +52,29 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String profile_pin = "pin";
 	private static final String profile_squs = "squs";
 	private static final String profile_ans = "sans";
+	private static final String profile_spoints = "spoints";
+
+	// // Columns names for vehicle info
+	private static final String vehicle_tableID = "id";
+	private static final String vehicle_id = "vehicle_id";
+	private static final String vehicle_type = "vehicle_type";
+	private static final String vehicle_make = "vehicle_make";
+	private static final String vehicle_model = "vehicle_model";
+	private static final String vehicle_body = "vehicle_body";
+	private static final String vehicle_eng = "vehicle_eng";
+	private static final String vehicle_ch = "vehicle_ch";
+	private static final String vehicle_colour = "vehicle_colour";
+	private static final String vehicle_acc = "vehicle_acc";
+	private static final String vehicle_reg = "vehicle_reg";
+	private static final String vehicle_insname = "vehicle_insname";
+	private static final String vehicle_insno = "vehicle_insno";
+	private static final String vehicle_insexp = "vehicle_insexp";
+	private static final String vehicle_status = "vehicle_status";
+	private static final String vehicle_expmil = "vehicle_expmil";
 
 	/**
-	 * Constructor Takes and keeps a reference of the passed context in order to
-	 * access to the application assets and resources.
+	 * /** Constructor Takes and keeps a reference of the passed context in
+	 * order to access to the application assets and resources.
 	 * 
 	 * @param context
 	 */
@@ -211,6 +231,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(profile_pin, data.getpin());
 		values.put(profile_squs, data.getsqus());
 		values.put(profile_ans, data.getsans());
+		values.put(profile_spoints, data.getspoints());
 
 		// Inserting Row
 		// db.insert(TABLE_profile, null, values);
@@ -240,7 +261,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						cursor.getString(12), cursor.getString(13),
 						cursor.getString(14), cursor.getString(15),
 						cursor.getString(16), cursor.getString(17),
-						cursor.getString(18), cursor.getString(19));
+						cursor.getString(18), cursor.getString(19),
+						cursor.getString(20));
 				con.add(data);
 			} while (cursor.moveToNext());
 		}
@@ -252,4 +274,92 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		// returning lables
 		return con;
 	}
+
+	// vehicle info
+
+	public void insertvehicleData(VehicleData data) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(vehicle_id, data.getvehicle_id());
+		values.put(vehicle_type, data.getvehicle_type());
+		values.put(vehicle_make, data.getvehicle_make());
+		values.put(vehicle_model, data.getvehicle_model());
+		values.put(vehicle_body, data.getvehicle_body());
+		values.put(vehicle_eng, data.getvehicle_eng());
+		values.put(vehicle_ch, data.getvehicle_ch());
+		values.put(vehicle_colour, data.getvehicle_colour());
+		values.put(vehicle_acc, data.getvehicle_acc());
+		values.put(vehicle_reg, data.getvehicle_reg());
+		values.put(vehicle_insname, data.getvehicle_insname());
+		values.put(vehicle_insno, data.getvehicle_insno());
+		values.put(vehicle_insexp, data.getvehicle_insexp());
+		values.put(vehicle_status, data.getstatus());
+		values.put(vehicle_expmil, data.getexpmil());
+
+		// Inserting Row
+
+		db.insert(TABLE_Vehicle, null, values);
+		db.close(); // Closing database connection
+	}
+
+	public void updatevehicleData(VehicleData data, String id) {
+		SQLiteDatabase db = this.getWritableDatabase();
+
+		ContentValues values = new ContentValues();
+		values.put(vehicle_id, data.getvehicle_id());
+		values.put(vehicle_type, data.getvehicle_type());
+		values.put(vehicle_make, data.getvehicle_make());
+		values.put(vehicle_model, data.getvehicle_model());
+		values.put(vehicle_body, data.getvehicle_body());
+		values.put(vehicle_eng, data.getvehicle_eng());
+		values.put(vehicle_ch, data.getvehicle_ch());
+		values.put(vehicle_colour, data.getvehicle_colour());
+		values.put(vehicle_acc, data.getvehicle_acc());
+		values.put(vehicle_reg, data.getvehicle_reg());
+		values.put(vehicle_insname, data.getvehicle_insname());
+		values.put(vehicle_insno, data.getvehicle_insno());
+		values.put(vehicle_insexp, data.getvehicle_insexp());
+		values.put(vehicle_status, data.getstatus());
+		values.put(vehicle_expmil, data.getexpmil());
+
+		// Inserting Row
+		db.update(TABLE_Vehicle, values, vehicle_id + " = ?",
+				new String[] { String.valueOf(id) });
+
+		db.close(); // Closing database connection
+	}
+
+	public List<VehicleData> getVehicleData() {
+		List<VehicleData> con = new ArrayList<VehicleData>();
+
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + TABLE_Vehicle;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				VehicleData data = new VehicleData(cursor.getInt(1),
+						cursor.getString(2), cursor.getString(3),
+						cursor.getString(4), cursor.getString(5),
+						cursor.getString(6), cursor.getString(7),
+						cursor.getString(8), cursor.getString(9),
+						cursor.getString(10), cursor.getString(11),
+						cursor.getString(12), cursor.getString(13),
+						cursor.getString(14), cursor.getString(15));
+				con.add(data);
+			} while (cursor.moveToNext());
+		}
+
+		// closing connection
+		cursor.close();
+		db.close();
+
+		// returning lables
+		return con;
+	}
+
 }

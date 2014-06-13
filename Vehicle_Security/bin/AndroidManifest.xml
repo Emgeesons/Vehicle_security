@@ -14,7 +14,8 @@
         android:protectionLevel="signature" />
 
     <uses-permission android:name="com.emgeesons.crime_stoppers.vehicle_security.permission.UA_DATA" />
-
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <!-- Required for Push -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -181,44 +182,97 @@
 
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.FilenewReport"
-            android:label="@string/title_activity_filenew_report" >
+            android:label="@string/title_activity_filenew_report"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.ReportSighting"
-            android:label="@string/title_activity_report_sighting" >
+            android:label="@string/title_activity_report_sighting"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.FbNewuser"
-            android:label="@string/title_activity_fb_newuser" >
+            android:label="@string/title_activity_fb_newuser"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.EmergencyNumbers"
-            android:label="@string/title_activity_emergency_numbers" >
+            android:label="@string/title_activity_emergency_numbers"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.AboutUs"
-            android:label="@string/title_activity_about_us" >
+            android:label="@string/title_activity_about_us"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Website"
-            android:label="@string/title_activity_website" >
+            android:label="@string/title_activity_website"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Feedback"
-            android:label="@string/title_activity_feddback" >
+            android:label="@string/title_activity_feddback"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.ProfileScreen"
-            android:label="@string/title_activity_profile_screen" >
+            android:label="@string/title_activity_profile_screen"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.AddDetails"
-            android:label="@string/title_activity_add_details" >
+            android:label="@string/title_activity_add_details"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.EditInfo"
-            android:label="@string/title_activity_edit_info" >
+            android:label="@string/title_activity_edit_info"
+            android:screenOrientation="portrait" >
         </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.PinLock"
+            android:label="@string/title_activity_pin_lock"
+            android:theme="@style/Theme.Transparent" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.BaseActivity"
+            android:label="@string/title_activity_base" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Addvehicle"
+            android:label="@string/title_activity_addvehicle"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.VehicleProfile"
+            android:label="@string/title_activity_vehicle_profile"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Editvehicle"
+            android:label="@string/title_activity_editvehicle"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.AddInsurance"
+            android:label="@string/title_activity_add_insurance"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.VehicleInfo"
+            android:label="@string/title_activity_vehicle_info"
+            android:screenOrientation="portrait" >
+        </activity>
+
+        <!-- notification -->
+        <receiver android:name="com.emgeesons.crime_stoppers.vehicle_security.NotificationAlarm" />
+        <receiver android:name="com.emgeesons.crime_stoppers.vehicle_security.NotificationSpawn" />
+        <receiver android:name="com.emgeesons.crime_stoppers.vehicle_security.NotificationAutoStart" >
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

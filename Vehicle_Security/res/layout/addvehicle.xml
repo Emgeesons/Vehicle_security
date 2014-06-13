@@ -1,0 +1,164 @@
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:scrollbars="none" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="@dimen/ten"
+        tools:context=".Addvehicle" >
+
+        <TextView
+            android:id="@+id/type"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Vehicle type"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/type_other"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/type"
+            android:layout_alignRight="@+id/type"
+            android:layout_below="@+id/type"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Specify Vehicle Type"
+            android:visibility="visible" >
+        </EditText>
+
+        <LinearLayout
+            android:id="@+id/l"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/type_other"
+            android:layout_marginTop="10dp"
+            android:weightSum="2" >
+
+            <EditText
+                android:id="@+id/make"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_weight="1"
+                android:background="@drawable/box_gry"
+                android:ems="10"
+                android:hint="  Make"
+                android:nextFocusDown="@+id/model"
+                android:paddingLeft="10dp"
+                android:singleLine="true" >
+            </EditText>
+
+            <EditText
+                android:id="@+id/model"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_alignLeft="@+id/type_other"
+                android:layout_below="@+id/type_other"
+                android:layout_weight="1"
+                android:background="@drawable/box_gry"
+                android:ems="10"
+                android:hint="  Model"
+                android:paddingLeft="10dp"
+                android:singleLine="true" >
+            </EditText>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/body"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/l"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Body type"
+            android:paddingLeft="10dp"
+            android:paddingTop="10dp"
+            android:singleLine="true" />
+
+        <EditText
+            android:id="@+id/registration"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/l"
+            android:layout_alignRight="@+id/l"
+            android:layout_below="@+id/body"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Registration / Serial No"
+            android:singleLine="true" >
+        </EditText>
+
+        <EditText
+            android:id="@+id/engine"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/registration"
+            android:layout_alignRight="@+id/registration"
+            android:layout_below="@+id/registration"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Engine No"
+            android:singleLine="true" >
+        </EditText>
+
+        <EditText
+            android:id="@+id/chassis"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/engine"
+            android:layout_alignRight="@+id/engine"
+            android:layout_below="@+id/engine"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Chassis No"
+            android:singleLine="true" >
+        </EditText>
+
+        <EditText
+            android:id="@+id/Colour "
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/chassis"
+            android:layout_alignRight="@+id/chassis"
+            android:layout_below="@+id/chassis"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Colour"
+            android:singleLine="true" >
+        </EditText>
+
+        <EditText
+            android:id="@+id/acc "
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/Colour "
+            android:layout_alignRight="@+id/Colour "
+            android:layout_below="@+id/Colour "
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="  Accessories / Unique features"
+            android:singleLine="true" >
+        </EditText>
+    </RelativeLayout>
+
+</ScrollView>

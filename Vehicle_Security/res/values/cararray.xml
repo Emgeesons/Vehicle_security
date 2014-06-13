@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="car_comp">
+        <item>1Cover</item>
+        <item>AAMI</item>
+        <item>Allianz</item>
+        <item>APIA</item>
+        <item>Budget Direct </item>
+        <item>Bupa/HBA </item>
+        <item>CGU</item>
+        <item>Coles</item>
+        <item>CommInsure </item>
+        <item>COTA </item>
+        <item>Elders </item>
+        <item>GIO </item>
+        <item>NAB </item>
+        <item>NRMA </item>
+        <item>People’s Choice </item>
+        <item>QBE</item>
+        <item>RAA</item>
+        <item>RAC </item>
+        <item>RACQ</item>
+        <item>RACT</item>
+        <item>RACV</item>
+        <item>SGIC</item>
+        <item>SGIO</item>
+        <item>Shannons</item>
+        <item>St George</item>
+        <item>Suncorp</item>
+        <item>TIO</item>
+        <item>Westpac</item>
+        <item>Woolworths</item>
+        <item>Youi</item>
+        <item>Other </item>
+    </string-array>
+    <string-array name="car_no">
+        <item>1300885996</item>
+        <item>132244</item>
+        <item>131013</item>
+        <item>1300301799</item>
+        <item>1300139591 </item>
+        <item>134135</item>
+        <item>132480</item>
+        <item>1300265374</item>
+        <item>132423 </item>
+        <item>1300130050</item>
+        <item>1300554184</item>
+        <item>131446</item>
+        <item>1300555013</item>
+        <item>131123</item>
+        <item>131182</item>
+        <item>133723</item>
+        <item>0882024575</item>
+        <item>131703</item>
+        <item>137202</item>
+        <item>132722</item>
+        <item>131903</item>
+        <item>133233</item>
+        <item>133233</item>
+        <item>134646</item>
+        <item>131532</item>
+        <item>132524</item>
+        <item>1300301833</item>
+        <item>1800805458</item>
+        <item>1300101234</item>
+        <item>139684 </item>
+        <item></item>
+    </string-array>
+
+</resources>

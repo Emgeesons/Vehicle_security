@@ -865,6 +865,13 @@ public class LoginActivity extends Activity implements TextWatcher,
 				jsonMainArr = profile.getJSONArray("response");
 				success = profile.getString("status");
 				mess = profile.getString("message");
+				try {
+					pin = jsonMainArr.getJSONObject(0).getString("pin");
+					user_id = jsonMainArr.getJSONObject(0).getString("user_id");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
 			} catch (JSONException e) {
 				System.out.println("JSONException");
@@ -878,15 +885,6 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 			if (success.equals("success")) {
 
-				try {
-					pin = jsonMainArr.getJSONObject(0).getString("pin");
-					email = jsonMainArr.getJSONObject(0).getString("email");
-					user_id = jsonMainArr.getJSONObject(0).getString("user_id");
-				} catch (JSONException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
 				runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -894,9 +892,9 @@ public class LoginActivity extends Activity implements TextWatcher,
 						db = new DatabaseHandler(LoginActivity.this);
 						PersonalData data = new PersonalData(user_id, fbfname,
 								fblname, fbemail, "", fbdob, fbgender, "", "",
-								"", "", "", fbid, fbtoken, "", "", pin,"","");
+								"", "", "", fbid, fbtoken, "", "", pin, "", "","");
 						db.updateprofileData(data);
- 
+
 						SplashscreenActivity.fblogin = false;
 						if (mess.equalsIgnoreCase("New User")) {
 							Intent next = new Intent(LoginActivity.this,
@@ -920,10 +918,9 @@ public class LoginActivity extends Activity implements TextWatcher,
 							finish();
 
 						} else {
-							atPrefs.edit()
-									.putBoolean(
-											SplashscreenActivity.checkllogin,
-											false).commit();
+
+							atPrefs.edit().putBoolean(info.checkllogin, false)
+									.commit();
 							Intent next = new Intent(getApplicationContext(),
 									MainActivity.class);
 							startActivity(next);
@@ -993,7 +990,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		String success, mess, response;
 		String user_id, fName, lName, email, mobileNumber, dob, gender,
 				licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-				cname, cnumber,pin;
+				cname, cnumber, pin;
 
 		@Override
 		protected void onPreExecute() {
@@ -1016,9 +1013,8 @@ public class LoginActivity extends Activity implements TextWatcher,
 			try {
 				info.device();
 				json.put("email", id.getText().toString());
-				 pin = pin1.getText().toString()
-						+ pin2.getText().toString() + pin3.getText().toString()
-						+ pin4.getText().toString();
+				pin = pin1.getText().toString() + pin2.getText().toString()
+						+ pin3.getText().toString() + pin4.getText().toString();
 				json.put("pin", pin);
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
@@ -1079,11 +1075,11 @@ public class LoginActivity extends Activity implements TextWatcher,
 						PersonalData data = new PersonalData(user_id, fName,
 								lName, email, mobileNumber, dob, gender,
 								licenseNo, street, suburb, postcode,
-								dtModified, fbId, fbToken, cname, cnumber, pin,"","");
+								dtModified, fbId, fbToken, cname, cnumber, pin,
+								"", "","");
 						db.updateprofileData(data);
-						atPrefs.edit()
-								.putBoolean(SplashscreenActivity.checkllogin,
-										false).commit();
+						atPrefs.edit().putBoolean(info.checkllogin, false)
+								.commit();
 						Intent next = new Intent(LoginActivity.this,
 								MainActivity.class);
 						startActivity(next);

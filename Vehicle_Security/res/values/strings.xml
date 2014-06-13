@@ -19,5 +19,12 @@
     <string name="title_activity_profile_screen">ProfileScreen</string>
     <string name="title_activity_add_details">AddDetails</string>
     <string name="title_activity_edit_info">EditInfo</string>
+    <string name="title_activity_pin_lock">PinLock</string>
+    <string name="title_activity_base">BaseActivity</string>
+    <string name="title_activity_addvehicle">Addvehicle</string>
+    <string name="title_activity_vehicle_profile">VehicleProfile</string>
+    <string name="title_activity_editvehicle">Editvehicle</string>
+    <string name="title_activity_add_insurance">AddInsurance</string>
+    <string name="title_activity_vehicle_info">VehicleInfo</string>
 
 </resources>

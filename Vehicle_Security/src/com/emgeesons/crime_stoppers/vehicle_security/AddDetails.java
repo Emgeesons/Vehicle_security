@@ -293,10 +293,21 @@ public class AddDetails extends SherlockActivity implements TextWatcher {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			// app icon @ action bar clicked; go home
-			super.onBackPressed();
+			Intent back = new Intent(getApplicationContext(),
+					ProfileScreen.class);
+			startActivity(back);
+			finish();
 			break;
 		}
 		return true;
 	}
 
+	@Override
+	public void onBackPressed() {
+		// TODO Auto-generated method stub
+		Intent back = new Intent(getApplicationContext(), ProfileScreen.class);
+		startActivity(back);
+		finish();
+		super.onBackPressed();
+	}
 }

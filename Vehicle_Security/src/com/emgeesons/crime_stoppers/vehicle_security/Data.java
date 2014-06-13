@@ -6,6 +6,7 @@ import java.util.GregorianCalendar;
 
 import android.R.integer;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Build;
@@ -18,10 +19,15 @@ public class Data {
 
 	String user_id, fName, lName, email, mobileNumber, dob, gender, licenseNo,
 			street, address, postcode, dtModified, fbId, fbToken, contact_name,
-			contact_number, pin, sans;
+			contact_number, pin, sans, type, make, vmodel, reg, body, eng, vin,
+			color, acc, iname, ipolicy, exp, spoints,status;
 	int squs;
-
 	int year, month, date;
+
+	static String lock = "lock";
+	static String lockcheck = "lockcheck";
+	SharedPreferences atPrefs;
+	static String checkllogin = "checkllogin";
 
 	public void device() {
 		manufacturer = Build.MANUFACTURER;
@@ -52,13 +58,13 @@ public class Data {
 	}
 
 	public int qusvalues(String qus) {
-		if (qus.equalsIgnoreCase("What’s your Passport Number ?")) {
+		if (qus.equalsIgnoreCase("What's your Passport Number ?")) {
 			return 0;
-		} else if (qus.equalsIgnoreCase("What’s your License Number ?")) {
+		} else if (qus.equalsIgnoreCase("What's your License Number ?")) {
 			return 1;
-		} else if (qus.equalsIgnoreCase("What’s your Mothers Maiden Name ?")) {
+		} else if (qus.equalsIgnoreCase("What's your Mothers Maiden Name ?")) {
 			return 2;
-		} else if (qus.equalsIgnoreCase("What’s your First Pets Name ?")) {
+		} else if (qus.equalsIgnoreCase("What's your First Pets Name ?")) {
 			return 3;
 		} else if (qus
 				.equalsIgnoreCase("Who was your First Childhood Friend ?")) {
@@ -135,7 +141,54 @@ public class Data {
 				pin = cursor.getString(cursor.getColumnIndex("pin"));
 				squs = cursor.getInt(cursor.getColumnIndex("squs"));
 				sans = cursor.getString(cursor.getColumnIndex("sans"));
+				spoints = cursor.getString(cursor.getColumnIndex("spoints"));
 			} while (cursor.moveToNext());
 		}
 	}
+
+	// vehicle info
+
+	public void vehicleInfo(Context _context, String id) {
+
+		db = new DatabaseHandler(_context);
+		try {
+
+			db.createDataBase();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		dbb = db.openDataBase();
+		dbb = db.getReadableDatabase();
+
+		String selectQuery = "SELECT * FROM vehicle_info WHERE vehicle_id ='"
+				+ id + "'";
+		SQLiteDatabase dbbb = db.getReadableDatabase();
+		//
+
+		Cursor cursor = dbbb.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()) {
+			do {
+
+				type = cursor.getString(cursor.getColumnIndex("vehicle_type"));
+				make = cursor.getString(cursor.getColumnIndex("vehicle_make"));
+				vmodel = cursor.getString(cursor
+						.getColumnIndex("vehicle_model"));
+				reg = cursor.getString(cursor.getColumnIndex("vehicle_reg"));
+				body = cursor.getString(cursor.getColumnIndex("vehicle_body"));
+				eng = cursor.getString(cursor.getColumnIndex("vehicle_eng"));
+				vin = cursor.getString(cursor.getColumnIndex("vehicle_ch"));
+				color = cursor.getString(cursor
+						.getColumnIndex("vehicle_colour"));
+				acc = cursor.getString(cursor.getColumnIndex("vehicle_acc"));
+				iname = cursor.getString(cursor
+						.getColumnIndex("vehicle_insname"));
+				ipolicy = cursor.getString(cursor
+						.getColumnIndex("vehicle_insno"));
+				exp = cursor.getString(cursor.getColumnIndex("vehicle_insexp"));
+				status = cursor.getString(cursor.getColumnIndex("vehicle_status"));
+			} while (cursor.moveToNext());
+		}
+	}
+
 }

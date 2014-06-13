@@ -154,10 +154,11 @@ public class GPSTracker implements LocationListener {
 	public void showSettingsAlert() {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
-		alertDialog.setTitle("GPS is disable");
-		alertDialog.setMessage("Do you want to enable it ?");
+		alertDialog.setTitle("No location access");
+		alertDialog
+				.setMessage("Please allow My Wheels to access Your location . Turn it ON from Location Services");
 
-		alertDialog.setPositiveButton("Ok",
+		alertDialog.setPositiveButton("Setting",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						Intent intent = new Intent(

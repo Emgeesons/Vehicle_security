@@ -15,16 +15,6 @@
         android:scaleType="fitXY"
         android:src="@drawable/default_profile_bg" />
 
-    <com.emgeesons.crime_stoppers.vehicle_security.CustomImageView
-        android:id="@+id/profile"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/imageView1"
-        android:layout_alignParentLeft="true"
-        android:layout_marginBottom="17dp"
-        android:layout_marginLeft="16dp"
-        android:src="@drawable/default_profile" />
-
     <RelativeLayout
         android:id="@+id/points"
         android:layout_width="match_parent"
@@ -120,15 +110,6 @@
         android:textColor="@color/white"
         android:textSize="@dimen/medium_text" />
 
-    <ImageView
-        android:id="@+id/edit"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/male_female"
-        android:layout_marginRight="15dp"
-        android:src="@drawable/edit_white" />
-
     <ProgressBar
         android:id="@+id/progress"
         style="?android:attr/progressBarStyleHorizontal"
@@ -167,6 +148,14 @@
         android:textSize="@dimen/regular_text" />
 
     <LinearLayout
+        android:id="@+id/vehicles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView1"
+        android:orientation="vertical" >
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/add"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -198,5 +187,15 @@
             android:background="@drawable/box_whiteb"
             android:text="Add Vehicle" />
     </LinearLayout>
+
+    <com.emgeesons.crime_stoppers.vehicle_security.CustomImageView
+        android:id="@+id/profile"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_alignBottom="@+id/imageView1"
+        android:layout_alignParentLeft="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="5dp"
+        android:src="@drawable/default_profile" />
 
 </RelativeLayout>

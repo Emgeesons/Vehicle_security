@@ -3,13 +3,13 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 public class PersonalData {
 	private String user_id, fName, lName, email, mobileNumber, dob, gender,
 			licenseNo, street, address, postcode, dtModified, fbId, fbToken,
-			cname, cnumber, pin, squs, sans;
+			cname, cnumber, pin, squs, sans, spoints;
 
 	public PersonalData(String user_id, String fName, String lName,
 			String email, String mobileNumber, String dob, String gender,
 			String licenseNo, String street, String address, String postcode,
 			String dtModified, String fbId, String fbToken, String cname,
-			String cnumber, String pin, String squs, String sans) {
+			String cnumber, String pin, String squs, String sans, String spoints) {
 		this.user_id = user_id;
 		this.fName = fName;
 		this.lName = lName;
@@ -29,6 +29,7 @@ public class PersonalData {
 		this.pin = pin;
 		this.squs = squs;
 		this.sans = sans;
+		this.spoints = spoints;
 
 	}
 
@@ -182,5 +183,13 @@ public class PersonalData {
 
 	public void setsans(String sans) {
 		this.sans = sans;
+	}
+
+	public String getspoints() {
+		return this.spoints;
+	}
+
+	public void setspoints(String spoints) {
+		this.spoints = spoints;
 	}
 }

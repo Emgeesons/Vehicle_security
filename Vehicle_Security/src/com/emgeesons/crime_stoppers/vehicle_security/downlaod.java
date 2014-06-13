@@ -18,10 +18,10 @@ public class downlaod {
 	String dir;
 	File sdRoot;
 
-	public void DownloadFromUrl(String DownloadUrl, String fileName) {
+	public void DownloadFromUrl(String DownloadUrl, String fileName,String Folder,String dirs) {
 		sdRoot = Environment.getExternalStorageDirectory();
 		// cr8 folder
-		File folder = new File(sdRoot + "/My Wheel");
+		File folder = new File(sdRoot + Folder);
 		boolean success = true;
 
 		if (!folder.exists()) {
@@ -32,7 +32,7 @@ public class downlaod {
 		} else {
 
 		}
-		dir = "My Wheel/";
+		dir = dirs;
 		try {
 			// File root = android.os.Environment.getExternalStorageDirectory();
 

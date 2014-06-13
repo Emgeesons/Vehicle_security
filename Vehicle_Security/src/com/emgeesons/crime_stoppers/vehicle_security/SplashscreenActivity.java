@@ -13,11 +13,11 @@ import com.facebook.Session;
 public class SplashscreenActivity extends Activity {
 	SharedPreferences atPrefs;
 	static String agree = "agree";
-	static String checkllogin = "checkllogin";
+	// static String checkllogin = "checkllogin";
 	static boolean fblogin = true;
 	static String progress = "progress";
 	static String profile_pic = "profile_pic";
-	
+	Data info;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,7 @@ public class SplashscreenActivity extends Activity {
 		setContentView(R.layout.splashscreen_activity);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(SplashscreenActivity.this);
-
+		info = new Data();
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
@@ -45,13 +45,13 @@ public class SplashscreenActivity extends Activity {
 					// } else {
 					// System.out.println("asd");
 					// }
-					if (atPrefs.getBoolean(checkllogin, true)) {
+					if (atPrefs.getBoolean(info.checkllogin, true)) {
 						Intent next = new Intent(getApplicationContext(),
 								LoginActivity.class);
 						startActivity(next);
 						finish();
 					} else {
-						//user login from fb
+						// user login from fb
 						if (fblogin == false) {
 							if (session != null && session.isOpened()) {
 								Intent next = new Intent(

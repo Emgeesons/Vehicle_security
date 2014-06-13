@@ -51,7 +51,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class EditInfo extends SherlockActivity implements TextWatcher,
+public class EditInfo extends BaseActivity implements TextWatcher,
 		OnKeyListener {
 	Connection_Detector cd = new Connection_Detector(this);
 	Boolean IsInternetPresent;
@@ -83,7 +83,7 @@ public class EditInfo extends SherlockActivity implements TextWatcher,
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.edit_info);
+		// setContentView(R.layout.edit_info);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'>Edit Info </font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -137,7 +137,7 @@ public class EditInfo extends SherlockActivity implements TextWatcher,
 		postcode.addTextChangedListener(this);
 		info = new Data();
 		secqus = getResources().getStringArray(R.array.sec_qus);
-		if (!atPrefs.getBoolean(SplashscreenActivity.checkllogin, true)) {
+		if (!atPrefs.getBoolean(info.checkllogin, true)) {
 			info.showInfo(getApplicationContext());
 			id = info.user_id;
 			fname.setText(info.fName);
@@ -156,6 +156,7 @@ public class EditInfo extends SherlockActivity implements TextWatcher,
 			pin2.setText(pinnumber[1]);
 			pin3.setText(pinnumber[2]);
 			pin4.setText(pinnumber[3]);
+			
 			if (info.gender.equalsIgnoreCase("male")) {
 				male.setImageResource(R.drawable.male_active);
 				female.setImageResource(R.drawable.female_inactive);
@@ -513,18 +514,18 @@ public class EditInfo extends SherlockActivity implements TextWatcher,
 
 				switch (buffKey) {
 				case 0:
-					qus = "What’s your Passport Number ?";
+					qus = "What\' s your Passport Number ?";
 					break;
 				case 1:
-					qus = "What’s your License Number ?";
+					qus = "What\'s your License Number ?";
 					break;
 
 				case 2:
-					qus = "What’s your Mothers Maiden Name ?";
+					qus = "What\'s your Mothers Maiden Name ?";
 					break;
 
 				case 3:
-					qus = "What’s your First Pets Name ?";
+					qus = "What\'s your First Pets Name ?";
 					break;
 
 				case 4:
@@ -599,9 +600,8 @@ public class EditInfo extends SherlockActivity implements TextWatcher,
 								+ "',sans = '" + answer.getText().toString()
 								+ "'");
 
-						atPrefs.edit()
-								.putBoolean(SplashscreenActivity.checkllogin,
-										false).commit();
+						atPrefs.edit().putBoolean(info.checkllogin, false)
+								.commit();
 						Intent next = new Intent(EditInfo.this,
 								ProfileScreen.class);
 						startActivity(next);
@@ -680,6 +680,7 @@ public class EditInfo extends SherlockActivity implements TextWatcher,
 		if (pin3.getText().toString().length() == 1) {
 			pin4.requestFocus();
 		}
+		
 
 		if (!(pin1.getText().toString().isEmpty()
 				|| pin2.getText().toString().isEmpty()
@@ -757,6 +758,12 @@ public class EditInfo extends SherlockActivity implements TextWatcher,
 			break;
 		}
 		return true;
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.edit_info;
 	}
 
 }

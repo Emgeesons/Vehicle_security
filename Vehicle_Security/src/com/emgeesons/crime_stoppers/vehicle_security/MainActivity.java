@@ -9,11 +9,11 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -21,6 +21,7 @@ import android.widget.ListView;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.facebook.Session;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		OnItemClickListener {
@@ -33,15 +34,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 	private int[] photo = null;
 	int selectedPosition = -1;
 	SharedPreferences atPrefs;
+	Data info;
+	boolean check = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		itemname = new String[] { "Home", "Emgergncy Numbers", "", "Feedback",
+		itemname = new String[] { "Home", "Emergency Numbers", "", "Feedback",
 				"Share App", "Rate Us", "", "Logout" };
-
+		info = new Data();
 		photo = new int[] { R.drawable.ic_nav_home,
 				R.drawable.ic_nav_emergency_numbers, R.drawable.ic_nav_home,
 				R.drawable.ic_nav_feedback, R.drawable.ic_nav_share_app,
@@ -67,7 +70,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(MainActivity.this);
 		actbardrawertoggle = new ActionBarDrawerToggle(this, drawlayout,
-				R.drawable.ic_about_us, R.string.drawer_open,
+				R.drawable.ic_drawer, R.string.drawer_open,
 				R.string.drawer_close) {
 			public void onDrawerClosed(View view) {
 				super.onDrawerClosed(view);
@@ -142,7 +145,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			break;
 
 		case 3:
-			if (!atPrefs.getBoolean(SplashscreenActivity.checkllogin, true)) {
+			if (!atPrefs.getBoolean(info.checkllogin, true)) {
 				Feedback feedback = new Feedback();
 				ft.replace(R.id.content_frame, feedback);
 				getSupportActionBar().setBackgroundDrawable(
@@ -158,7 +161,12 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			break;
 		case 4:
-
+			String message;
+			message = "Check Out My Wheels :-\n https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
+			Intent share = new Intent(Intent.ACTION_SEND);
+			share.setType("text/plain");
+			share.putExtra(Intent.EXTRA_TEXT, message);
+			startActivity(Intent.createChooser(share, "Share My Wheels"));
 			break;
 		case 5:
 			startActivity(new Intent(
@@ -168,7 +176,28 @@ public class MainActivity extends SherlockFragmentActivity implements
 			break;
 
 		case 7:
+			SplashscreenActivity.fblogin = true;
+			atPrefs.edit().putBoolean(info.checkllogin, true).commit();
+			Session session = Session.getActiveSession();
+			if (session != null) {
 
+				if (!session.isClosed()) {
+					session.closeAndClearTokenInformation();
+					// clear your preferences if saved
+				}
+			} else {
+
+				session = new Session(this);
+				Session.setActiveSession(session);
+
+				session.closeAndClearTokenInformation();
+				// clear your preferences if saved
+
+			}
+			Intent nextscreen = new Intent(MainActivity.this,
+					LoginActivity.class);
+			startActivity(nextscreen);
+			finish();
 			break;
 
 		}
@@ -188,6 +217,63 @@ public class MainActivity extends SherlockFragmentActivity implements
 			super.onBackPressed();
 		}
 	}
+
+	// @Override
+	// protected void onStart() {
+	// // TODO Auto-generated method stub
+	// atPrefs.edit().putBoolean(info.lockcheck, true).commit();
+	//
+	// //
+	// Log.i("main", "onStart");
+	// super.onStart();
+	// }
+	//
+	// @Override
+	// protected void onResume() {
+	// Log.i("main", "onResume");
+	//
+	// if (!atPrefs.getBoolean(info.lock, true)
+	// && !atPrefs.getBoolean(info.checkllogin, true)
+	// && atPrefs.getBoolean(info.lockcheck, true)) {
+	// Log.i("main", "on");
+	// Intent n = new Intent(getApplicationContext(), PinLock.class);
+	// startActivity(n);
+	//
+	// }
+	// super.onResume();
+	//
+	// };
+	//
+	// @Override
+	// protected void onPause() {
+	// if (!atPrefs.getBoolean(info.checkllogin, true)) {
+	// atPrefs.edit().putBoolean(info.lock, false).commit();
+	// Log.i("main", "onPause");
+	// atPrefs.edit().putBoolean(info.lockcheck, false).commit();
+	// super.onPause();
+	// }
+	// };
+	//
+	// @Override
+	// protected void onStop() {
+	// // TODO Auto-generated method stub
+	// if (!atPrefs.getBoolean(info.checkllogin, true)) {
+	// Log.i("main", "onStop");
+	// atPrefs.edit().putBoolean(info.lock, false).commit();
+	// // atPrefs.edit().putBoolean(info.lockcheck, false).commit();
+	// super.onStop();
+	// }
+	// }
+	//
+	// @Override
+	// protected void onDestroy() {
+	// if (!atPrefs.getBoolean(info.checkllogin, true)) {
+	// atPrefs.edit().putBoolean(info.lock, false).commit();
+	// // atPrefs.edit().putBoolean(info.lockcheck, false).commit();
+	// super.onPause();
+	// }
+	//
+	// };
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
