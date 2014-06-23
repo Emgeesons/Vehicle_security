@@ -22,7 +22,7 @@
         <item>RAC </item>
         <item>RACQ</item>
         <item>RACT</item>
-        <item>RACV</item>
+         <item>RACV</item>
         <item>SGIC</item>
         <item>SGIO</item>
         <item>Shannons</item>
@@ -32,14 +32,18 @@
         <item>Westpac</item>
         <item>Woolworths</item>
         <item>Youi</item>
+        <item>BikeSure</item>
+        <item>CycleCover</item>
+        <item>RealBike</item>
+        <item>Velosure</item>
         <item>Other </item>
     </string-array>
     <string-array name="car_no">
-        <item>1300885996</item>
+        <item>1800611422 </item>
         <item>132244</item>
         <item>131013</item>
         <item>1300301799</item>
-        <item>1300139591 </item>
+        <item>1800069336</item>
         <item>134135</item>
         <item>132480</item>
         <item>1300265374</item>
@@ -59,12 +63,16 @@
         <item>133233</item>
         <item>133233</item>
         <item>134646</item>
-        <item>131532</item>
+        <item>1300655489</item>
         <item>132524</item>
         <item>1300301833</item>
-        <item>1800805458</item>
+        <item>1800369989</item>
         <item>1300101234</item>
         <item>139684 </item>
+        <item>1300441543</item>
+        <item>1300733055</item>
+        <item>1300277002</item>
+        <item>1300835678</item>
         <item></item>
     </string-array>
 

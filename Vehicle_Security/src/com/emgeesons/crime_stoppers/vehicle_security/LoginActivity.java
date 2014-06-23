@@ -1,7 +1,10 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
+import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -25,6 +28,7 @@ import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -79,6 +83,11 @@ public class LoginActivity extends Activity implements TextWatcher,
 	String userid;
 	EditText ans;
 
+	downlaod d;
+	File sdRoot;
+	String dir;
+	JSONArray jsonVehicleArr;
+
 	// private SimpleFacebook mSimpleFacebook;
 	// protected static final String TAG = LoginActivity.class.getName();
 
@@ -90,6 +99,8 @@ public class LoginActivity extends Activity implements TextWatcher,
 		register = (Button) findViewById(R.id.register);
 		login = (Button) findViewById(R.id.login);
 		// facebook = (Button) findViewById(R.id.facebook);
+		info = new Data();
+		d = new downlaod();
 		main = (RelativeLayout) findViewById(R.id.mainl);
 		apidUpdateFilter = new IntentFilter();
 		apidUpdateFilter.addAction(PushManager.ACTION_REGISTRATION_FINISHED);
@@ -443,20 +454,17 @@ public class LoginActivity extends Activity implements TextWatcher,
 			@Override
 			public void onTextChanged(CharSequence arg0, int arg1, int arg2,
 					int arg3) {
-				// TODO Auto-generated method stub
 
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence arg0, int arg1,
 					int arg2, int arg3) {
-				// TODO Auto-generated method stub
 				forgot_id.setTextColor(getResources().getColor(R.color.black));
 			}
 
 			@Override
 			public void afterTextChanged(Editable arg0) {
-				// TODO Auto-generated method stub
 
 			}
 		});
@@ -583,21 +591,18 @@ public class LoginActivity extends Activity implements TextWatcher,
 							@Override
 							public void onTextChanged(CharSequence arg0,
 									int arg1, int arg2, int arg3) {
-								// TODO Auto-generated method stub
 
 							}
 
 							@Override
 							public void beforeTextChanged(CharSequence arg0,
 									int arg1, int arg2, int arg3) {
-								// TODO Auto-generated method stub
 								ans.setTextColor(getResources().getColor(
 										R.color.black));
 							}
 
 							@Override
 							public void afterTextChanged(Editable arg0) {
-								// TODO Auto-generated method stub
 
 							}
 						});
@@ -820,7 +825,16 @@ public class LoginActivity extends Activity implements TextWatcher,
 	}
 
 	private class fb extends AsyncTask<Void, Void, Void> {
-		String success, mess, response, user_id, pin, email;
+		String success, mess, response;
+		String user_id, fName, lName, email, mobileNumber, dob, gender,
+				licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
+				cname, cnumber, sques, sans, photourl, photoname, pin, points,
+				exp;
+		int profilecom;
+
+		// vehicle
+		int vid;
+		String vtype, vmake, vmodel, reg, vstatus;
 
 		@Override
 		protected void onPreExecute() {
@@ -863,13 +877,50 @@ public class LoginActivity extends Activity implements TextWatcher,
 				Log.e("response :", response);
 				JSONObject profile = new JSONObject(response);
 				jsonMainArr = profile.getJSONArray("response");
+				jsonVehicleArr = profile.getJSONArray("vehicles");
 				success = profile.getString("status");
 				mess = profile.getString("message");
 				try {
-					pin = jsonMainArr.getJSONObject(0).getString("pin");
 					user_id = jsonMainArr.getJSONObject(0).getString("user_id");
+					fName = jsonMainArr.getJSONObject(0)
+							.getString("first_name");
+					lName = jsonMainArr.getJSONObject(0).getString("last_name");
+					email = jsonMainArr.getJSONObject(0).getString("email");
+					mobileNumber = jsonMainArr.getJSONObject(0).getString(
+							"mobile_number");
+					String[] datespilt = jsonMainArr.getJSONObject(0)
+							.getString("dob").split("\\s+");
+					dob = String.valueOf(datespilt[0]);
+					gender = jsonMainArr.getJSONObject(0).getString("gender");
+					licenseNo = jsonMainArr.getJSONObject(0).getString(
+							"license_no");
+					street = jsonMainArr.getJSONObject(0).getString("street");
+					suburb = jsonMainArr.getJSONObject(0).getString("suburb");
+					postcode = jsonMainArr.getJSONObject(0).getString(
+							"postcode");
+					dtModified = jsonMainArr.getJSONObject(0).getString(
+							"modified_at");
+					fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
+					fbToken = jsonMainArr.getJSONObject(0)
+							.getString("fb_token");
+					cname = jsonMainArr.getJSONObject(0).getString(
+							"emergency_contact");
+					cnumber = jsonMainArr.getJSONObject(0).getString(
+							"emergency_contact_number");
+					sques = jsonMainArr.getJSONObject(0).getString(
+							"security_question");
+					sans = jsonMainArr.getJSONObject(0).getString(
+							"security_answer");
+					profilecom = jsonMainArr.getJSONObject(0).getInt(
+							"profile_completed");
+					pin = jsonMainArr.getJSONObject(0).getString("pin");
+					points = jsonMainArr.getJSONObject(0).getString(
+							"samaritan_points");
+					photourl = jsonMainArr.getJSONObject(0).getString(
+							"photo_url");
+					int pos = photourl.lastIndexOf("/");
+					photoname = photourl.substring(pos + 1);
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -890,10 +941,118 @@ public class LoginActivity extends Activity implements TextWatcher,
 					public void run() {
 
 						db = new DatabaseHandler(LoginActivity.this);
-						PersonalData data = new PersonalData(user_id, fbfname,
-								fblname, fbemail, "", fbdob, fbgender, "", "",
-								"", "", "", fbid, fbtoken, "", "", pin, "", "","");
+						PersonalData data = new PersonalData(user_id, fName,
+								lName, email, mobileNumber, dob, gender,
+								licenseNo, street, suburb, postcode,
+								dtModified, fbId, fbToken, cname, cnumber, pin,
+								sques, sans, points);
+
 						db.updateprofileData(data);
+						atPrefs.edit()
+								.putInt(SplashscreenActivity.progress,
+										profilecom).commit();
+						atPrefs.edit().putBoolean(info.checkllogin, false)
+								.commit();
+						atPrefs.edit()
+								.putString(SplashscreenActivity.profile_pic, "profilePic.png")
+								.commit();
+
+						SQLiteDatabase dbb = db.getReadableDatabase();
+						dbb.execSQL("delete from Vehicle_info");
+
+						for (int i = 0; i < jsonVehicleArr.length(); i++) {
+
+							try {
+								vid = jsonVehicleArr.getJSONObject(i).getInt(
+										"vehicle_id");
+								vtype = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_type");
+								vmake = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_make");
+								vmodel = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_model");
+								reg = jsonVehicleArr.getJSONObject(i)
+										.getString("registration_serial_no");
+								vstatus = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_status");
+								exp = jsonVehicleArr.getJSONObject(i)
+										.getString("insurance_expiry_date");
+								String[] date = exp.split("\\s+");
+								db = new DatabaseHandler(LoginActivity.this);
+								VehicleData datas = new VehicleData(vid, vtype,
+										vmake, vmodel, "", "", "", "", "", reg,
+										"", "", date[0], vstatus, "");
+								db.insertvehicleData(datas);
+
+								ParkingData datass = new ParkingData(
+										String.valueOf(vid), vmodel, "", "",
+										"", "", vtype);
+								db.inserparkData(datass);
+
+								if (date[0].equalsIgnoreCase("0000-00-00")) {
+								} else {
+									String toParse = date[0] + " " + 8 + ":"
+											+ 00;
+									SimpleDateFormat formatter = new SimpleDateFormat(
+											"yyyy-MM-dd h:m");
+									Date dates = formatter.parse(toParse);
+									long millis = dates.getTime();
+									long time = millis - 604800000;
+
+									dbb.execSQL("UPDATE vehicle_info SET vehicle_expmil = '"
+											+ time
+											+ "'WHERE vehicle_id ='"
+											+ vid + "'");
+									NotificationAlarm
+											.CancelAlarm(LoginActivity.this);
+									NotificationAlarm
+											.SetAlarm(LoginActivity.this);
+								}
+
+							} catch (JSONException e) {
+								e.printStackTrace();
+							} catch (java.text.ParseException e) {
+								e.printStackTrace();
+							}
+
+						}
+						Thread thread = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								sdRoot = Environment
+										.getExternalStorageDirectory();
+								dir = "My Wheel/";
+								String dowlaod = "/My Wheel";
+								File photo = new File(sdRoot, dir + photoname);
+								if (photo.exists()) {
+									atPrefs.edit()
+											.putString(
+													SplashscreenActivity.profile_pic,
+													photoname).commit();
+								} else {
+									try {
+										d.DownloadFromUrl(photourl, photoname,
+												dowlaod, dir);
+										atPrefs.edit()
+												.putString(
+														SplashscreenActivity.profile_pic,
+														photoname).commit();
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+
+							}
+						});
+						thread.start();
+
+						// db = new DatabaseHandler(LoginActivity.this);
+						// PersonalData data = new PersonalData(user_id,
+						// fbfname,
+						// fblname, fbemail, "", fbdob, fbgender, "", "",
+						// "", "", "", fbid, fbtoken, "", "", pin, "", "",
+						// "");
+						// db.updateprofileData(data);
 
 						SplashscreenActivity.fblogin = false;
 						if (mess.equalsIgnoreCase("New User")) {
@@ -990,7 +1149,13 @@ public class LoginActivity extends Activity implements TextWatcher,
 		String success, mess, response;
 		String user_id, fName, lName, email, mobileNumber, dob, gender,
 				licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-				cname, cnumber, pin;
+				cname, cnumber, sques, sans, photourl, photoname, pin, points,
+				exp;
+		int profilecom;
+
+		// vehicle
+		int vid;
+		String vtype, vmake, vmodel, reg, vstatus;
 
 		@Override
 		protected void onPreExecute() {
@@ -1030,6 +1195,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 				JSONObject profile = new JSONObject(response);
 				jsonMainArr = profile.getJSONArray("response");
+				jsonVehicleArr = profile.getJSONArray("vehicles");
 				success = profile.getString("status");
 
 				mess = profile.getString("message");
@@ -1055,6 +1221,18 @@ public class LoginActivity extends Activity implements TextWatcher,
 						"emergency_contact");
 				cnumber = jsonMainArr.getJSONObject(0).getString(
 						"emergency_contact_number");
+				sques = jsonMainArr.getJSONObject(0).getString(
+						"security_question");
+				sans = jsonMainArr.getJSONObject(0)
+						.getString("security_answer");
+				profilecom = jsonMainArr.getJSONObject(0).getInt(
+						"profile_completed");
+				pin = jsonMainArr.getJSONObject(0).getString("pin");
+				points = jsonMainArr.getJSONObject(0).getString(
+						"samaritan_points");
+				photourl = jsonMainArr.getJSONObject(0).getString("photo_url");
+				int pos = photourl.lastIndexOf("/");
+				photoname = photourl.substring(pos + 1);
 
 			} catch (ClientProtocolException e) {
 				System.out.println("ClientProtocolException");
@@ -1071,13 +1249,112 @@ public class LoginActivity extends Activity implements TextWatcher,
 				runOnUiThread(new Runnable() {
 
 					public void run() {
+
 						db = new DatabaseHandler(LoginActivity.this);
 						PersonalData data = new PersonalData(user_id, fName,
 								lName, email, mobileNumber, dob, gender,
 								licenseNo, street, suburb, postcode,
 								dtModified, fbId, fbToken, cname, cnumber, pin,
-								"", "","");
+								sques, sans, points);
+
 						db.updateprofileData(data);
+						atPrefs.edit()
+								.putInt(SplashscreenActivity.progress,
+										profilecom).commit();
+						atPrefs.edit().putBoolean(info.checkllogin, false)
+								.commit();
+
+						SQLiteDatabase dbb = db.getReadableDatabase();
+						for (int i = 0; i < jsonVehicleArr.length(); i++) {
+
+							try {
+								vid = jsonVehicleArr.getJSONObject(i).getInt(
+										"vehicle_id");
+								vtype = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_type");
+								vmake = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_make");
+								vmodel = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_model");
+								reg = jsonVehicleArr.getJSONObject(i)
+										.getString("registration_serial_no");
+								vstatus = jsonVehicleArr.getJSONObject(i)
+										.getString("vehicle_status");
+								exp = jsonVehicleArr.getJSONObject(i)
+										.getString("insurance_expiry_date");
+								String[] date = exp.split("\\s+");
+								db = new DatabaseHandler(LoginActivity.this);
+								VehicleData datas = new VehicleData(vid, vtype,
+										vmake, vmodel, "", "", "", "", "", reg,
+										"", "", date[0], vstatus, "");
+								db.insertvehicleData(datas);
+
+								ParkingData datass = new ParkingData(
+										String.valueOf(vid), vmodel, "", "",
+										"", "", vtype);
+								db.inserparkData(datass);
+
+								if (date[0].equalsIgnoreCase("0000-00-00")) {
+								} else {
+									String toParse = date[0] + " " + 8 + ":"
+											+ 00;
+									SimpleDateFormat formatter = new SimpleDateFormat(
+											"yyyy-MM-dd h:m");
+									Date dates = formatter.parse(toParse);
+									long millis = dates.getTime();
+									long time = millis - 604800000;
+
+									dbb.execSQL("UPDATE vehicle_info SET vehicle_expmil = '"
+											+ time
+											+ "'WHERE vehicle_id ='"
+											+ vid + "'");
+									NotificationAlarm
+											.CancelAlarm(LoginActivity.this);
+									NotificationAlarm
+											.SetAlarm(LoginActivity.this);
+								}
+
+								//
+								// NotificationData datass = new
+								// NotificationData(
+								// vid, vmodel, "");
+								// db.insernotifiData(datass);
+							} catch (JSONException e) {
+								e.printStackTrace();
+							} catch (java.text.ParseException e) {
+								e.printStackTrace();
+							}
+
+						}
+						Thread thread = new Thread(new Runnable() {
+							@Override
+							public void run() {
+								sdRoot = Environment
+										.getExternalStorageDirectory();
+								dir = "My Wheel/";
+								String dowlaod = "/My Wheel";
+								File photo = new File(sdRoot, dir + photoname);
+								if (photo.exists()) {
+									atPrefs.edit()
+											.putString(
+													SplashscreenActivity.profile_pic,
+													photoname).commit();
+								} else {
+									try {
+										d.DownloadFromUrl(photourl, photoname,
+												dowlaod, dir);
+										atPrefs.edit()
+												.putString(
+														SplashscreenActivity.profile_pic,
+														photoname).commit();
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+
+							}
+						});
+						thread.start();
 						atPrefs.edit().putBoolean(info.checkllogin, false)
 								.commit();
 						Intent next = new Intent(LoginActivity.this,
@@ -1088,6 +1365,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 					}
 				});
 			}
+
 			// response failure
 			else if (success.equals("failure")) {
 

@@ -63,7 +63,7 @@ public class Editvehicle extends SherlockActivity implements TextWatcher {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		type = (TextView) findViewById(R.id.type);
 		body = (TextView) findViewById(R.id.body);
 		type_other = (EditText) findViewById(R.id.type_other);
@@ -91,8 +91,8 @@ public class Editvehicle extends SherlockActivity implements TextWatcher {
 
 		info = new Data();
 		info.vehicleInfo(getApplicationContext(), id);
-//		type.setText(info.vmodel);
-//		type.setText(info.type);
+		// type.setText(info.vmodel);
+		// type.setText(info.type);
 		make.setText(info.make);
 		model.setText(info.vmodel);
 		engine.setText(info.eng);
@@ -168,7 +168,7 @@ public class Editvehicle extends SherlockActivity implements TextWatcher {
 		} else {
 			btype = true;
 		}
-		
+
 		type.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -478,17 +478,10 @@ public class Editvehicle extends SherlockActivity implements TextWatcher {
 								+ reg.getText().toString()
 								+ "'WHERE vehicle_id='" + id + "'");
 
-						// VehicleData data = new
-						// VehicleData(Integer.valueOf(id),
-						// type.getText().toString(), make.getText()
-						// .toString(),
-						// model.getText().toString(), body.getText()
-						// .toString(), engine.getText()
-						// .toString(), chassis.getText()
-						// .toString(), colour.getText()
-						// .toString(), acc.getText().toString(),
-						// reg.getText().toString(), "", "", "", "", "");
-						// db.updatevehicleData(data, id);
+						dbbb.execSQL("UPDATE Vehicle_park SET type = '" + types
+								+ "',model = '" + model.getText().toString()
+								+ "'WHERE vid='" + id + "'");
+
 						Intent next = new Intent(getApplicationContext(),
 								VehicleProfile.class);
 						next.putExtra("id", id);

@@ -5,12 +5,15 @@
     <color name="black">#060606</color>
     <color name="light_black">#696969</color>
     <color name="white_trs">#80FFFFFF</color>
+    <color name="white_trs1">#BFFFFFFF</color>
     <color name="blue">#0065b3</color>
+    <color name="blue_trs">#960065b3</color>
     <color name="gry">#f3f3f3</color>
     <color name="red"> #ff0000</color>
     <color name="creamy">#eeebea</color>
     <color name="blue_text">#0065b3</color>
     <color name="yellow">#f09c4d</color>
     <color name="black_trs">#7f000000</color>
+    <color name="gry_profile">#dbdbdb</color>
 
 </resources>

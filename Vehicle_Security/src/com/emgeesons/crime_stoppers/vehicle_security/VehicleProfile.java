@@ -4,6 +4,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -56,6 +59,7 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.gms.internal.el;
 
 public class VehicleProfile extends SherlockActivity {
 	TextView title, reg, type, make, model, body, eng, vin, color, acc, cname,
@@ -72,7 +76,7 @@ public class VehicleProfile extends SherlockActivity {
 	File sdRoot;
 	String call;
 	RelativeLayout imagesre;
-	CustomImageView pic1, pic2, pic3;
+	CircularImageView pic1, pic2, pic3;
 	int nopic;
 	File folder;
 	Bitmap photo;
@@ -117,15 +121,15 @@ public class VehicleProfile extends SherlockActivity {
 		status = (TextView) findViewById(R.id.status);
 		imagesre = (RelativeLayout) findViewById(R.id.pic);
 		addpic = (ImageView) findViewById(R.id.addpic);
-		pic1 = (CustomImageView) findViewById(R.id.pic1);
-		pic2 = (CustomImageView) findViewById(R.id.pic2);
-		pic3 = (CustomImageView) findViewById(R.id.pic3);
+		pic1 = (CircularImageView) findViewById(R.id.pic1);
+		pic2 = (CircularImageView) findViewById(R.id.pic2);
+		pic3 = (CircularImageView) findViewById(R.id.pic3);
 		Delete = (Button) findViewById(R.id.Delete);
 		Intent intent = getIntent();
 		id = intent.getStringExtra("id");
 		info = new Data();
 		info.vehicleInfo(getApplicationContext(), id);
-		title.setText(info.vmodel);
+		title.setText(info.make + " " + info.vmodel);
 		type.setText(info.type);
 		make.setText(info.make);
 		model.setText(info.vmodel);
@@ -158,6 +162,7 @@ public class VehicleProfile extends SherlockActivity {
 		} else {
 
 		}
+
 		dir = "My Wheel/" + id + "/";
 
 		getSupportActionBar().setTitle(
@@ -166,7 +171,7 @@ public class VehicleProfile extends SherlockActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		if (type.getText().toString().equalsIgnoreCase("Bicycle")) {
 			reg.setText("Serial No:" + info.reg);
 		} else {
@@ -192,7 +197,12 @@ public class VehicleProfile extends SherlockActivity {
 			status.setText(info.status);
 			title.setTextColor(getResources().getColor(R.color.yellow));
 
+		} else {
+			ImageView s = (ImageView) findViewById(R.id.imageView1);
+			s.setVisibility(View.GONE);
+			status.setVisibility(View.GONE);
 		}
+
 		if (info.body.isEmpty()) {
 			TextView b = (TextView) findViewById(R.id.body);
 			b.setVisibility(View.GONE);
@@ -215,12 +225,12 @@ public class VehicleProfile extends SherlockActivity {
 			vin.setVisibility(View.GONE);
 		}
 
-		if (info.exp.contains("0000-00-00")) {
+		if (info.exp.contains("0000-00-00") || info.exp.isEmpty()) {
 			TextView ex = (TextView) findViewById(R.id.expiry);
 			ex.setVisibility(View.GONE);
 			expiry.setVisibility(View.GONE);
 		} else {
-			expiry.setText(info.exp);
+			expiry.setText(getdateformate(info.exp));
 		}
 
 		if (info.iname.isEmpty()) {
@@ -231,13 +241,17 @@ public class VehicleProfile extends SherlockActivity {
 
 		} else {
 			ins.setVisibility(View.VISIBLE);
+			// change status text
+			if (status.getText().toString().contains("Add Insurance")) {
+				status.setText("Add Vehicle Photos");
+			}
 			addins.setBackgroundResource(R.drawable.box_whiteb);
 			addins.setText("Edit Insurance");
 			call = "second";
 			addins.setTextColor(getResources().getColor(R.color.black));
 			cname.setText(info.iname);
 			policy.setText(info.ipolicy);
-			expiry.setText(info.exp);
+			expiry.setText(getdateformate(info.exp));
 
 		}
 
@@ -392,6 +406,20 @@ public class VehicleProfile extends SherlockActivity {
 
 	}
 
+	public String getdateformate(String _date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date datef;
+		String dateformat = "";
+		try {
+			datef = sdf.parse(_date);
+			sdf.applyPattern("dd-MMMM-yyyy");
+			dateformat = sdf.format(datef);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return dateformat;
+	}
+
 	private void picclick() {
 		pic1.setOnClickListener(new OnClickListener() {
 
@@ -456,6 +484,12 @@ public class VehicleProfile extends SherlockActivity {
 		if (pic1.getVisibility() == View.VISIBLE
 				&& pic2.getVisibility() == View.GONE
 				&& pic3.getVisibility() == View.GONE) {
+			if (status.getText().toString().contains("Add Vehicle")) {
+				status.setVisibility(View.GONE);
+				title.setTextColor(getResources().getColor(R.color.black));
+				ImageView s = (ImageView) findViewById(R.id.imageView1);
+				s.setVisibility(View.GONE);
+			}
 			nopic = 2;
 		} else if (pic1.getVisibility() == View.VISIBLE
 				&& pic2.getVisibility() == View.VISIBLE
@@ -500,7 +534,7 @@ public class VehicleProfile extends SherlockActivity {
 
 				imagepath = getImagePath();
 				photo = (Bitmap) decodeFile(imagepath);
-				photo = Bitmap.createScaledBitmap(photo, 100, 100, false);
+				// photo = Bitmap.createScaledBitmap(photo, 100, 100, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 				File f = new File(sdRoot, dir + "VehiclePic" + nopic + ".png");
@@ -527,7 +561,7 @@ public class VehicleProfile extends SherlockActivity {
 				imagepath = getPath(selectedImageUri);
 				photo = BitmapFactory.decodeFile(imagepath);
 				photo = (Bitmap) decodeFile(imagepath);
-				photo = Bitmap.createScaledBitmap(photo, 100, 100, false);
+				// photo = Bitmap.createScaledBitmap(photo, 100, 100, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 				File f = new File(sdRoot, dir + "VehiclePic" + nopic + ".png");
@@ -659,7 +693,10 @@ public class VehicleProfile extends SherlockActivity {
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						dbbb.execSQL("delete from Vehicle_info WHERE Vehicle_id ='"
 								+ id + "'");
-
+						dbbb.execSQL("delete from Vehicle_park WHERE vid ='"
+								+ id + "'");
+						NotificationAlarm.CancelAlarm(getApplicationContext());
+						NotificationAlarm.SetAlarm(getApplicationContext());
 						deleteDirectory(folder);
 						if (vehicles.size() == 1) {
 							Intent next = new Intent(getApplicationContext(),
@@ -860,7 +897,7 @@ public class VehicleProfile extends SherlockActivity {
 			o.inJustDecodeBounds = true;
 			BitmapFactory.decodeFile(path, o);
 			// The new size we want to scale to
-			final int REQUIRED_SIZE = 80;
+			final int REQUIRED_SIZE = 400;
 
 			// Find the correct scale value. It should be the power of 2.
 			int scale = 1;
@@ -905,7 +942,8 @@ public class VehicleProfile extends SherlockActivity {
 		String success, mess, response;
 		String user_id, fName, lName, email, mobileNumber, dob, gender,
 				licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-				cname, cnumber, sques, sans, photourl, photoname, pin, points;
+				cname, cnumber, sques, sans, photourl, photoname, pin, points,
+				address;
 		int profilecom;
 
 		// vehicle
@@ -966,6 +1004,7 @@ public class VehicleProfile extends SherlockActivity {
 				gender = jsonMainArr.getJSONObject(0).getString("gender");
 				licenseNo = jsonMainArr.getJSONObject(0)
 						.getString("license_no");
+				address = jsonMainArr.getJSONObject(0).getString("address");
 				// street = jsonMainArr.getJSONObject(0).getString("street");
 				// suburb = jsonMainArr.getJSONObject(0).getString("suburb");
 				postcode = jsonMainArr.getJSONObject(0).getString("postcode");

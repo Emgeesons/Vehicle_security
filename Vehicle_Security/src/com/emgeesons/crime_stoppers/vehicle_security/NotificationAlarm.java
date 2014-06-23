@@ -1,7 +1,5 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -14,10 +12,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
+import android.util.Log;
 
 public class NotificationAlarm extends BroadcastReceiver {
-
-	static String title;
 
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -33,7 +30,7 @@ public class NotificationAlarm extends BroadcastReceiver {
 	}
 
 	@SuppressLint("NewApi")
-	public static void SetAlarm(Context context, String titles) {
+	public static void SetAlarm(Context context) {
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(context, NotificationAlarm.class);
@@ -44,7 +41,6 @@ public class NotificationAlarm extends BroadcastReceiver {
 				gc.get(Calendar.DAY_OF_MONTH), 23, 59);
 		am.setRepeating(AlarmManager.RTC_WAKEUP, gc.getTimeInMillis()
 				+ TimeUnit.MINUTES.toMillis(2), AlarmManager.INTERVAL_DAY, pi);
-		title = titles;
 		callAlarm(context);
 	}
 
@@ -59,20 +55,27 @@ public class NotificationAlarm extends BroadcastReceiver {
 
 	public static void callAlarm(Context context) {
 		DatabaseHandler db = new DatabaseHandler(context);
-		List<VehicleData> vehicleData = db.getVehicleData();
-		for (int i = 0; i < vehicleData.size(); i++) {
-			VehicleData data = vehicleData.get(i);
-			if (data.getvehicle_insexp().isEmpty()) {
+		List<VehicleData> notificationData = db.getVehicleData();
+		int co = 1;
+		for (int i = 0; i < notificationData.size(); i++) {
+			VehicleData data = notificationData.get(i);
+			if (data.getexpmil().isEmpty()) {
 
 			} else {
+
 				long times = Long.valueOf(data.getexpmil());
-				// if (i == 1) {
-				// NotificationSpawn.SetAlarm(context, times + 70000);
-				// }
-				NotificationSpawn.SetAlarm(context, times + 30000,title);
+				// +(1000*co)
+				Calendar gc = Calendar.getInstance();
+				// if (gc.getTimeInMillis() < times) {
+				System.out.println(String.valueOf(times) + ""
+						+ data.getvehicle_model());
+				NotificationSpawn.SetAlarm(context, times,
+						data.getvehicle_model());
 			}
+			co++;
+			// }
 
 		}
-	}
 
+	}
 }

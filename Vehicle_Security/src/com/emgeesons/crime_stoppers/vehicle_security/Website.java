@@ -25,7 +25,7 @@ public class Website extends SherlockActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		WebView wv = (WebView) findViewById(R.id.webView1);
 		wv.setWebViewClient(new MyWebViewClient());
 		wv.getSettings().setJavaScriptEnabled(true);

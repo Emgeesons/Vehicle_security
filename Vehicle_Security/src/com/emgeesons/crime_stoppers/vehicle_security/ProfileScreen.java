@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpEntity;
@@ -45,10 +46,12 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
@@ -61,10 +64,11 @@ public class ProfileScreen extends BaseActivity {
 	ImageView edit, gender, bg;
 	Button adddetails, addvehicle;
 	CustomImageView profilepic;
-	RelativeLayout pointsrel;
+	RelativeLayout pointsrel, relbg;
 	Data info;
 	File sdRoot;
 	String dir, imgPath;
+
 	private String imagepath = null;
 	ProgressBar progress;
 	int oldprogress = 0;
@@ -77,7 +81,10 @@ public class ProfileScreen extends BaseActivity {
 	SQLiteDatabase dbb;
 	DatabaseHandler db;
 	LinearLayout v;
-	 int count = 0;
+	int count = 0;
+	ArrayList<String> f = new ArrayList<String>();// list of file paths
+	File[] listFile;
+	int height;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +95,7 @@ public class ProfileScreen extends BaseActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(ProfileScreen.this);
 		db = new DatabaseHandler(getApplicationContext());
@@ -116,6 +123,12 @@ public class ProfileScreen extends BaseActivity {
 		pointsrel = (RelativeLayout) findViewById(R.id.points);
 		progress = (ProgressBar) findViewById(R.id.progress);
 		samaritan = (TextView) findViewById(R.id.textView2);
+		relbg = (RelativeLayout) findViewById(R.id.relbg);
+		height = getWindowManager().getDefaultDisplay().getHeight();
+		int image_h = height * 30 / 100;
+		RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
+				LayoutParams.WRAP_CONTENT, image_h);
+		relbg.setLayoutParams(parms);
 		info = new Data();
 		info.showInfo(getApplicationContext());
 		name.setText(info.fName + "" + info.lName);
@@ -164,16 +177,17 @@ public class ProfileScreen extends BaseActivity {
 
 		}
 		dir = "My Wheel/";
-		names = atPrefs.getString(SplashscreenActivity.profile_pic,
-				"profilePic.png");
-		File f = new File(sdRoot, dir + names);
-		if (f.exists()) {
-			imagepath = f.getAbsolutePath();
-			Bitmap photo = (Bitmap) decodeFile(imagepath);
-			profilepic.setImageBitmap(photo);
-		} else {
-			profilepic.setImageResource(R.drawable.default_profile);
-		}
+		setimage();
+		// refresh ui
+		final Handler handler = new Handler();
+		handler.postDelayed(new Runnable() {
+			@Override
+			public void run() {
+
+				Log.i("call", "call");
+				setimage();
+			}
+		}, 3000);
 
 		// change points bg color
 		if (!pts.getText().toString().equalsIgnoreCase("0")) {
@@ -181,7 +195,8 @@ public class ProfileScreen extends BaseActivity {
 			pts.setTextColor(getResources().getColor(R.color.white));
 			samaritan.setTextColor(getResources().getColor(R.color.white));
 		} else {
-			pointsrel.setBackgroundColor(getResources().getColor(R.color.gry));
+			pointsrel.setBackgroundColor(getResources().getColor(
+					R.color.gry_profile));
 			pts.setTextColor(getResources().getColor(R.color.black));
 			samaritan.setTextColor(getResources().getColor(R.color.black));
 
@@ -246,40 +261,62 @@ public class ProfileScreen extends BaseActivity {
 
 			}
 		});
-		// edit.setOnClickListener(new OnClickListener() {
+
+		// get all images from folder
+		getFromSdcard();
+
+		// new Handler().postDelayed(new Runnable() {
+		// public void run() {
 		//
-		// @Override
-		// public void onClick(View arg0) {
-		// Intent next = new Intent(getApplicationContext(),
-		// EditInfo.class);
-		// startActivity(next);
+		// if (count < f.size()) {
+		//
+		// Drawable d = (Drawable) Drawable.createFromPath(f
+		// .get(count));
+		//
+		// bg.setImageDrawable(d);
+		//
+		// count++; // <<< increment counter here
+		// } else {
+		// // reset counter here
+		// count = 0;
+		// }
 		//
 		// }
-		// });
-//		File dir = new File(sdRoot + "/My Wheel");
-//
-//		
-//		final File file[] = dir.listFiles();
-//
-//		
-//		new Handler().postDelayed(new Runnable() {
-//			public void run() {
-//
-//				if (count < file.length) {
-//
-//					Drawable d = (Drawable) Drawable.createFromPath(file[count]
-//							.toString());
-//
-//					bg.setImageDrawable(d);
-//
-//					count++; // <<< increment counter here
-//				} else {
-//					// reset counter here
-//					count = 0;
-//				}
-//
-//			}
-//		}, 4000);
+		// }, 1000);
+
+		// change images
+
+		if (f.size() == 0) {
+			height = getWindowManager().getDefaultDisplay().getHeight();
+			int image_hs = height * 30 / 100;
+			RelativeLayout.LayoutParams parmss = new RelativeLayout.LayoutParams(
+					LayoutParams.MATCH_PARENT, image_hs);
+			bg.setLayoutParams(parmss);
+			bg.setImageResource(R.drawable.default_profile_bg);
+			bg.setScaleType(ScaleType.FIT_XY);
+
+		} else {
+
+			final Handler handlers = new Handler();
+			Runnable runnable = new Runnable() {
+
+				public void run() {
+					Drawable d = (Drawable) Drawable.createFromPath(f
+							.get(count));
+
+					bg.setImageDrawable(d);
+					count++;
+
+					if (count > f.size() - 1) {
+
+						count = 0;
+					}
+
+					handlers.postDelayed(this, 1000); // for interval...
+				}
+			};
+			handlers.post(runnable);
+		}
 
 		profilepic.setOnClickListener(new OnClickListener() {
 
@@ -336,7 +373,7 @@ public class ProfileScreen extends BaseActivity {
 			progress.setAnimation(anim);
 		} else if (newprogress <= 80) {
 			progress.setProgressDrawable(getResources().getDrawable(
-					R.drawable.middlebar));
+					R.drawable.fourbar));
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
@@ -372,32 +409,36 @@ public class ProfileScreen extends BaseActivity {
 
 		}
 
-		// v = (LinearLayout) findViewById(R.id.vehicles);
-		// LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-		// LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		// params.setMargins(5, 0, 0, 0);
-		// LinearLayout.LayoutParams param = new LinearLayout.LayoutParams(
-		// LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		//
-		// params.addRule(RelativeLayout.LEFT_OF, R.id.p);
-		// for (int i = 0; i < vehicles.size(); i++) {
-		// LinearLayout ll = new LinearLayout(this);
-		// ll.setOrientation(LinearLayout.VERTICAL);
-		//
-		// // Create TextView
-		// TextView product = new TextView(this);
-		// product.setText(" Product");
-		// ll.addView(product);
-		//
-		// ImageView p = new ImageView(this);
-		// p.setImageResource(R.drawable.ic_car);
-		// p.setId(i + 1);
-		//
-		// p.setLayoutParams(params);
-		// ll.addView(p);
-		// v.addView(ll);
+	}
 
-		// }
+	public void getFromSdcard() {
+		File file = null;
+		for (int i = 0; i < vehicles.size(); i++) {
+			file = new File(sdRoot + "/My Wheel/"
+					+ vehicles.get(i).getvehicle_id());
+			if (file.isDirectory()) {
+				listFile = file.listFiles();
+				for (int j = 0; j < listFile.length; j++) {
+
+					f.add(listFile[j].getAbsolutePath());
+
+				}
+			}
+		}
+
+	}
+
+	private void setimage() {
+		names = atPrefs.getString(SplashscreenActivity.profile_pic,
+				"profilePic.png");
+		File f = new File(sdRoot, dir + names);
+		if (f.exists()) {
+			imagepath = f.getAbsolutePath();
+			Bitmap photo = (Bitmap) decodeFile(imagepath);
+			profilepic.setImageBitmap(photo);
+		} else {
+			profilepic.setImageResource(R.drawable.default_profile);
+		}
 
 	}
 
@@ -441,7 +482,7 @@ public class ProfileScreen extends BaseActivity {
 
 				imagepath = getImagePath();
 				Bitmap photo = (Bitmap) decodeFile(imagepath);
-				photo = Bitmap.createScaledBitmap(photo, 100, 100, false);
+				photo = Bitmap.createScaledBitmap(photo, 200, 200, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 				File f = new File(sdRoot, dir + "profilePic.png");
@@ -469,7 +510,7 @@ public class ProfileScreen extends BaseActivity {
 				imagepath = getPath(selectedImageUri);
 				// Bitmap bitmap = BitmapFactory.decodeFile(imagepath);
 				Bitmap photo = (Bitmap) decodeFile(imagepath);
-				photo = Bitmap.createScaledBitmap(photo, 100, 100, false);
+				photo = Bitmap.createScaledBitmap(photo, 200, 200, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 				File f = new File(sdRoot, dir + "profilePic.png");

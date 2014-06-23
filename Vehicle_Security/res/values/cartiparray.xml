@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="car_tip">
+        <item>what\'s the My Wheels User Rating here?</item>
+        <item>well lit spot?</item>
+        <item>spot in full view of people?</item>
+        <item>windows closed and doors locked?</item>
+        <item>all loose and valuable items in the boot?</item>
+        <item>immobiliser activated or steering wheel lock on?</item>
+        <item>near a security camera or on-site staff?</item>
+        <item>no spare keys left in/on the car</item>
+        <item>if home – keys out of sight?</item>
+        <item>if home – off the road?</item>
+        <item>if home – in a locked garage?</item>
+    </string-array>
+
+</resources>

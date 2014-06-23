@@ -52,7 +52,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -83,7 +82,7 @@ public class ReportSighting extends SherlockActivity {
 	EditText vmake, vmodel, color, reg, comments;
 	Button send;
 	TextView date, type;
-	ImageView expand, takepic;
+	ImageView expand, addpic;
 	boolean exp_col;
 	int map_height;
 	final static CharSequence[] typeSighting = { "Theft", "Vandalism",
@@ -99,11 +98,12 @@ public class ReportSighting extends SherlockActivity {
 	String[] names;
 	private String imagepath = null;
 	File sdRoot;
-	LinearLayout takenpic;
-	int nopic = 1;
-
-	//
+	// LinearLayout takenpic;
+	// int nopic = 1;
+	CircularImageView pic1, pic2, pic3;
 	List<String> ch = new ArrayList<String>();
+	int nopic;
+	Bitmap photo;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -115,7 +115,7 @@ public class ReportSighting extends SherlockActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		marker = (RelativeLayout) findViewById(R.id.marker);
 		mapview = (RelativeLayout) findViewById(R.id.mapview);
 		marker_label = (TextView) findViewById(R.id.textView1);
@@ -127,8 +127,11 @@ public class ReportSighting extends SherlockActivity {
 		date = (TextView) findViewById(R.id.date);
 		type = (TextView) findViewById(R.id.type);
 		expand = (ImageView) findViewById(R.id.expand);
-		takepic = (ImageView) findViewById(R.id.camera);
-		takenpic = (LinearLayout) findViewById(R.id.pic);
+		addpic = (ImageView) findViewById(R.id.addpic);
+		pic1 = (CircularImageView) findViewById(R.id.pic1);
+		pic2 = (CircularImageView) findViewById(R.id.pic2);
+		pic3 = (CircularImageView) findViewById(R.id.pic3);
+		// takenpic = (LinearLayout) findViewById(R.id.pic);
 		send = (Button) findViewById(R.id.send);
 		sdRoot = Environment.getExternalStorageDirectory();
 		// cr8 folder
@@ -176,11 +179,12 @@ public class ReportSighting extends SherlockActivity {
 		cdatevalue = datevalue;
 		System.out.println(cdatevalue + "," + ctimevalue);
 		date.setText(datevalue + "," + timevalue);
+		checkpic();
+		picclick();
 		expand.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				if (exp_col) {
 					RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
 							LayoutParams.WRAP_CONTENT,
@@ -203,7 +207,6 @@ public class ReportSighting extends SherlockActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						ReportSighting.this);
 				builder.setTitle(" Type Of Sighting ");
@@ -214,40 +217,37 @@ public class ReportSighting extends SherlockActivity {
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
-								// set to buffKey instead of selected
-								// (when cancel not save to selected)
-								// int sel = atPrefs.getInt(blood_value, 0);
 								buffKey = which;
+								type.setText(typeSighting[buffKey]);
+								int selectedPosition = ((AlertDialog) dialog)
+										.getListView().getCheckedItemPosition();
+								// set buff to selected
+								tSighting = buffKey;
+								dialog.dismiss();
 							}
-						})
-						.setCancelable(false)
-						.setPositiveButton("Ok",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-										type.setText(typeSighting[buffKey]);
-										int selectedPosition = ((AlertDialog) dialog)
-												.getListView()
-												.getCheckedItemPosition();
-										// set buff to selected
-										tSighting = buffKey;
-										// atPrefs.edit()
-										// .putInt(Activity_EButton_data.blood_value,
-										// selectedPosition)
-										// .commit();
-										// set blood grp value in number
-
-									}
-								})
-						.setNegativeButton("Cancel",
-								new DialogInterface.OnClickListener() {
-									@Override
-									public void onClick(DialogInterface dialog,
-											int which) {
-
-									}
-								});
+						}).setCancelable(false);
+				// .setPositiveButton("Ok",
+				// new DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog,
+				// int which) {
+				//
+				// // atPrefs.edit()
+				// // .putInt(Activity_EButton_data.blood_value,
+				// // selectedPosition)
+				// // .commit();
+				// // set blood grp value in number
+				//
+				// }
+				// })
+				// .setNegativeButton("Cancel",
+				// new DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog,
+				// int which) {
+				//
+				// }
+				// });
 
 				AlertDialog alert = builder.create();
 				alert.show();
@@ -296,7 +296,6 @@ public class ReportSighting extends SherlockActivity {
 
 					@Override
 					public void onClick(View v) {
-						// TODO Auto-generated method stub
 
 						date.setText(datevalue + "," + timevalue);
 						dialog.dismiss();
@@ -305,11 +304,10 @@ public class ReportSighting extends SherlockActivity {
 				dialog.show();
 			}
 		});
-		takepic.setOnClickListener(new OnClickListener() {
+		addpic.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				final CharSequence[] items = { "Take Photo", "From Gallery",
 						"Cancel" };
 				AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -319,10 +317,6 @@ public class ReportSighting extends SherlockActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int item) {
 						if (items[item].equals("Take Photo")) {
-							// Intent takePicture = new Intent(
-							// MediaStore.ACTION_IMAGE_CAPTURE);
-							// startActivityForResult(takePicture,
-							// 2);
 							final Intent intent = new Intent(
 									MediaStore.ACTION_IMAGE_CAPTURE);
 							intent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -346,10 +340,113 @@ public class ReportSighting extends SherlockActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				new sendd().execute();
 			}
 		});
+	}
+
+	private void picclick() {
+		pic1.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				nopic = 1;
+				clickd();
+
+			}
+		});
+		pic2.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				nopic = 2;
+				clickd();
+
+			}
+		});
+		pic3.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				nopic = 3;
+				clickd();
+
+			}
+		});
+
+	}
+
+	private void setpic() {
+		photo = (Bitmap) decodeFile(imagepath);
+		if (nopic == 1) {
+			pic1.setVisibility(View.VISIBLE);
+			pic1.setImageBitmap(photo);
+			// upload = new sendd().execute();
+			checkpic();
+		} else if (nopic == 2) {
+			pic2.setVisibility(View.VISIBLE);
+			pic2.setImageBitmap(photo);
+			// upload = new sendd().execute();
+			checkpic();
+		} else if (nopic == 3) {
+			pic3.setVisibility(View.VISIBLE);
+			pic3.setImageBitmap(photo);
+			addpic.setVisibility(View.GONE);
+			// upload = new sendd().execute();
+			checkpic();
+		}
+
+	}
+
+	private void clickd() {
+		final CharSequence[] items = { "Take Photo", "From Gallery", "Cancel" };
+		AlertDialog.Builder builder = new AlertDialog.Builder(
+				ReportSighting.this);
+		builder.setTitle("Add Photo!");
+		builder.setItems(items, new DialogInterface.OnClickListener() {
+			@Override
+			public void onClick(DialogInterface dialog, int item) {
+				if (items[item].equals("Take Photo")) {
+
+					final Intent intent = new Intent(
+							MediaStore.ACTION_IMAGE_CAPTURE);
+					intent.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
+					startActivityForResult(intent, 2);
+				} else if (items[item].equals("From Gallery")) {
+					// Choose from Library
+					Intent pickPhoto = new Intent(
+							Intent.ACTION_PICK,
+							android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+					startActivityForResult(pickPhoto, 3);
+				} else if (items[item].equals("Cancel")) {
+					dialog.dismiss();
+				}
+			}
+		});
+		builder.show();
+
+	}
+
+	private void checkpic() {
+		if (pic1.getVisibility() == View.VISIBLE
+				&& pic2.getVisibility() == View.GONE
+				&& pic3.getVisibility() == View.GONE) {
+
+			nopic = 2;
+		} else if (pic1.getVisibility() == View.VISIBLE
+				&& pic2.getVisibility() == View.VISIBLE
+				&& pic3.getVisibility() == View.GONE) {
+			nopic = 3;
+		} else if (pic1.getVisibility() == View.VISIBLE
+				&& pic2.getVisibility() == View.VISIBLE
+				&& pic3.getVisibility() == View.VISIBLE) {
+			addpic.setVisibility(View.GONE);
+
+			nopic = 4;
+		} else {
+			nopic = 1;
+		}
+
 	}
 
 	// update profile pic
@@ -430,8 +527,8 @@ public class ReportSighting extends SherlockActivity {
 			if (resultCode == RESULT_OK) {
 
 				imagepath = getImagePath();
-				Bitmap photo = (Bitmap) decodeFile(imagepath);
-				photo = Bitmap.createScaledBitmap(photo, 74, 74, false);
+				photo = (Bitmap) decodeFile(imagepath);
+				// photo = Bitmap.createScaledBitmap(photo, 74, 74, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 				File f = new File(sdRoot, dir + "profilePic" + nopic + ".png");
@@ -446,13 +543,14 @@ public class ReportSighting extends SherlockActivity {
 				}
 
 				imagepath = f.getAbsolutePath();
-				ch.add(imagepath);
-				photo = (Bitmap) decodeFile(imagepath);
-				CustomImageView image = new CustomImageView(
-						getApplicationContext());
-				image.setImageBitmap(photo);
-				takenpic.addView(image);
-				check();
+				setpic();
+				// ch.add(imagepath);
+				// photo = (Bitmap) decodeFile(imagepath);
+				// CustomImageView image = new CustomImageView(
+				// getApplicationContext());
+				// image.setImageBitmap(photo);
+				// takenpic.addView(image);
+				// check();
 
 			}
 
@@ -463,8 +561,8 @@ public class ReportSighting extends SherlockActivity {
 				Uri selectedImageUri = data.getData();
 				imagepath = getPath(selectedImageUri);
 				// Bitmap bitmap = BitmapFactory.decodeFile(imagepath);
-				Bitmap photo = (Bitmap) decodeFile(imagepath);
-				photo = Bitmap.createScaledBitmap(photo, 74, 74, false);
+				photo = (Bitmap) decodeFile(imagepath);
+				// photo = Bitmap.createScaledBitmap(photo, 74, 74, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
 				File f = new File(sdRoot, dir + "profilePic" + nopic + ".png");
@@ -479,12 +577,13 @@ public class ReportSighting extends SherlockActivity {
 				}
 
 				imagepath = f.getAbsolutePath();
-				photo = (Bitmap) decodeFile(imagepath);
-				CustomImageView image = new CustomImageView(
-						getApplicationContext());
-				image.setImageBitmap(photo);
-				takenpic.addView(image);
-				check();
+				setpic();
+				// photo = (Bitmap) decodeFile(imagepath);
+				// CustomImageView image = new CustomImageView(
+				// getApplicationContext());
+				// image.setImageBitmap(photo);
+				// takenpic.addView(image);
+				// check();
 
 			}
 			break;
@@ -492,13 +591,13 @@ public class ReportSighting extends SherlockActivity {
 
 	}
 
-	private void check() {
-		nopic++;
-		if (takenpic.getChildCount() == 4) {
-
-			takepic.setVisibility(View.INVISIBLE);
-		}
-	}
+	// private void check() {
+	// nopic++;
+	// if (takenpic.getChildCount() == 4) {
+	//
+	// takepic.setVisibility(View.INVISIBLE);
+	// }
+	// }
 
 	public Bitmap decodeFile(String path) {
 		try {
@@ -507,7 +606,7 @@ public class ReportSighting extends SherlockActivity {
 			o.inJustDecodeBounds = true;
 			BitmapFactory.decodeFile(path, o);
 			// The new size we want to scale to
-			final int REQUIRED_SIZE = 70;
+			final int REQUIRED_SIZE = 280;
 
 			// Find the correct scale value. It should be the power of 2.
 			int scale = 1;
@@ -553,7 +652,6 @@ public class ReportSighting extends SherlockActivity {
 		@Override
 		public void onDateChanged(DatePicker view, int year, int monthOfYear,
 				int dayOfMonth) {
-			// TODO Auto-generated method stub
 			dates = dayOfMonth;
 			years = year;
 			months = monthOfYear + 1;

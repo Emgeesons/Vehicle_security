@@ -26,38 +26,76 @@
                 android:layout_height="50dp"
                 android:layout_alignParentBottom="true"
                 android:layout_alignParentLeft="true"
-                android:background="#96FFFFFF"
                 android:orientation="horizontal"
                 android:weightSum="2" >
 
-                <TextView
-                    android:id="@+id/park"
+                <RelativeLayout
+                    android:id="@+id/parkrel"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="I&apos;m Parking Here"
-                    android:textColor="@color/blue_text"
-                    android:textSize="@dimen/medium_text" />
+                    android:background="@color/white_trs1" >
 
-                <ImageView
-                    android:layout_width="2dp"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:background="@drawable/gry"
-                    android:scaleType="fitXY" />
+                    <ImageView
+                        android:id="@+id/imageView2"
+                        android:layout_width="1dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:background="@drawable/gry"
+                        android:scaleType="fitXY" />
 
-                <TextView
-                    android:id="@+id/find"
+                    <TextView
+                        android:id="@+id/park"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:gravity="center"
+                        android:text="I&apos;m Parking Here"
+                        android:textColor="@color/blue_text"
+                        android:textSize="@dimen/medium_text" />
+
+                    <ImageView
+                        android:id="@+id/tick"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:layout_marginRight="10dp"
+                        android:layout_toLeftOf="@+id/imageView2"
+                        android:background="@drawable/tick_mark"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/findrel"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Find my car"
-                    android:textColor="@color/blue_text"
-                    android:textSize="@dimen/medium_text" />
+                    android:background="@color/white_trs1" >
+
+                    <ImageView
+                        android:layout_width="2dp"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:background="@drawable/gry"
+                        android:scaleType="fitXY" />
+
+                    <TextView
+                        android:id="@+id/find"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_alignParentTop="true"
+                        android:layout_centerHorizontal="true"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:text="Find my car"
+                        android:textColor="@color/blue_text"
+                        android:textSize="@dimen/medium_text" />
+                </RelativeLayout>
             </LinearLayout>
         </RelativeLayout>
     </RelativeLayout>

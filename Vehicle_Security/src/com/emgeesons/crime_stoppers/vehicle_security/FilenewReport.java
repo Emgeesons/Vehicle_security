@@ -77,7 +77,7 @@ public class FilenewReport extends SherlockActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		marker = (RelativeLayout) findViewById(R.id.marker);
 		mapview = (RelativeLayout) findViewById(R.id.mapview);
 		marker_label = (TextView) findViewById(R.id.textView1);

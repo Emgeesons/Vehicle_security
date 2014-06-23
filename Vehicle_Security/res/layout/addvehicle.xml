@@ -23,7 +23,8 @@
             android:hint="  Vehicle type"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textSize="17sp" />
 
         <EditText
             android:id="@+id/type_other"
@@ -36,7 +37,7 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="  Specify Vehicle Type"
-            android:visibility="visible" >
+            android:visibility="gone" >
         </EditText>
 
         <LinearLayout
@@ -88,7 +89,8 @@
             android:hint="  Body type"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textSize="17sp" />
 
         <EditText
             android:id="@+id/registration"
@@ -101,6 +103,7 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="  Registration / Serial No"
+            android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
 
@@ -115,6 +118,7 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="  Engine No"
+            android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
 
@@ -129,6 +133,7 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="  Chassis No"
+            android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
 
@@ -143,6 +148,7 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="  Colour"
+            android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
 
@@ -157,6 +163,7 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="  Accessories / Unique features"
+            android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
     </RelativeLayout>

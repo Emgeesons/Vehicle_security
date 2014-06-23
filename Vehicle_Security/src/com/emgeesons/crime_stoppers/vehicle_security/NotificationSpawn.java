@@ -18,7 +18,7 @@ import android.os.PowerManager.WakeLock;
 import android.support.v4.app.NotificationCompat;
 
 public class NotificationSpawn extends BroadcastReceiver {
-	static String name;
+	String name;
 	static DatabaseHandler db;
 	static SQLiteDatabase dbb;
 
@@ -39,10 +39,33 @@ public class NotificationSpawn extends BroadcastReceiver {
 		Uri alarmSound = RingtoneManager
 				.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 		name = intent.getStringExtra("time");
+		db = new DatabaseHandler(context);
+		try {
+
+			db.createDataBase();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		dbb = db.openDataBase();
+		dbb = db.getReadableDatabase();
+		SQLiteDatabase dbbb = this.db.getReadableDatabase();
+		String selectQuery = "SELECT vehicle_model FROM Vehicle_info WHERE vehicle_expmil = '"
+				+ name + "'";
+		Cursor cursor = dbbb.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()) {
+			do {
+				name = cursor.getString(0);
+			} while (cursor.moveToNext());
+		}
+
+		cursor.getCount();
 
 		Notification noti = new NotificationCompat.Builder(context)
-				.setContentTitle("My Wheel").setSmallIcon(R.drawable.ic_app)
-				.setContentIntent(pIntent).setContentText(name)
+				.setContentTitle("My Wheel")
+				.setSmallIcon(R.drawable.app_icon)
+				.setContentIntent(pIntent)
+				.setContentText(
+						"Your " + name + " is due for service in a week")
 				.setSound(alarmSound).build();
 		NotificationManager notificationManager = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -58,12 +81,12 @@ public class NotificationSpawn extends BroadcastReceiver {
 				.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(context, NotificationSpawn.class);
 
-		i.putExtra("time", "Your  " + "  " + title
-				+ " is due for service in a week");
+		i.putExtra("time", String.valueOf(time));
 		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
 
 		// time check .
 		if (System.currentTimeMillis() <= time) {
+			System.out.println(System.currentTimeMillis() - time + "" + time);
 			am.set(AlarmManager.RTC_WAKEUP, time, pi);
 		}
 	}

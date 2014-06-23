@@ -89,7 +89,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(EditInfo.this);
 		db = new DatabaseHandler(EditInfo.this);
 		try {
@@ -124,6 +124,9 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		number.addTextChangedListener(this);
 		email.addTextChangedListener(this);
 		dob.addTextChangedListener(this);
+		lnumber.addTextChangedListener(this);
+		address.addTextChangedListener(this);
+		postcode.addTextChangedListener(this);
 		pin1.addTextChangedListener(this);
 		pin2.addTextChangedListener(this);
 		pin3.addTextChangedListener(this);
@@ -132,9 +135,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		pin2.setOnKeyListener(this);
 		pin3.setOnKeyListener(this);
 		pin4.setOnKeyListener(this);
-		lnumber.addTextChangedListener(this);
-		address.addTextChangedListener(this);
-		postcode.addTextChangedListener(this);
+
 		info = new Data();
 		secqus = getResources().getStringArray(R.array.sec_qus);
 		if (!atPrefs.getBoolean(info.checkllogin, true)) {
@@ -156,7 +157,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			pin2.setText(pinnumber[1]);
 			pin3.setText(pinnumber[2]);
 			pin4.setText(pinnumber[3]);
-			
+
 			if (info.gender.equalsIgnoreCase("male")) {
 				male.setImageResource(R.drawable.male_active);
 				female.setImageResource(R.drawable.female_inactive);
@@ -514,18 +515,18 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 
 				switch (buffKey) {
 				case 0:
-					qus = "What\' s your Passport Number ?";
+					qus = "What' s your Passport Number ?";
 					break;
 				case 1:
-					qus = "What\'s your License Number ?";
+					qus = "What's your License Number ?";
 					break;
 
 				case 2:
-					qus = "What\'s your Mothers Maiden Name ?";
+					qus = "What's your Mothers Maiden Name ?";
 					break;
 
 				case 3:
-					qus = "What\'s your First Pets Name ?";
+					qus = "What's your First Pets Name ?";
 					break;
 
 				case 4:
@@ -670,17 +671,17 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 	@Override
 	public void afterTextChanged(Editable s) {
 		// go next
-		if (pin1.getText().toString().length() == 1) {
+
+		if (pin1.hasFocus() && pin1.getText().toString().length() == 1) {
 			pin2.requestFocus();
 
 		}
-		if (pin2.getText().toString().length() == 1) {
+		if (pin2.hasFocus() && pin2.getText().toString().length() == 1) {
 			pin3.requestFocus();
 		}
-		if (pin3.getText().toString().length() == 1) {
+		if (pin3.hasFocus() && pin3.getText().toString().length() == 1) {
 			pin4.requestFocus();
 		}
-		
 
 		if (!(pin1.getText().toString().isEmpty()
 				|| pin2.getText().toString().isEmpty()

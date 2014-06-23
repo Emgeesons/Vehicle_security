@@ -89,7 +89,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(RegisterActivity.this);
 		db = new DatabaseHandler(RegisterActivity.this);
@@ -334,6 +334,22 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 								} else {
 									otherqus.setVisibility(View.GONE);
 								}
+
+								qus.setText(secqus[buffKey]);
+								qus.setTextColor(getResources().getColor(
+										R.color.black));
+								// int selectedPosition = ((AlertDialog) dialog)
+								// .getListView().getCheckedItemPosition();
+
+								tqus = buffKey;
+								if (qus.getText().toString()
+										.equalsIgnoreCase("Other")) {
+									otherqus.setVisibility(View.VISIBLE);
+								} else {
+									otherqus.setVisibility(View.GONE);
+								}
+								dialog.dismiss();
+
 							}
 						}).setCancelable(false)
 
@@ -603,11 +619,13 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 								.getText().toString(), input_date, title, "",
 								"", "", "", "", "", "", "", "", pin,
 								String.valueOf(qusvalue), answer.getText()
-										.toString(),"");
+										.toString(), "0");
 						db.updateprofileData(data);
+						atPrefs.edit().putBoolean(info.checkllogin, false)
+								.commit();
 						atPrefs.edit()
-								.putBoolean(info.checkllogin,
-										false).commit();
+								.putInt(SplashscreenActivity.progress, 30)
+								.commit();
 						//
 						// atPrefs.edit()
 						// .putInt(SplashscreenActivity.progress, 30)
@@ -693,14 +711,14 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 	@Override
 	public void afterTextChanged(Editable s) {
 		// go next
-		if (pin1.getText().toString().length() == 1) {
+		if (pin1.hasFocus() && pin1.getText().toString().length() == 1) {
 			pin2.requestFocus();
 
 		}
-		if (pin2.getText().toString().length() == 1) {
+		if (pin2.hasFocus() && pin2.getText().toString().length() == 1) {
 			pin3.requestFocus();
 		}
-		if (pin3.getText().toString().length() == 1) {
+		if (pin3.hasFocus() && pin3.getText().toString().length() == 1) {
 			pin4.requestFocus();
 		}
 

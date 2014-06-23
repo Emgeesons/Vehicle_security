@@ -181,8 +181,8 @@ public class GPSTracker implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-		HomescreenActivity h = new HomescreenActivity();
-		h.gpscheck();
+//		HomescreenActivity h = new HomescreenActivity();
+//		h.gpscheck();
 
 	}
 

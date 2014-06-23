@@ -14,6 +14,7 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class DatabaseHandler extends SQLiteOpenHelper {
 	// Database Version
@@ -24,6 +25,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
 	static final String TABLE_profile = "profile";
 	static final String TABLE_Vehicle = "Vehicle_info";
+	static final String TABLE_parking = "Vehicle_park";
 
 	//
 	private static String DB_PATH = "/data/data/com.emgeesons.crime_stoppers.vehicle_security/databases/";
@@ -71,6 +73,16 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String vehicle_insexp = "vehicle_insexp";
 	private static final String vehicle_status = "vehicle_status";
 	private static final String vehicle_expmil = "vehicle_expmil";
+
+	// // Vehicle_park
+	private static final String vehicle_ID = "id";
+	private static final String vehicle_vid = "vid";
+	private static final String vehicle_vmodel = "model";
+	private static final String vehicle_lat = "lat";
+	private static final String vehicle_lon = "lon";
+	private static final String vehicle_comm = "comm";
+	private static final String vehicle_check = "mark";
+	private static final String vehicle_vtype = "type";
 
 	/**
 	 * /** Constructor Takes and keeps a reference of the passed context in
@@ -350,6 +362,52 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						cursor.getString(10), cursor.getString(11),
 						cursor.getString(12), cursor.getString(13),
 						cursor.getString(14), cursor.getString(15));
+				con.add(data);
+			} while (cursor.moveToNext());
+		}
+
+		// closing connection
+		cursor.close();
+		db.close();
+
+		// returning lables
+		return con;
+	}
+
+	// parking
+	public void inserparkData(ParkingData data) {
+		SQLiteDatabase db = this.getWritableDatabase();
+		ContentValues values = new ContentValues();
+		values.put(vehicle_vid, data.getvehicle_id());
+		values.put(vehicle_vmodel, data.getvehicle_model());
+		values.put(vehicle_lat, data.getlat());
+		values.put(vehicle_lon, data.getlon());
+		values.put(vehicle_comm, data.getcomm());
+		values.put(vehicle_check, data.getcheck());
+		values.put(vehicle_vtype, data.gettype());
+		db.insert(TABLE_parking, null, values);
+		// long success = db.insert(TABLE_parking, null, values);
+		// Log.i("sad", String.valueOf(success));
+		db.close(); // Closing database connection
+	}
+
+	// parking
+	public List<ParkingData> getparkingData() {
+		List<ParkingData> con = new ArrayList<ParkingData>();
+
+		// Select All Query
+		String selectQuery = "SELECT * FROM " + TABLE_parking;
+
+		SQLiteDatabase db = this.getReadableDatabase();
+		Cursor cursor = db.rawQuery(selectQuery, null);
+
+		// looping through all rows and adding to list
+		if (cursor.moveToFirst()) {
+			do {
+				ParkingData data = new ParkingData(cursor.getString(1),
+						cursor.getString(2), cursor.getString(3),
+						cursor.getString(4), cursor.getString(5),
+						cursor.getString(6), cursor.getString(7));
 				con.add(data);
 			} while (cursor.moveToNext());
 		}

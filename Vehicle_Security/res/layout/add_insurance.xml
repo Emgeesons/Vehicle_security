@@ -14,7 +14,8 @@
         android:background="@drawable/box_gry"
         android:ems="10"
         android:hint="insurance company name"
-        android:padding="10dp" >
+        android:padding="10dp"
+        android:textSize="17dp" >
     </TextView>
 
     <EditText
@@ -73,7 +74,8 @@
         android:background="@drawable/box_gry"
         android:ems="10"
         android:hint="Expiry"
-        android:padding="10dp" >
+        android:padding="10dp"
+        android:textSize="17dp" >
     </TextView>
 
 </RelativeLayout>

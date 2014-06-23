@@ -28,6 +28,9 @@ public class Data {
 	static String lockcheck = "lockcheck";
 	SharedPreferences atPrefs;
 	static String checkllogin = "checkllogin";
+	static String glatitude = "glatitude";
+	static String glongitude = "glongitude";
+	static String gcomm = "gcomm";
 
 	public void device() {
 		manufacturer = Build.MANUFACTURER;

@@ -57,7 +57,7 @@ public class AddDetails extends SherlockActivity implements TextWatcher {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(AddDetails.this);
 		lnumber = (EditText) findViewById(R.id.Licence);

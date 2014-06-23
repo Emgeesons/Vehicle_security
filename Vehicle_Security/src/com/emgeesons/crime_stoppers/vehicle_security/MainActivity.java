@@ -1,8 +1,13 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
+import java.io.IOException;
+
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -13,7 +18,6 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -35,13 +39,23 @@ public class MainActivity extends SherlockFragmentActivity implements
 	int selectedPosition = -1;
 	SharedPreferences atPrefs;
 	Data info;
+	DatabaseHandler db;
+	SQLiteDatabase dbb;
 	boolean check = true;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		db = new DatabaseHandler(getApplicationContext());
+		try {
 
+			db.createDataBase();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		dbb = db.openDataBase();
+		dbb = db.getReadableDatabase();
 		itemname = new String[] { "Home", "Emergency Numbers", "", "Feedback",
 				"Share App", "Rate Us", "", "Logout" };
 		info = new Data();
@@ -58,7 +72,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setDisplayShowHomeEnabled(true);
 		getSupportActionBar().setDisplayShowTitleEnabled(true);
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
 		drawlayout.setDrawerShadow(R.drawable.box_gry, GravityCompat.START);
@@ -142,9 +156,21 @@ public class MainActivity extends SherlockFragmentActivity implements
 			getSupportActionBar()
 					.setTitle(
 							Html.fromHtml("<font color='#ffffff'>Emergency Numbers</font>"));
+			// hide dropdown from action bar
+			getSupportActionBar()
+					.setNavigationMode(
+							com.actionbarsherlock.app.ActionBar.NAVIGATION_MODE_STANDARD);
+
+			getSupportActionBar().setDisplayShowCustomEnabled(false);
+
 			break;
 
 		case 3:
+			// hide dropdown from action bar
+			getSupportActionBar()
+					.setNavigationMode(
+							com.actionbarsherlock.app.ActionBar.NAVIGATION_MODE_STANDARD);
+
 			if (!atPrefs.getBoolean(info.checkllogin, true)) {
 				Feedback feedback = new Feedback();
 				ft.replace(R.id.content_frame, feedback);
@@ -161,6 +187,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 			break;
 		case 4:
+
 			String message;
 			message = "Check Out My Wheels :-\n https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
 			Intent share = new Intent(Intent.ACTION_SEND);
@@ -176,28 +203,74 @@ public class MainActivity extends SherlockFragmentActivity implements
 			break;
 
 		case 7:
-			SplashscreenActivity.fblogin = true;
-			atPrefs.edit().putBoolean(info.checkllogin, true).commit();
-			Session session = Session.getActiveSession();
-			if (session != null) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(
+					MainActivity.this);
+			builder.setMessage("Are you sure you want to Logout?")
+					.setCancelable(false)
+					.setMessage(
+							"Logging out of the App will erase all User data.")
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
 
-				if (!session.isClosed()) {
-					session.closeAndClearTokenInformation();
-					// clear your preferences if saved
-				}
-			} else {
+								@Override
+								public void onClick(DialogInterface dialog,
+										int which) {
+									// TODO Auto-generated method stub
 
-				session = new Session(this);
-				Session.setActiveSession(session);
+								}
+							})
+					.setPositiveButton("Continue",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									SplashscreenActivity.fblogin = true;
+									atPrefs.edit()
+											.putBoolean(info.checkllogin, true)
+											.commit();
+									atPrefs.edit()
+											.putString(info.glatitude,
+													String.valueOf("not"))
+											.commit();
+									atPrefs.edit()
+											.putString(info.glongitude,
+													String.valueOf("not"))
 
-				session.closeAndClearTokenInformation();
-				// clear your preferences if saved
+											.commit();
+									atPrefs.edit()
+											.putString(
+													SplashscreenActivity.profile_pic,
+													"profilePic.png").commit();
+									Session session = Session
+											.getActiveSession();
+									if (session != null) {
 
-			}
-			Intent nextscreen = new Intent(MainActivity.this,
-					LoginActivity.class);
-			startActivity(nextscreen);
-			finish();
+										if (!session.isClosed()) {
+											session.closeAndClearTokenInformation();
+											// clear your preferences if saved
+										}
+									} else {
+
+										session = new Session(MainActivity.this);
+										Session.setActiveSession(session);
+
+										session.closeAndClearTokenInformation();
+										// clear your preferences if saved
+
+									}
+									dbb.execSQL("delete from Vehicle_info");
+									dbb.execSQL("delete from Vehicle_park");
+									dbb.execSQL("UPDATE profile SET user_id ='',fName='',lName='',email='',mobileNumber='',dob='',gender='',licenseNo='',street='',address='',postcode='',dtModified='',fbId='',fbToken='',contact_name='',contact_number='',pin='',squs='',sans='',spoints=''");
+
+									Intent nextscreen = new Intent(
+											MainActivity.this,
+											LoginActivity.class);
+									startActivity(nextscreen);
+									finish();
+								}
+
+							});
+			builder.show();
+
 			break;
 
 		}

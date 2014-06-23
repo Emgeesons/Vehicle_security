@@ -71,7 +71,7 @@ public class VehicleInfo extends SherlockActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		setContentView(R.layout.vehicle_info);
 		list = (ListView) findViewById(R.id.listView1);
 		info = new Data();
@@ -398,7 +398,8 @@ public class VehicleInfo extends SherlockActivity {
 
 			}
 			// ids.setText(String.valueOf(vehicles.get(position).getvehicle_id()));
-			make.setText(vehicles.get(position).getvehicle_make());
+			make.setText(vehicles.get(position).getvehicle_make() + " "
+					+ vehicles.get(position).getvehicle_model());
 			reg.setText(vehicles.get(position).getvehicle_reg());
 			if (vehicles.get(position).getvehicle_type()
 					.equalsIgnoreCase("Car")) {

@@ -77,7 +77,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		Intent intent = getIntent();
 		email = intent.getStringExtra("email");
 		userid = intent.getStringExtra("userid");

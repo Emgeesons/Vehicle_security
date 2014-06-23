@@ -158,9 +158,12 @@ public class Feedback extends SherlockFragment {
 									public void onClick(DialogInterface dialog,
 											int which) {
 										pDialog.dismiss();
+										Intent next = new Intent(getActivity(),
+												MainActivity.class);
+										startActivity(next);
 									}
 								});
-						Dialog.setCancelable(true);
+						Dialog.setCancelable(false);
 						Dialog.show();
 					}
 				});

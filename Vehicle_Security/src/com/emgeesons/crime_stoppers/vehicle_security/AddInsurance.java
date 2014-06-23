@@ -1,7 +1,10 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -70,6 +73,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 	JSONArray jsonVehicleArr;
 	String profile_url = Data.url + "getProfile.php";
 	SharedPreferences atPrefs;
+	String expdate = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +84,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(AddInsurance.this);
 		cname = (TextView) findViewById(R.id.cname);
@@ -340,8 +344,26 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 					}
 					if (bpolicy == true && bother_name == true
 							&& bother_name == true) {
+						if (!(expdate == null)) {
 
+							String date[] = expdate
+									.split("-");
+							int year = Integer.valueOf(date[0]);
+							int month = Integer.valueOf(date[1]);
+							int day = Integer.valueOf(date[2]);
+
+							Calendar gc = Calendar.getInstance();
+							gc.set(year, month - 1, day, 8, 0);
+							time = gc.getTimeInMillis() - 604800000;
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("UPDATE vehicle_info SET vehicle_expmil = '"
+									+ time + "'WHERE vehicle_id ='" + id + "'");
+							NotificationAlarm
+									.CancelAlarm(getApplicationContext());
+							NotificationAlarm.SetAlarm(getApplicationContext());
+						}
 						addins = new ins().execute();
+
 					}
 				}
 
@@ -392,7 +414,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 				if (expiry.getText().toString().isEmpty()) {
 					json.put("insuranceExpiryDate", "000-00-00");
 				} else {
-					json.put("insuranceExpiryDate", expiry.getText().toString());
+					json.put("insuranceExpiryDate", expdate);
 				}
 
 				json.put("make", info.manufacturer);
@@ -432,7 +454,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 								+ "',vehicle_insno = '"
 								+ policy.getText().toString()
 								+ "',vehicle_insexp = '"
-								+ expiry.getText().toString()
+								+ expdate
 								+ "'WHERE vehicle_id='" + id + "'");
 
 						Intent next = new Intent(AddInsurance.this,
@@ -519,6 +541,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 	private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
 		String month, dates;
 		String title;
+		String input_date ;
 
 		@Override
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
@@ -535,33 +558,30 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 			if (months < 10 || date < 10) {
 				month = StringUtils.leftPad(String.valueOf(months), 2, "0");
 				dates = StringUtils.leftPad(String.valueOf(date), 2, "0");
-
+				 input_date = years + "-" + month + "-" + dates;
 			}
-			String input_date = years + "-" + month + "-" + dates;
+			input_date = years + "-" + months + "-" + date;
 			System.out.println(input_date);
-			expiry.setText(input_date);
-			Calendar gc = Calendar.getInstance();
-			gc.set(years, months - 1, date);
-			// 604800000 for one week before
-			time = gc.getTimeInMillis() - 604800000;
-			SQLiteDatabase dbbb = db.getReadableDatabase();
-			dbbb.execSQL("UPDATE vehicle_info SET vehicle_expmil = '" + time
-					+ "'WHERE vehicle_id ='" + id + "'");
-			String selectQuery = "SELECT vehicle_model FROM Vehicle_info WHERE vehicle_expmil = '"
-					+ time + "'";
-			Cursor cursor = dbbb.rawQuery(selectQuery, null);
-			if (cursor.moveToFirst()) {
-				do {
-					title = cursor.getString(0);
-				} while (cursor.moveToNext());
-			}
+			expdate = input_date;
+			expiry.setText(getdateformate(input_date));
 
-			cursor.getCount();
-			NotificationAlarm.CancelAlarm(getApplicationContext());
-			NotificationAlarm.SetAlarm(getApplicationContext(), title);
 		}
 
 	};
+
+	 public String getdateformate(String _date) {
+	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+	 Date datef;
+	 String dateformat = "";
+	 try {
+	 datef = sdf.parse(_date);
+	 sdf.applyPattern("dd-MMMM-yyyy");
+	 dateformat = sdf.format(datef);
+	 } catch (ParseException e) {
+	 e.printStackTrace();
+	 }
+	 return dateformat;
+	 }
 
 	@Override
 	public void afterTextChanged(Editable arg0) {

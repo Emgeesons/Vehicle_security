@@ -17,9 +17,12 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
@@ -55,6 +58,12 @@ public class Addvehicle extends SherlockActivity implements TextWatcher {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.addvehicle);
+		getSupportActionBar().setTitle(
+				Html.fromHtml("<font color='#FFFFFF'> Add Vehicle</font>"));
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setBackgroundDrawable(
+				new ColorDrawable(Color.parseColor("#060606")));
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		type = (TextView) findViewById(R.id.type);
 		body = (TextView) findViewById(R.id.body);
 		type_other = (EditText) findViewById(R.id.type_other);
@@ -373,7 +382,18 @@ public class Addvehicle extends SherlockActivity implements TextWatcher {
 										.toString(), colour.getText()
 										.toString(), acc.getText().toString(),
 								reg.getText().toString(), "", "", "", "", "");
+
+						ParkingData datas = new ParkingData(vid, model
+								.getText().toString(), "", "", "", "",
+								typevalue);
+						db.inserparkData(datas);
 						db.insertvehicleData(data);
+						// SQLiteDatabase dbbb = db.getReadableDatabase();
+						// dbbb.execSQL("UPDATE vehicle_info SET vehicle_model = '"
+						// + model.getText().toString()
+						//
+						// + "'WHERE vehicle_id='" + "5" + "'");
+
 						Intent next = new Intent(getApplicationContext(),
 								VehicleProfile.class);
 						next.putExtra("id", vid);
@@ -383,6 +403,7 @@ public class Addvehicle extends SherlockActivity implements TextWatcher {
 					}
 				});
 			}
+
 			// response failure
 			else if (success.equals("failure")) {
 

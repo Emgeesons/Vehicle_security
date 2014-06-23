@@ -25,7 +25,7 @@ public class AboutUs extends BaseActivity {
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
-		getSupportActionBar().setIcon(R.drawable.ic_app);
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		call = (TextView) findViewById(R.id.call);
 		call.setOnClickListener(new OnClickListener() {
 

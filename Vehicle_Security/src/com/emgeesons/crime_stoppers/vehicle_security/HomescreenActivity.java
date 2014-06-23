@@ -2,6 +2,9 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.File;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -15,7 +18,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -24,7 +26,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -34,6 +39,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
@@ -42,16 +48,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
+import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -78,7 +84,6 @@ public class HomescreenActivity extends SherlockFragment implements
 	Fragment fragment;
 	RelativeLayout report, file, about;
 	MarkerOptions markerOptions;
-	LocationListener locationListener;
 	private AsyncTask<Void, Void, Void> profile;
 	ProgressDialog pDialog;
 	String profile_url = Data.url + "getProfile.php";
@@ -89,14 +94,27 @@ public class HomescreenActivity extends SherlockFragment implements
 	File sdRoot;
 	String dir;
 	JSONArray jsonVehicleArr;
+	List<ParkingData> vehicles;
+	ArrayList<String> name = new ArrayList<String>();
+	ArrayList<String> no = new ArrayList<String>();
+	ArrayList<String> type = new ArrayList<String>();
+	Connection_Detector cd;
+	Boolean IsInternetPresent;
+	private AsyncTask<Void, Void, Void> details;
+	String details_url = Data.url + "parkingHere.php";
+	String vid, typename;
+	String lat, lon, comm;
+	CircularImageView profilepic;
+	String names;
+	private String imagepath = null;
+	AlertDialog alert;
 
-	@SuppressLint("ResourceAsColor")
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 
 		view = inflater.inflate(R.layout.homescreen_activity, container, false);
-
+		cd = new Connection_Detector(getActivity());
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		db = new DatabaseHandler(getActivity());
 		try {
@@ -107,6 +125,8 @@ public class HomescreenActivity extends SherlockFragment implements
 		}
 		dbb = db.openDataBase();
 		dbb = db.getReadableDatabase();
+		vehicles = db.getparkingData();
+		alert = new AlertDialog.Builder(getActivity()).create();
 		info = new Data();
 		marker = (RelativeLayout) view.findViewById(R.id.marker);
 		mapview = (RelativeLayout) view.findViewById(R.id.mapview);
@@ -120,6 +140,103 @@ public class HomescreenActivity extends SherlockFragment implements
 				.getHeight();
 		d = new downlaod();
 		setHasOptionsMenu(true);
+		if (!(vehicles.size() == 0)) {
+			for (int i = 0; i < vehicles.size(); i++) {
+				name.add(vehicles.get(i).getvehicle_model());
+				no.add(vehicles.get(i).getvehicle_id());
+				type.add(vehicles.get(i).gettype());
+			}
+		}
+
+		ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
+				R.layout.nav_item, name);
+		// hide if no vehicle added
+		if (name.size() == 0) {
+			getSherlockActivity()
+					.getSupportActionBar()
+					.setNavigationMode(
+							com.actionbarsherlock.app.ActionBar.NAVIGATION_MODE_STANDARD);
+			typename = "other";
+			check();
+		} else {
+			getSherlockActivity().getSupportActionBar().setNavigationMode(
+					com.actionbarsherlock.app.ActionBar.NAVIGATION_MODE_LIST);
+		}
+
+		ActionBar.OnNavigationListener navigationListener = new OnNavigationListener() {
+
+			@Override
+			public boolean onNavigationItemSelected(int itemPosition,
+					long itemId) {
+
+				typename = type.get(itemPosition);
+				vid = no.get(itemPosition);
+				// Toast.makeText(getActivity(),
+				// typename + "" + vid + "" + name.get(itemPosition),
+				// Toast.LENGTH_SHORT).show();
+				checkinfo();
+				return false;
+			}
+
+		};
+
+		getSherlockActivity().getSupportActionBar().setListNavigationCallbacks(
+				adapter, navigationListener);
+		adapter.setDropDownViewResource(R.layout.nav_item);
+
+		// add images at right side
+		getSherlockActivity().getSupportActionBar().setDisplayShowTitleEnabled(
+				true);
+		getSherlockActivity().getSupportActionBar().setDisplayUseLogoEnabled(
+				true);
+		getSherlockActivity().getSupportActionBar().setDisplayHomeAsUpEnabled(
+				true);
+		getSherlockActivity().getSupportActionBar()
+				.setDisplayShowCustomEnabled(true);
+		getSherlockActivity().getSupportActionBar().setDisplayShowHomeEnabled(
+				true);
+
+		View customNav = LayoutInflater.from(getActivity()).inflate(
+				R.layout.test, null);
+		profilepic = (CircularImageView) customNav
+				.findViewById(R.id.actionBarLogo);
+		names = atPrefs.getString(SplashscreenActivity.profile_pic,
+				"profilePic.png");
+		sdRoot = Environment.getExternalStorageDirectory();
+		dir = "My Wheel/";
+		File f = new File(sdRoot, dir + names);
+		if (f.exists()) {
+			imagepath = f.getAbsolutePath();
+			Bitmap photo = (Bitmap) decodeFile(imagepath);
+			profilepic.setImageBitmap(photo);
+		} else {
+			profilepic.setImageResource(R.drawable.default_profile);
+		}
+		profilepic.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View view) {
+
+				if (atPrefs.getBoolean(info.checkllogin, true)) {
+					Intent next = new Intent(getActivity(), LoginActivity.class);
+					startActivity(next);
+					getActivity().finish();
+				} else {
+
+					// profile = new getprofile().execute();
+					Intent nextscreen = new Intent(getActivity(),
+							ProfileScreen.class);
+					startActivity(nextscreen);
+
+					getActivity().finish();
+
+				}
+
+			}
+		});
+
+		getSherlockActivity().getSupportActionBar().setCustomView(customNav);
+
 		locationManager = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
 		getActivity()
@@ -130,98 +247,10 @@ public class HomescreenActivity extends SherlockFragment implements
 
 		locationManager = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
-		locationListener = new LocationListener() {
-
-			@Override
-			public void onStatusChanged(String provider, int status,
-					Bundle extras) {
-
-			}
-
-			@Override
-			public void onProviderEnabled(String provider) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onProviderDisabled(String provider) {
-				// TODO Auto-generated method stub
-
-			}
-
-			@Override
-			public void onLocationChanged(Location location) {
-				// TODO Auto-generated method stub
-				LATITUDE = location.getLatitude();
-				LONGITUDE = location.getLongitude();
-
-				gpschecks(LATITUDE, LONGITUDE);
-			}
-		};
-		// locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-		// 30000, 0, new LocationListener() {
-		//
-		// @Override
-		// public void onStatusChanged(String provider, int status,
-		// Bundle extras) {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		//
-		// @Override
-		// public void onProviderEnabled(String provider) {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		//
-		// @Override
-		// public void onProviderDisabled(String provider) {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		//
-		// @Override
-		// public void onLocationChanged(Location location) {
-		// // TODO Auto-generated method stub
-		// LATITUDE = location.getLatitude();
-		// LONGITUDE = location.getLongitude();
-		//
-		// gpschecks(LATITUDE, LONGITUDE);
-		// }
-		// });
-		// locationManager.requestLocationUpdates(
-		// LocationManager.NETWORK_PROVIDER, 30000, 0,
-		// new LocationListener() {
-		//
-		// @Override
-		// public void onStatusChanged(String provider, int status,
-		// Bundle extras) {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		//
-		// @Override
-		// public void onProviderEnabled(String provider) {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		//
-		// @Override
-		// public void onProviderDisabled(String provider) {
-		// // TODO Auto-generated method stub
-		//
-		// }
-		//
-		// @Override
-		// public void onLocationChanged(Location location) {
-		// // TODO Auto-generated method stub
-		// LATITUDE = location.getLatitude();
-		// LONGITUDE = location.getLongitude();
-		//
-		// gpschecks(LATITUDE, LONGITUDE);
-		// }
-		// });
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				30000, 100, this);
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 30000, 100, this);
 
 		// 30% of phone
 		int image_h = height * 30 / 100;
@@ -247,16 +276,16 @@ public class HomescreenActivity extends SherlockFragment implements
 			public void onClick(View arg0) {
 				Intent next = new Intent(getActivity(), ReportSighting.class);
 				startActivity(next);
-				// getActivity().finish();
+				getActivity().finish();
 			}
 		});
 		file.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				Intent next = new Intent(getActivity(), FilenewReport.class);
-				startActivity(next);
-				// getActivity().finish();
+				 Intent next = new Intent(getActivity(), FilenewReport.class);
+				 startActivity(next);
+				 getActivity().finish();
 			}
 		});
 		about.setOnClickListener(new OnClickListener() {
@@ -268,56 +297,219 @@ public class HomescreenActivity extends SherlockFragment implements
 				getActivity().finish();
 			}
 		});
-		// list = (ListView) view.findViewById(R.id.listView1);
-		// title = getResources().getStringArray(R.array.title);
-		// subtitle = getResources().getStringArray(R.array.sub_title);
-		// titleadapter = new ArrayAdapter<String>(getActivity(),
-		// android.R.layout.simple_list_item_1, title);
-		// View footer = getActivity().getLayoutInflater().inflate(
-		// R.layout.homescreen_footer, null);
-		// list.addFooterView(footer);
-		// list.setAdapter(new listAdapter());
-		// list.setOnItemClickListener(new OnItemClickListener() {
-		//
-		// @Override
-		// public void onItemClick(AdapterView<?> parent, View view,
-		// int position, long id) {
-		// Intent next;
-		// switch (position) {
-		//
-		// case 0:
-		// next = new Intent(getActivity(), ReportSighting.class);
-		// startActivity(next);
-		// // finish();
-		// break;
-		// case 1:
-		// next = new Intent(getActivity(), FilenewReport.class);
-		// startActivity(next);
-		// // finish();
-		// break;
-		// case 2:
-		// next = new Intent(getActivity(), AboutUs.class);
-		// startActivity(next);
-		// // finish();
-		// break;
-		//
-		// default:
-		// break;
-		// }
-		// }
-		// });
 
 		park.setOnClickListener(new OnClickListener() {
 
-			@SuppressLint("ResourceAsColor")
 			@Override
 			public void onClick(View v) {
-				park.setBackgroundColor(R.color.blue_text);
-				park.setTextColor(R.color.white);
+				IsInternetPresent = cd.isConnectingToInternet();
+				if (IsInternetPresent == false) {
+					cd.showNoInternetPopup();
+				} else {
+					if (gps.canGetLocation() || !(LATITUDE == 0.0)
+							|| !(LONGITUDE == 0.0)) {
+
+						details = new detail().execute();
+
+					} else {
+						Toast.makeText(
+								getActivity(),
+								"Please allow My Wheels to access Your location . Turn it ON from Location Services",
+								Toast.LENGTH_LONG).show();
+					}
+				}
+
 			}
 		});
 		return view;
 
+	}
+
+	public Bitmap decodeFile(String path) {
+		try {
+			// Decode image size
+			BitmapFactory.Options o = new BitmapFactory.Options();
+			o.inJustDecodeBounds = true;
+			BitmapFactory.decodeFile(path, o);
+			// The new size we want to scale to
+			final int REQUIRED_SIZE = 80;
+
+			// Find the correct scale value. It should be the power of 2.
+			int scale = 1;
+			while (o.outWidth / scale / 2 >= REQUIRED_SIZE
+					&& o.outHeight / scale / 2 >= REQUIRED_SIZE)
+				scale *= 2;
+
+			// Decode with inSampleSize
+			BitmapFactory.Options o2 = new BitmapFactory.Options();
+			o2.inSampleSize = scale;
+			return BitmapFactory.decodeFile(path, o2);
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		return null;
+
+	}
+
+	private class detail extends AsyncTask<Void, Void, Void> {
+		String success, mess, response, id, rate, notip;
+
+		@Override
+		protected void onPreExecute() {
+			super.onPreExecute();
+			pDialog = new ProgressDialog(getActivity());
+			pDialog.setMessage("Parking Details");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
+		}
+
+		@Override
+		protected Void doInBackground(Void... params) {
+
+			DefaultHttpClient httpClient = new DefaultHttpClient();
+			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
+			HttpPost postMethod = new HttpPost(details_url);
+			System.out.println(details_url);
+			JSONArray jsonMainArr;
+			JSONObject json = new JSONObject();
+			try {
+				info.device();
+				info.showInfo(getActivity());
+				if (!atPrefs.getBoolean(info.checkllogin, true)) {
+					json.put("userId", info.user_id);
+					json.put("vehicleId", vid);
+					json.put("pin", info.pin);
+				} else {
+
+					json.put("userId", 0);
+					json.put("vehicleId", 0);
+					//
+					json.put("pin", "0" + "0" + "0" + "0");
+				}
+
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
+				json.put("make", info.manufacturer);
+				json.put("os", "Android" + " " + info.Version);
+				json.put("model", info.model);
+
+				System.out.println("Elements-->" + json);
+				postMethod.setHeader("Content-Type", "application/json");
+				postMethod.setEntity(new ByteArrayEntity(json.toString()
+						.getBytes("UTF8")));
+				String response = httpClient
+						.execute(postMethod, resonseHandler);
+				Log.e("response :", response);
+				JSONObject profile = new JSONObject(response);
+				jsonMainArr = profile.getJSONArray("response");
+				success = profile.getString("status");
+				mess = profile.getString("message");
+				rate = jsonMainArr.getJSONObject(0).getString("rating");
+				notip = jsonMainArr.getJSONObject(0).getString("noTips");
+
+			} catch (JSONException e) {
+				System.out.println("JSONException");
+			} catch (ClientProtocolException e) {
+				System.out.println("ClientProtocolException");
+				e.printStackTrace();
+			} catch (IOException e) {
+				System.out.println("IOException");
+				e.printStackTrace();
+			}
+
+			if (success.equals("success")) {
+
+				getActivity().runOnUiThread(new Runnable() {
+
+					public void run() {
+						if (name.size() == 0) {
+
+							atPrefs.edit()
+									.putString(info.glatitude,
+											String.valueOf(LATITUDE)).commit();
+							atPrefs.edit()
+									.putString(info.glongitude,
+											String.valueOf(LONGITUDE)).commit();
+							// atPrefs.edit()
+							// .putString(gcomm,
+							// String.valueOf(LONGITUDE)).commit();
+
+						} else {
+
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("UPDATE Vehicle_park SET lat = '"
+									+ LATITUDE + "',lon = '" + LONGITUDE
+									+ "',mark = '" + "true" + "',type = '"
+									+ typename + "'WHERE vid='" + vid + "'");
+						}
+						Intent next = new Intent(getActivity(), CarPark.class);
+						next.putExtra("Rate", rate);
+						next.putExtra("tips", notip);
+						next.putExtra("type", typename);
+						next.putExtra("id", vid);
+						next.putExtra("Address", getaddress());
+						startActivity(next);
+						getActivity().finish();
+
+					}
+				});
+			}
+			// response failure
+			else if (success.equals("failure")) {
+
+				getActivity().runOnUiThread(new Runnable() {
+
+					public void run() {
+						final AlertDialog Dialog = new AlertDialog.Builder(
+								getActivity()).create();
+						Dialog.setTitle("Error");
+						Dialog.setIcon(R.drawable.ic_action_error);
+						Dialog.setMessage(mess);
+						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										pDialog.dismiss();
+									}
+								});
+						Dialog.setCancelable(true);
+						Dialog.show();
+					}
+				});
+
+			} else if (success.equals("error")) {
+
+				getActivity().runOnUiThread(new Runnable() {
+
+					public void run() {
+						final AlertDialog Dialog = new AlertDialog.Builder(
+								getActivity()).create();
+						Dialog.setTitle("Error");
+						Dialog.setIcon(R.drawable.ic_action_error);
+						Dialog.setMessage(mess);
+						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										pDialog.dismiss();
+									}
+								});
+						Dialog.setCancelable(true);
+						Dialog.show();
+					}
+				});
+			}
+
+			return null;
+
+		}
+
+		@Override
+		protected void onPostExecute(Void notUsed) {
+			pDialog.dismiss();
+
+		}
 	}
 
 	private BroadcastReceiver mlocation = new BroadcastReceiver() {
@@ -333,6 +525,7 @@ public class HomescreenActivity extends SherlockFragment implements
 	public void onDestroy() {
 		super.onDestroy();
 		getActivity().unregisterReceiver(mlocation);
+		locationManager.removeUpdates(this);
 
 	}
 
@@ -501,68 +694,14 @@ public class HomescreenActivity extends SherlockFragment implements
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 			onchange();
 
-			// pos = String.valueOf(position.latitude)
-			// + String.valueOf(position.longitude);
-
-			// when map is move
-			// map.setOnCameraChangeListener(new OnCameraChangeListener() {
-			// public void onCameraChange(CameraPosition arg0) {
-			//
-			// map.clear();
-			// LATITUDE = arg0.target.latitude;
-			// LONGITUDE = arg0.target.longitude;
-			// new update().execute();
-			// onchange();
-			//
-			// // pos = String.valueOf(arg0.target.latitude) + " "
-			// // + String.valueOf(arg0.target.longitude);
-			//
-			// }
-			// });
-
-			// map.setOnMapClickListener(new OnMapClickListener() {
-			//
-			// @Override
-			// public void onMapClick(LatLng latLng) {
-			//
-			// // Creating a marker
-			// MarkerOptions markerOptions = new MarkerOptions();
-			//
-			// // Setting the position for the marker
-			// markerOptions.position(latLng);
-			//
-			// // Setting the title for the marker.
-			// // This will be displayed on taping the marker
-			// markerOptions.title(latLng.latitude + " : "
-			// + latLng.longitude);
-			//
-			// // Clears the previously touched position
-			// map.clear();
-			//
-			// // Animating to the touched position
-			// map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-			//
-			// // Placing a marker on the touched position
-			// map.addMarker(markerOptions);
-			// }
-			// });
-			// map.addMarker(new MarkerOptions().position(currlocation).title(
-			// "Current location"));
-			// map.moveCamera(CameraUpdateFactory.newLatLngZoom(currlocation,
-			// 12));
-			// // Zoom in, animating the camera.
-			// map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
 		} else {
 
-			// Ask user to enable GPS/network in settings
-
 			// give popup for 1st time
-			if (!IsAlertDialogShown) {
-				return;
+			if (!alert.isShowing()) {
+				showAlert();
 			}
-			gps.showSettingsAlert();
-			IsAlertDialogShown = false;
+
+			// IsAlertDialogShown = false;
 		}
 	}
 
@@ -578,68 +717,13 @@ public class HomescreenActivity extends SherlockFragment implements
 			map.getUiSettings().setZoomControlsEnabled(false);
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 			onchange();
-			// pos = String.valueOf(position.latitude)
-			// + String.valueOf(position.longitude);
-
-			// when map is move
-			// map.setOnCameraChangeListener(new OnCameraChangeListener() {
-			// public void onCameraChange(CameraPosition arg0) {
-			//
-			// map.clear();
-			// LATITUDE = arg0.target.latitude;
-			// LONGITUDE = arg0.target.longitude;
-			// new update().execute();
-			// onchange();
-			//
-			// // pos = String.valueOf(arg0.target.latitude) + " "
-			// // + String.valueOf(arg0.target.longitude);
-			//
-			// }
-			// });
-
-			// map.setOnMapClickListener(new OnMapClickListener() {
-			//
-			// @Override
-			// public void onMapClick(LatLng latLng) {
-			//
-			// // Creating a marker
-			// MarkerOptions markerOptions = new MarkerOptions();
-			//
-			// // Setting the position for the marker
-			// markerOptions.position(latLng);
-			//
-			// // Setting the title for the marker.
-			// // This will be displayed on taping the marker
-			// markerOptions.title(latLng.latitude + " : "
-			// + latLng.longitude);
-			//
-			// // Clears the previously touched position
-			// map.clear();
-			//
-			// // Animating to the touched position
-			// map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-			//
-			// // Placing a marker on the touched position
-			// map.addMarker(markerOptions);
-			// }
-			// });
-			// map.addMarker(new MarkerOptions().position(currlocation).title(
-			// "Current location"));
-			// map.moveCamera(CameraUpdateFactory.newLatLngZoom(currlocation,
-			// 12));
-			// // Zoom in, animating the camera.
-			// map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
 
 		} else {
 
-			// Ask user to enable GPS/network in settings
-
-			// give popup for 1st time
-			if (!IsAlertDialogShown) {
-				return;
+			if (!alert.isShowing()) {
+				showAlert();
 			}
-			gps.showSettingsAlert();
-			IsAlertDialogShown = false;
+
 		}
 	}
 
@@ -647,36 +731,18 @@ public class HomescreenActivity extends SherlockFragment implements
 	public void onLocationChanged(Location location) {
 		LATITUDE = location.getLatitude();
 		LONGITUDE = location.getLongitude();
-
-		gpschecks(LATITUDE, LONGITUDE);
+		gpscheck();
+		// gpschecks(LATITUDE, LONGITUDE);
 	}
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		// locationManager = (LocationManager) getActivity().getSystemService(
-		// Context.LOCATION_SERVICE);
-		// if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-		// {
-		// locationManager.requestLocationUpdates(
-		// LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-		// } else {
-		// locationManager.requestLocationUpdates(
-		// LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-		// }
+
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		// locationManager = (LocationManager) getActivity().getSystemService(
-		// Context.LOCATION_SERVICE);
-		// if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
-		// {
-		// locationManager.requestLocationUpdates(
-		// LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-		// } else {
-		// locationManager.requestLocationUpdates(
-		// LocationManager.NETWORK_PROVIDER, 0, 0, locationListener);
-		// }
+
 	}
 
 	@Override
@@ -684,36 +750,23 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	}
 
-	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(R.menu.homescreen, menu);
-		menu.add("Notification").setIcon(R.drawable.default_profile_home)
-				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
+	//
+	public void onPause() {
+		super.onPause();
+		// locationManager.removeUpdates(this);
+	};
 
-					@Override
-					public boolean onMenuItemClick(MenuItem item) {
-						// login check
-						if (atPrefs.getBoolean(info.checkllogin, true)) {
-							Intent next = new Intent(getActivity(),
-									LoginActivity.class);
-							startActivity(next);
-							getActivity().finish();
-						} else {
-
-							profile = new getprofile().execute();
-
-						}
-
-						return false;
-					}
-				}).setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
-
-	}
+	public void onStop() {
+		super.onStop();
+		// locationManager.removeUpdates(this);
+	};
 
 	private class getprofile extends AsyncTask<Void, Void, Void> {
 		String success, mess, response;
 		String user_id, fName, lName, email, mobileNumber, dob, gender,
 				licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-				cname, cnumber, sques, sans, photourl, photoname, pin, points;
+				cname, cnumber, sques, sans, photourl, photoname, pin, points,
+				exp;
 		int profilecom;
 
 		// vehicle
@@ -826,6 +879,8 @@ public class HomescreenActivity extends SherlockFragment implements
 										profilecom).commit();
 						atPrefs.edit().putBoolean(info.checkllogin, false)
 								.commit();
+
+						SQLiteDatabase dbb = db.getReadableDatabase();
 						dbb.execSQL("delete from Vehicle_info");
 						for (int i = 0; i < jsonVehicleArr.length(); i++) {
 
@@ -842,14 +897,36 @@ public class HomescreenActivity extends SherlockFragment implements
 										.getString("registration_serial_no");
 								vstatus = jsonVehicleArr.getJSONObject(i)
 										.getString("vehicle_status");
-
+								exp = jsonVehicleArr.getJSONObject(i)
+										.getString("insurance_expiry_date");
+								String[] date = exp.split("\\s+");
 								db = new DatabaseHandler(getActivity());
 								VehicleData datas = new VehicleData(vid, vtype,
 										vmake, vmodel, "", "", "", "", "", reg,
-										"", "", "", vstatus, "");
+										"", "", date[0], vstatus, "");
 								db.insertvehicleData(datas);
+								if (date[0].equalsIgnoreCase("0000-00-00")) {
+								} else {
+									String toParse = date[0] + " " + 8 + ":"
+											+ 00;
+									SimpleDateFormat formatter = new SimpleDateFormat(
+											"yyyy-MM-dd h:m");
+									Date dates = formatter.parse(toParse);
+									long millis = dates.getTime();
+									long time = millis - 604800000;
+
+									dbb.execSQL("UPDATE vehicle_info SET vehicle_expmil = '"
+											+ time
+											+ "'WHERE vehicle_id ='"
+											+ vid + "'");
+									NotificationAlarm
+											.CancelAlarm(getActivity());
+									NotificationAlarm.SetAlarm(getActivity());
+								}
+
 							} catch (JSONException e) {
-								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (java.text.ParseException e) {
 								e.printStackTrace();
 							}
 
@@ -863,7 +940,10 @@ public class HomescreenActivity extends SherlockFragment implements
 								String dowlaod = "/My Wheel";
 								File photo = new File(sdRoot, dir + photoname);
 								if (photo.exists()) {
-
+									atPrefs.edit()
+											.putString(
+													SplashscreenActivity.profile_pic,
+													photoname).commit();
 								} else {
 									try {
 										d.DownloadFromUrl(photourl, photoname,
@@ -926,6 +1006,7 @@ public class HomescreenActivity extends SherlockFragment implements
 										pDialog.dismiss();
 									}
 								});
+
 						Dialog.setCancelable(true);
 						Dialog.show();
 					}
@@ -944,114 +1025,261 @@ public class HomescreenActivity extends SherlockFragment implements
 		}
 	}
 
-	// private class listAdapter extends BaseAdapter {
-	//
-	// @Override
-	// public int getCount() {
-	// return titleadapter.getCount();
-	// }
-	//
-	// @Override
-	// public Object getItem(int position) {
-	// return null;
-	// }
-	//
-	// @Override
-	// public long getItemId(int position) {
-	// return 0;
-	// }
-	//
-	// @Override
-	// public View getView(int position, View convertView, ViewGroup parent) {
-	// View v;
-	// if (convertView == null) {
-	// v = getActivity().getLayoutInflater().inflate(
-	// R.layout.homescreen_items, null);
-	// } else {
-	// v = convertView;
-	// }
-	// ImageView image = (ImageView) v.findViewById(R.id.imageView1);
-	// for (int i = 0; i < images.length; i++) {
-	// if (position == i) {
-	// image.setImageResource(images[i]);
-	// }
-	//
-	// }
-	// TextView title = (TextView) v.findViewById(R.id.title);
-	// TextView sub_title = (TextView) v.findViewById(R.id.sub_title);
-	// title.setText(titleadapter.getItem(position));
-	// sub_title.setText(subtitle[position]);
-	//
-	// return v;
-	// }
-	// }
+	public void showAlert() {
+		HomescreenActivity n = new HomescreenActivity();
+		if (!(n == null)) {
 
-	// @Override
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// // Inflate the menu; this adds items to the action bar if it is present.
-	// getActivity().getMenuInflater().inflate(R.menu.homescreen, menu);
-	// return true;
-	// }
+			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+			builder.setTitle("No location access")
+					.setMessage(
+							"Please allow User App to access your location.Turn it On From Location Services")
+					.setCancelable(false)
+					.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.dismiss();
+								}
+							})
+					.setPositiveButton("Settings",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									Intent intent = new Intent(
+											Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+									startActivity(intent);
+								}
+							});
+			alert = builder.create();
+			alert.show();
+		}
+	}
 
-	// @Override
-	// public void onLocationChanged(Location location) {
-	//
-	// // Toast.makeText(getApplicationContext(),
-	// // "change" + LATITUDE + LONGITUDE, Toast.LENGTH_LONG).show();
-	//
-	// }
-	//
-	// @Override
-	// public void onProviderDisabled(String provider) {
-	// // Toast.makeText(getApplicationContext(), "off" + LATITUDE + LONGITUDE,
-	// // Toast.LENGTH_LONG).show();
-	// }
-	//
-	// @Override
-	// public void onProviderEnabled(String provider) {
-	// gpscheck();
-	// // Toast.makeText(getApplicationContext(), "on" + LATITUDE + LONGITUDE,
-	// // Toast.LENGTH_LONG).show();
-	// }
-	//
-	// @Override
-	// public void onStatusChanged(String provider, int status, Bundle extras) {
-	// // gpscheck();
-	// }
-	// public boolean onOptionsItemSelected(MenuItem item) {
-	// // Handle item selection
-	// switch (item.getItemId()) {
-	// case R.id.action_settings:
-	// SplashscreenActivity.fblogin = true;
-	// atPrefs.edit().putBoolean(SplashscreenActivity.checkllogin, true)
-	// .commit();
-	// Session session = Session.getActiveSession();
-	// if (session != null) {
-	//
-	// if (!session.isClosed()) {
-	// session.closeAndClearTokenInformation();
-	// // clear your preferences if saved
-	// }
-	// } else {
-	//
-	// session = new Session(this);
-	// Session.setActiveSession(session);
-	//
-	// session.closeAndClearTokenInformation();
-	// // clear your preferences if saved
-	//
-	// }
-	// Intent nextscreen = new Intent(HomescreenActivity.this,
-	// LoginActivity.class);
-	// startActivity(nextscreen);
-	// finish();
-	//
-	// return true;
-	//
-	// default:
-	// return super.onOptionsItemSelected(item);
-	// }
-	//
-	// }
+	private void checkinfo() {
+
+		RelativeLayout parkrel;
+		parkrel = (RelativeLayout) view.findViewById(R.id.parkrel);
+		ImageView tick = (ImageView) view.findViewById(R.id.tick);
+		final SQLiteDatabase dbbb = this.db.getReadableDatabase();
+		String selectQuery = "SELECT * FROM Vehicle_park WHERE vid = '" + vid
+				+ "'";
+		Cursor cursor = dbbb.rawQuery(selectQuery, null);
+		if (cursor.moveToFirst()) {
+			do {
+
+				lat = cursor.getString(3);
+				lon = cursor.getString(4);
+				comm = cursor.getString(5);
+			} while (cursor.moveToNext());
+		}
+
+		if (!lat.isEmpty()) {
+
+			tick.setVisibility(View.VISIBLE);
+			parkrel.setBackgroundColor(getResources().getColor(
+					R.color.blue_text));
+			park.setTextColor(getResources().getColor(R.color.white));
+			find.setEnabled(true);
+			find.setTextColor(getResources().getColor(R.color.blue_text));
+
+			find.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					Intent next = new Intent(getActivity(), FindVehicle.class);
+					next.putExtra("lat", lat);
+					next.putExtra("lon", lon);
+					next.putExtra("id", vid);
+					next.putExtra("comm", comm);
+
+					startActivity(next);
+					getActivity().finish();
+				}
+			});
+			park.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+							getActivity());
+
+					alertDialog.setTitle("Cancel parking");
+					alertDialog
+							.setMessage("Please confirm your vehicle is not parked here");
+
+					alertDialog.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dbbb.execSQL("UPDATE Vehicle_park SET lat = '"
+											+ ""
+											+ "',lon = '"
+											+ ""
+											+ "',mark = '"
+											+ ""
+											+ "'WHERE vid='" + vid + "'");
+
+									checkinfo();
+								}
+							});
+
+					alertDialog.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+							});
+
+					alertDialog.show();
+
+				}
+			});
+
+		} else {
+			tick.setVisibility(View.GONE);
+			parkrel.setBackgroundColor(getResources().getColor(
+					R.color.white_trs1));
+			park.setTextColor(getResources().getColor(R.color.blue_text));
+			find.setTextColor(getResources().getColor(R.color.blue_trs));
+			find.setEnabled(false);
+			find.setAlpha(50);
+			park.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					IsInternetPresent = cd.isConnectingToInternet();
+					if (IsInternetPresent == false) {
+						cd.showNoInternetPopup();
+					} else {
+						if (gps.canGetLocation() || !(LATITUDE == 0.0)
+								|| !(LONGITUDE == 0.0)) {
+
+							details = new detail().execute();
+
+						} else {
+							Toast.makeText(
+									getActivity(),
+									"Please allow My Wheels to access Your location . Turn it ON from Location Services",
+									Toast.LENGTH_LONG).show();
+						}
+					}
+
+				}
+			});
+
+		}
+
+	}
+
+	private void check() {
+
+		RelativeLayout parkrel;
+		parkrel = (RelativeLayout) view.findViewById(R.id.parkrel);
+		ImageView tick = (ImageView) view.findViewById(R.id.tick);
+		final SQLiteDatabase dbbb = this.db.getReadableDatabase();
+
+		lat = atPrefs.getString(info.glatitude, "not");
+		lon = atPrefs.getString(info.glongitude, "not");
+		comm = atPrefs.getString(info.gcomm, "not");
+
+		if (!lat.equalsIgnoreCase("not")) {
+
+			tick.setVisibility(View.VISIBLE);
+			parkrel.setBackgroundColor(getResources().getColor(
+					R.color.blue_text));
+			park.setTextColor(getResources().getColor(R.color.white));
+			find.setEnabled(true);
+			find.setTextColor(getResources().getColor(R.color.blue_text));
+
+			find.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					Intent next = new Intent(getActivity(), FindVehicle.class);
+					next.putExtra("lat", lat);
+					next.putExtra("lon", lon);
+					next.putExtra("id", vid);
+					next.putExtra("comm", comm);
+
+					startActivity(next);
+					getActivity().finish();
+				}
+			});
+			park.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View v) {
+					AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+							getActivity());
+
+					alertDialog.setTitle("Cancel parking");
+					alertDialog
+							.setMessage("Please confirm your vehicle is not parked here");
+
+					alertDialog.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dbbb.execSQL("UPDATE Vehicle_park SET lat = '"
+											+ ""
+											+ "',lon = '"
+											+ ""
+											+ "',mark = '"
+											+ ""
+											+ "'WHERE vid='" + vid + "'");
+
+									check();
+								}
+							});
+
+					alertDialog.setNegativeButton("Cancel",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.cancel();
+								}
+							});
+
+					alertDialog.show();
+
+				}
+			});
+
+		} else {
+			tick.setVisibility(View.GONE);
+			parkrel.setBackgroundColor(getResources().getColor(
+					R.color.white_trs1));
+			park.setTextColor(getResources().getColor(R.color.blue_text));
+			find.setTextColor(getResources().getColor(R.color.blue_trs));
+			find.setEnabled(false);
+			find.setAlpha(50);
+			park.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					IsInternetPresent = cd.isConnectingToInternet();
+					if (IsInternetPresent == false) {
+						cd.showNoInternetPopup();
+					} else {
+						if (gps.canGetLocation() || !(LATITUDE == 0.0)
+								|| !(LONGITUDE == 0.0)) {
+
+							details = new detail().execute();
+
+						} else {
+							Toast.makeText(
+									getActivity(),
+									"Please allow My Wheels to access Your location . Turn it ON from Location Services",
+									Toast.LENGTH_LONG).show();
+						}
+					}
+
+				}
+			});
+
+		}
+
+	}
 
 }

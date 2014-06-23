@@ -26,5 +26,7 @@
     <string name="title_activity_editvehicle">Editvehicle</string>
     <string name="title_activity_add_insurance">AddInsurance</string>
     <string name="title_activity_vehicle_info">VehicleInfo</string>
+    <string name="title_activity_car_park">CarPark</string>
+    <string name="title_activity_find_vehicle">FindVehicle</string>
 
 </resources>
