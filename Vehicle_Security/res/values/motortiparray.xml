@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="motor_tip">
+        <item>what\’s the My Wheels User Rating here?</item>
+        <item>well lit spot?</item>
+        <item>spot in full view of people?</item>
+        <item>steering and ignition locked and taking the key?</item>
+        <item>locked to something immovable eg light pole?</item>
+        <item>got a good quality lock – chain lock, U-wheel lock?</item>
+        <item>forks or disk brakes lock with large, bright colour tags?</item>
+        <item>near a security camera or on-site staff?</item>
+        <item>not parked next to or between large trucks or SUVs?</item>
+        <item>motorcycle cover is on? </item>
+        <item>if riding with others – bikes locked together?</item>
+        <item>if home – off the road?</item>
+        <item>if home – in a locked garage?</item>
+        <item>if home – chained to U-bolt in garage floor?</item>
+    </string-array>
+
+</resources>

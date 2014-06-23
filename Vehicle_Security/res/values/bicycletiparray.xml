@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="bicycle_tip">
+        <item>what\’s the My Wheels User Rating here?</item>
+        <item>well lit spot?</item>
+        <item>spot in full view of people?</item>
+        <item>got a good quality lock – cable or D-lock, padlock and chain??</item>
+        <item>frame and both wheels locked to something immovable?</item>
+        <item>removed everything that can be taken – helmet, light, pump?</item>
+        <item>near a security camera or on-site staff?</item>
+        <item>if home – locked in garage or inside house?</item>
+    </string-array>
+
+</resources>

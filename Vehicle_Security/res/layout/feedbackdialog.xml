@@ -1,0 +1,95 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".AboutUs" >
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="41dp"
+            android:src="@drawable/im_points" />
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/imageView1"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="16dp"
+            android:text="Post a Feedback and gain Samaritan points"
+            android:textSize="@dimen/big_text" />
+
+        <EditText
+            android:id="@+id/feedback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/ratebar"
+            android:layout_margin="10dp"
+            android:layout_marginTop="11dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:gravity="top|left"
+            android:hint="eg: Police Station nearby,24hr service station oppossite,well-lit street with lots of people around"
+            android:inputType="textMultiLine"
+            android:lines="8"
+            android:padding="10dp"
+            android:scrollbars="vertical" />
+
+        <RatingBar
+            android:id="@+id/ratebar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/textView1"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="18dp"
+            android:max="100"
+            android:numStars="5"
+            android:stepSize="0.0" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/linearLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/relativeLayout1"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/box_whiteb"
+        android:weightSum="2" >
+
+        <TextView
+            android:id="@+id/skip"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1.00"
+            android:background="@drawable/box_whiteb"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="Skip"
+            android:textSize="@dimen/big_text" />
+
+        <TextView
+            android:id="@+id/post"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:padding="15dp"
+            android:text="Post"
+            android:textSize="@dimen/big_text" />
+    </LinearLayout>
+
+</RelativeLayout>

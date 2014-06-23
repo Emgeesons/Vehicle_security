@@ -88,7 +88,7 @@ public class ReportSighting extends SherlockActivity {
 	final static CharSequence[] typeSighting = { "Theft", "Vandalism",
 			"Suspicious Activity", "Other" };
 	int tSighting;
-	// static int selected = -1;
+	Data info;
 	static int buffKey = 0;
 	String datevalue, timevalue;
 	int years, months, dates, Hrs, min;
@@ -131,6 +131,7 @@ public class ReportSighting extends SherlockActivity {
 		pic1 = (CircularImageView) findViewById(R.id.pic1);
 		pic2 = (CircularImageView) findViewById(R.id.pic2);
 		pic3 = (CircularImageView) findViewById(R.id.pic3);
+		info = new Data();
 		// takenpic = (LinearLayout) findViewById(R.id.pic);
 		send = (Button) findViewById(R.id.send);
 		sdRoot = Environment.getExternalStorageDirectory();
@@ -178,7 +179,7 @@ public class ReportSighting extends SherlockActivity {
 		ctimevalue = timevalue;
 		cdatevalue = datevalue;
 		System.out.println(cdatevalue + "," + ctimevalue);
-		date.setText(datevalue + "," + timevalue);
+		date.setText((info.getdateformate(datevalue + "" + timevalue)) + ampm);
 		checkpic();
 		picclick();
 		expand.setOnClickListener(new OnClickListener() {
@@ -296,8 +297,8 @@ public class ReportSighting extends SherlockActivity {
 
 					@Override
 					public void onClick(View v) {
-
-						date.setText(datevalue + "," + timevalue);
+						date.setText((info.getdateformate(datevalue + ""
+								+ timevalue)));
 						dialog.dismiss();
 					}
 				});
@@ -825,11 +826,26 @@ public class ReportSighting extends SherlockActivity {
 	}
 
 	@Override
+	public void onBackPressed() {
+
+		Intent next = new Intent(getApplicationContext(), MainActivity.class);
+		startActivity(next);
+		finish();
+		super.onBackPressed();
+	}
+
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
+
 			// app icon @ action bar clicked; go home
-			super.onBackPressed();
+			Intent next = new Intent(getApplicationContext(),
+					MainActivity.class);
+
+			startActivity(next);
+			finish();
+
 			break;
 		}
 		return true;

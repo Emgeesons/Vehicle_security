@@ -1,7 +1,10 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 
 import android.R.integer;
@@ -20,7 +23,7 @@ public class Data {
 	String user_id, fName, lName, email, mobileNumber, dob, gender, licenseNo,
 			street, address, postcode, dtModified, fbId, fbToken, contact_name,
 			contact_number, pin, sans, type, make, vmodel, reg, body, eng, vin,
-			color, acc, iname, ipolicy, exp, spoints,status;
+			color, acc, iname, ipolicy, exp, spoints, status;
 	int squs;
 	int year, month, date;
 
@@ -58,6 +61,20 @@ public class Data {
 			a = 0;
 		}
 		return a;
+	}
+
+	public String getdateformate(String date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddhh:mm");
+		Date datef;
+		String dateformat = "";
+		try {
+			datef = sdf.parse(date);
+			sdf.applyPattern("E,MMMM dd,yyyy, HH:mm aaa");
+			dateformat = sdf.format(datef);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return dateformat;
 	}
 
 	public int qusvalues(String qus) {
@@ -189,7 +206,8 @@ public class Data {
 				ipolicy = cursor.getString(cursor
 						.getColumnIndex("vehicle_insno"));
 				exp = cursor.getString(cursor.getColumnIndex("vehicle_insexp"));
-				status = cursor.getString(cursor.getColumnIndex("vehicle_status"));
+				status = cursor.getString(cursor
+						.getColumnIndex("vehicle_status"));
 			} while (cursor.moveToNext());
 		}
 	}
