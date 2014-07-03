@@ -36,7 +36,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class Addvehicle extends SherlockActivity implements TextWatcher {
+public class Addvehicle extends BaseActivity implements TextWatcher {
 	TextView type, body;
 	EditText type_other, make, model, reg, engine, chassis, colour, acc;
 	boolean btype, bbody, btype_other, bmake, bmodel, breg, beng, bchassis,
@@ -57,7 +57,7 @@ public class Addvehicle extends SherlockActivity implements TextWatcher {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.addvehicle);
+		// setContentView(R.layout.addvehicle);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'> Add Vehicle</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -513,6 +513,12 @@ public class Addvehicle extends SherlockActivity implements TextWatcher {
 			break;
 		}
 		return true;
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.addvehicle;
 	}
 
 }

@@ -3,68 +3,77 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
-    <ScrollView
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fillViewport="true"
-        android:scrollbars="none" >
+        tools:context=".FilenewReport" >
 
         <RelativeLayout
+            android:id="@+id/mapview"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            tools:context=".FilenewReport" >
+            android:layout_height="200dp" >
+
+            <fragment
+                android:id="@+id/map"
+                android:name="com.google.android.gms.maps.MapFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true" />
 
             <RelativeLayout
-                android:id="@+id/mapview"
+                android:id="@+id/marker"
                 android:layout_width="match_parent"
-                android:layout_height="200dp" >
+                android:layout_height="match_parent" >
 
-                <fragment
-                    android:id="@+id/map"
-                    android:name="com.google.android.gms.maps.MapFragment"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_alignParentTop="true" />
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_above="@+id/imageView1"
+                    android:layout_centerHorizontal="true"
+                    android:text="Large Text"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <RelativeLayout
-                    android:id="@+id/marker"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" >
+                <ImageView
+                    android:id="@+id/expand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginRight="16dp"
+                    android:layout_marginTop="5dp"
+                    android:src="@drawable/ic_expand_map" />
 
-                    <ImageView
-                        android:id="@+id/imageView1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_centerHorizontal="true"
-                        android:layout_centerVertical="true"
-                        android:src="@drawable/location_marker" />
+                <TextView
+                    android:id="@+id/textView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:layout_centerVertical="true"
+                    android:text="TextView"
+                    android:visibility="invisible" />
 
-                    <TextView
-                        android:id="@+id/textView1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_above="@+id/imageView1"
-                        android:layout_centerHorizontal="true"
-                        android:text="Large Text"
-                        android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                    <ImageView
-                        android:id="@+id/expand"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:layout_alignParentTop="true"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginTop="5dp"
-                        android:src="@drawable/ic_expand_map" />
-                </RelativeLayout>
+                <ImageView
+                    android:id="@+id/imageView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBottom="@+id/textView2"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/location_marker" />
             </RelativeLayout>
+        </RelativeLayout>
+
+        <ScrollView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/mapview"
+            android:fillViewport="true"
+            android:scrollbars="none" >
 
             <RelativeLayout
                 android:id="@+id/relativeLayout1"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_below="@+id/mapview"
                 android:padding="@dimen/ten" >
 
                 <TextView
@@ -101,7 +110,8 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/box_gry"
                     android:hint="registration/serial no"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:singleLine="true" />
 
                 <EditText
                     android:id="@+id/vmake"
@@ -113,7 +123,8 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/box_gry"
                     android:hint="make"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:singleLine="true" />
 
                 <LinearLayout
                     android:id="@+id/l"
@@ -131,7 +142,8 @@
                         android:background="@drawable/box_gry"
                         android:hint="vehicle model"
                         android:nextFocusDown="@+id/color"
-                        android:paddingLeft="10dp" />
+                        android:paddingLeft="10dp"
+                        android:singleLine="true" />
 
                     <EditText
                         android:id="@+id/color"
@@ -140,7 +152,8 @@
                         android:layout_weight="1"
                         android:background="@drawable/box_gry"
                         android:hint="color"
-                        android:padding="10dp" />
+                        android:padding="10dp"
+                        android:singleLine="true" />
                 </LinearLayout>
 
                 <EditText
@@ -153,7 +166,8 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/box_gry"
                     android:hint="comments"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:singleLine="true" />
 
                 <RelativeLayout
                     android:id="@+id/pic"
@@ -215,7 +229,7 @@
                     android:text="Send"
                     android:textColor="@color/white" />
             </RelativeLayout>
-        </RelativeLayout>
-    </ScrollView>
+        </ScrollView>
+    </RelativeLayout>
 
 </RelativeLayout>

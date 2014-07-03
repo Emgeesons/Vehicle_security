@@ -47,7 +47,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class AddInsurance extends SherlockActivity implements TextWatcher {
+public class AddInsurance extends BaseActivity implements TextWatcher {
 	TextView cname, expiry;
 	EditText other_name, policy, number;
 	String type, id, call;
@@ -78,7 +78,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.add_insurance);
+		// setContentView(R.layout.add_insurance);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'> Add Insurance</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -346,8 +346,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 							&& bother_name == true) {
 						if (!(expdate == null)) {
 
-							String date[] = expdate
-									.split("-");
+							String date[] = expdate.split("-");
 							int year = Integer.valueOf(date[0]);
 							int month = Integer.valueOf(date[1]);
 							int day = Integer.valueOf(date[2]);
@@ -541,7 +540,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 	private DatePickerDialog.OnDateSetListener datePickerListener = new DatePickerDialog.OnDateSetListener() {
 		String month, dates;
 		String title;
-		String input_date ;
+		String input_date;
 
 		@Override
 		public void onDateSet(DatePicker view, int year, int monthOfYear,
@@ -558,7 +557,7 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 			if (months < 10 || date < 10) {
 				month = StringUtils.leftPad(String.valueOf(months), 2, "0");
 				dates = StringUtils.leftPad(String.valueOf(date), 2, "0");
-				 input_date = years + "-" + month + "-" + dates;
+				input_date = years + "-" + month + "-" + dates;
 			}
 			input_date = years + "-" + months + "-" + date;
 			System.out.println(input_date);
@@ -569,19 +568,19 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 
 	};
 
-	 public String getdateformate(String _date) {
-	 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-	 Date datef;
-	 String dateformat = "";
-	 try {
-	 datef = sdf.parse(_date);
-	 sdf.applyPattern("dd-MMMM-yyyy");
-	 dateformat = sdf.format(datef);
-	 } catch (ParseException e) {
-	 e.printStackTrace();
-	 }
-	 return dateformat;
-	 }
+	public String getdateformate(String _date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		Date datef;
+		String dateformat = "";
+		try {
+			datef = sdf.parse(_date);
+			sdf.applyPattern("dd-MMMM-yyyy");
+			dateformat = sdf.format(datef);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+		return dateformat;
+	}
 
 	@Override
 	public void afterTextChanged(Editable arg0) {
@@ -632,6 +631,12 @@ public class AddInsurance extends SherlockActivity implements TextWatcher {
 			break;
 		}
 		return true;
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.add_insurance;
 	}
 
 }

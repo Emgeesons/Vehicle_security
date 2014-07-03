@@ -10,5 +10,7 @@
 	<classpathentry exported="true" kind="lib" path="D:/git/lib/httpclient-4.3.3.jar"/>
 	<classpathentry exported="true" kind="lib" path="D:/git/lib/httpcore-4.3.2.jar"/>
 	<classpathentry exported="true" kind="lib" path="D:/git/lib/httpmime-4.3.3.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/git/lib/twitter4j-core-4.0.2.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/git/lib/universal-image-loader-1.9.2-with-sources.jar"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>

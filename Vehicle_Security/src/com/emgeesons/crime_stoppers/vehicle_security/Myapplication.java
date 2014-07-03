@@ -17,17 +17,18 @@ public class Myapplication extends Application {
 		AirshipConfigOptions options = AirshipConfigOptions
 				.loadDefaultOptions(Myapplication.this);
 		UAirship.takeOff(this, options);
-		PushManager.shared().setAlias("test");
-
-		// Tags
-		HashSet<String> tags = new HashSet<String>();
-		tags.add("tag1");
-		tags.add("tag2");
-		PushManager.shared().setTags(tags);
-		PushManager.enablePush();
-		PushManager.shared().setIntentReceiver(IntentReceiver.class);
+//		PushManager.shared().setAlias("testing");
+//
+//		// Tags
+//		HashSet<String> tags = new HashSet<String>();
+//		tags.add("tag1ss");
+//		tags.add("tag2sss");
+//		PushManager.shared().setTags(tags);
+//		PushManager.enablePush();
+//		PushManager.shared().setIntentReceiver(IntentReceiver.class);
 		String apid = PushManager.shared().getAPID();
 		Logger.info("My Application onCreate - App APID: " + apid);
+		
 
 	}
 }

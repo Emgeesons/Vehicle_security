@@ -1,0 +1,506 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/call"
+        android:fillViewport="true"
+        android:scrollbars="none" >
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <RelativeLayout
+                android:id="@+id/basic"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/box_whiteb"
+                android:paddingBottom="5dp" >
+
+                <ImageView
+                    android:id="@+id/vtypeimage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="24dp"
+                    android:layout_marginTop="24dp"
+                    android:src="@drawable/ic_car" />
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="13dp"
+                    android:layout_marginTop="20dp"
+                    android:layout_toRightOf="@+id/vtypeimage"
+                    android:text="TextView"
+                    android:textColor="@color/blue_text"
+                    android:textSize="@dimen/big_text" />
+
+                <TextView
+                    android:id="@+id/reg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/name"
+                    android:layout_below="@+id/name"
+                    android:layout_marginTop="5dp"
+                    android:text="TextView"
+                    android:textSize="@dimen/medium_text" />
+
+                <TextView
+                    android:id="@+id/rtype"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@+id/name"
+                    android:layout_marginRight="36dp"
+                    android:text="TextView"
+                    android:textColor="@color/red"
+                    android:textSize="@dimen/medium_text" />
+
+                <RelativeLayout
+                    android:id="@+id/relativeLayout1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="1.25dp"
+                    android:layout_alignLeft="@+id/reg"
+                    android:layout_alignRight="@+id/rtype"
+                    android:layout_below="@+id/reg"
+                    android:layout_marginTop="10dp"
+                    android:background="@color/light_black" >
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/relativeLayout1"
+                    android:layout_below="@+id/relativeLayout1"
+                    android:layout_marginTop="14dp"
+                    android:text="TextView"
+                    android:textSize="@dimen/medium_text" />
+
+                <TextView
+                    android:id="@+id/time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/date"
+                    android:layout_alignBottom="@+id/date"
+                    android:layout_alignRight="@+id/relativeLayout1"
+                    android:text="TextView"
+                    android:textSize="@dimen/medium_text" />
+
+                <ImageView
+                    android:id="@+id/imageView2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/date"
+                    android:layout_below="@+id/date"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/ic_location" />
+
+                <TextView
+                    android:id="@+id/location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/date"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_toRightOf="@+id/imageView2"
+                    android:text="TextView"
+                    android:textSize="@dimen/medium_text" />
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/adv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/basic"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/box_whiteb"
+                android:paddingTop="5dp" >
+
+                <TextView
+                    android:id="@+id/comm"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginLeft="14dp"
+                    android:text="TextViewTextViewTextViewTextViewTextViewTextView"
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/regular_text" />
+
+                <RelativeLayout
+                    android:id="@+id/pic"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_below="@+id/comm"
+                    android:layout_marginTop="15dp"
+                    android:paddingBottom="5dp" >
+
+                    <ImageView
+                        android:id="@+id/pic1"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_alignParentLeft="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginLeft="27dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/splashscreen"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/pic2"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="3dp"
+                        android:layout_toRightOf="@+id/pic1"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/splashscreen"
+                        android:visibility="gone" />
+
+                    <ImageView
+                        android:id="@+id/pic3"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_centerVertical="true"
+                        android:layout_marginLeft="3dp"
+                        android:layout_toRightOf="@+id/pic2"
+                        android:adjustViewBounds="true"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/splashscreen"
+                        android:visibility="gone" >
+                    </ImageView>
+                </RelativeLayout>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/adv"
+                android:layout_marginLeft="14dp"
+                android:layout_marginTop="10dp"
+                android:text="Vehicle Details"
+                android:textSize="@dimen/medium_text" />
+
+            <RelativeLayout
+                android:id="@+id/details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/textView1"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_marginTop="10dp"
+                android:background="@drawable/box_whiteb"
+                android:paddingTop="5dp" >
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="14dp" >
+
+                    <TextView
+                        android:id="@+id/type"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="14dp"
+                        android:text="Vehicle Type:"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vtype"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/type"
+                        android:layout_alignBottom="@+id/type"
+                        android:layout_marginLeft="5dp"
+                        android:layout_toRightOf="@+id/type"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/make"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/type"
+                        android:layout_below="@+id/type"
+                        android:layout_marginTop="5dp"
+                        android:text="Make:"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vmake"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/make"
+                        android:layout_alignBottom="@+id/make"
+                        android:layout_toRightOf="@+id/make"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/Model"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/make"
+                        android:layout_below="@+id/make"
+                        android:layout_marginTop="5dp"
+                        android:text="Model:"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vmodel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/Model"
+                        android:layout_alignBottom="@+id/Model"
+                        android:layout_toRightOf="@+id/Model"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/body"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/Model"
+                        android:layout_below="@+id/Model"
+                        android:layout_marginTop="5dp"
+                        android:text="Body Type:"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vbody"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/body"
+                        android:layout_alignBottom="@+id/body"
+                        android:layout_toRightOf="@+id/body"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/engine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/body"
+                        android:layout_below="@+id/body"
+                        android:layout_marginTop="5dp"
+                        android:text="Engine No:"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vengine"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/engine"
+                        android:layout_alignBottom="@+id/engine"
+                        android:layout_toRightOf="@+id/engine"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/engine"
+                        android:layout_below="@+id/engine"
+                        android:layout_marginTop="5dp"
+                        android:text="VIN:"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vvin"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/vin"
+                        android:layout_alignBottom="@+id/vin"
+                        android:layout_toRightOf="@+id/vin"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/color"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/vin"
+                        android:layout_below="@+id/vin"
+                        android:layout_marginTop="5dp"
+                        android:text="Color :"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vcolor"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/color"
+                        android:layout_alignBottom="@+id/color"
+                        android:layout_toRightOf="@+id/color"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/accessories"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/color"
+                        android:layout_below="@+id/color"
+                        android:layout_marginTop="5dp"
+                        android:text="Accessories:"
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vacc"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/accessories"
+                        android:layout_alignBottom="@+id/accessories"
+                        android:layout_toRightOf="@+id/accessories"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
+                    <RelativeLayout
+                        android:id="@+id/ins"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/vacc"
+                        android:layout_marginTop="5dp" >
+
+                        <RelativeLayout
+                            android:id="@+id/rel"
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:layout_marginTop="10dp"
+                            android:background="@color/light_black" >
+                        </RelativeLayout>
+
+                        <TextView
+                            android:id="@+id/name"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_below="@+id/rel"
+                            android:layout_marginTop="5dp"
+                            android:text="Insurance Company Name :"
+                            android:textColor="@color/light_black"
+                            android:textSize="@dimen/medium_text" />
+
+                        <TextView
+                            android:id="@+id/vname"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBaseline="@+id/name"
+                            android:layout_alignBottom="@+id/name"
+                            android:layout_toRightOf="@+id/name"
+                            android:text="TextView"
+                            android:textSize="@dimen/medium_text" />
+
+                        <TextView
+                            android:id="@+id/policy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_below="@+id/name"
+                            android:layout_marginTop="5dp"
+                            android:text="Insurance Policy No:"
+                            android:textColor="@color/light_black"
+                            android:textSize="@dimen/medium_text" />
+
+                        <TextView
+                            android:id="@+id/vpolicy"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@+id/policy"
+                            android:layout_toRightOf="@+id/policy"
+                            android:text="TextView"
+                            android:textSize="@dimen/medium_text" />
+
+                        <TextView
+                            android:id="@+id/num"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_below="@+id/policy"
+                            android:layout_marginTop="5dp"
+                            android:text="Insurance Company No:"
+                            android:textColor="@color/light_black"
+                            android:textSize="@dimen/medium_text" />
+
+                        <TextView
+                            android:id="@+id/vnum"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignTop="@+id/num"
+                            android:layout_toRightOf="@+id/num"
+                            android:text="TextView"
+                            android:textSize="@dimen/medium_text" />
+
+                        <TextView
+                            android:id="@+id/expiry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentLeft="true"
+                            android:layout_below="@+id/num"
+                            android:layout_marginTop="5dp"
+                            android:text="Expiry:"
+                            android:textColor="@color/light_black"
+                            android:textSize="@dimen/medium_text" />
+
+                        <TextView
+                            android:id="@+id/vexpiry"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignBaseline="@+id/expiry"
+                            android:layout_alignBottom="@+id/expiry"
+                            android:layout_toRightOf="@+id/expiry"
+                            android:text="TextView"
+                            android:textSize="@dimen/medium_text" />
+
+                        <RelativeLayout
+                            android:id="@+id/relativeLayout3"
+                            android:layout_width="match_parent"
+                            android:layout_height="2dp"
+                            android:layout_alignParentLeft="true"
+                            android:layout_below="@+id/expiry"
+                            android:layout_marginTop="5dp"
+                            android:background="@color/gry" >
+                        </RelativeLayout>
+                    </RelativeLayout>
+                </RelativeLayout>
+            </RelativeLayout>
+        </RelativeLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/call"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/blue_button"
+        android:text="Call Police"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

@@ -15,5 +15,11 @@
     <color name="yellow">#f09c4d</color>
     <color name="black_trs">#7f000000</color>
     <color name="gry_profile">#dbdbdb</color>
+    <color name="underline">#127896</color>
+    <color name="indicator">#127896</color>
+    <color name="divider">#127896</color>
+    <color name="tabtxtcolor">#FF333333</color>
+    <color name="background_tab_pressed">#AA33B5E5</color>
+    <color name="background_tab">#FFE5E5E5</color>
 
 </resources>

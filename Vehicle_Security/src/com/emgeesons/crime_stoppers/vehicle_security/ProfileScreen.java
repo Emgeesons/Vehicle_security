@@ -89,7 +89,7 @@ public class ProfileScreen extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.profilescreen);
+//		setContentView(R.layout.profilescreen);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'> My Profile </font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -330,6 +330,7 @@ public class ProfileScreen extends BaseActivity {
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int item) {
+						atPrefs.edit().putString(callcheck, "True").commit();
 						if (items[item].equals("Take Photo")) {
 
 							final Intent intent = new Intent(
@@ -344,6 +345,7 @@ public class ProfileScreen extends BaseActivity {
 									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 							startActivityForResult(pickPhoto, 3);
 						} else if (items[item].equals("Cancel")) {
+							atPrefs.edit().putString(callcheck, "false").commit();
 							dialog.dismiss();
 						}
 					}

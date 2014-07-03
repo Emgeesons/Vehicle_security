@@ -19,10 +19,18 @@
         android:layout_height="wrap_content" >
     </TimePicker>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="10dp"
+        android:background="@color/light_black" >
+    </RelativeLayout>
+
     <Button
         android:id="@+id/ok"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@color/white"
         android:paddingLeft="50dp"
         android:paddingRight="50dp"
         android:text="Ok" />

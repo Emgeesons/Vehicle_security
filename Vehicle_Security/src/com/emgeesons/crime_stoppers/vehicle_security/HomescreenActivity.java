@@ -18,6 +18,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
@@ -82,7 +84,7 @@ public class HomescreenActivity extends SherlockFragment implements
 	TextView park, find;
 	View view;
 	Fragment fragment;
-	RelativeLayout report, file, about;
+	RelativeLayout report, file, about, update;
 	MarkerOptions markerOptions;
 	private AsyncTask<Void, Void, Void> profile;
 	ProgressDialog pDialog;
@@ -126,14 +128,16 @@ public class HomescreenActivity extends SherlockFragment implements
 		dbb = db.openDataBase();
 		dbb = db.getReadableDatabase();
 		vehicles = db.getparkingData();
+
 		alert = new AlertDialog.Builder(getActivity()).create();
 		info = new Data();
 		marker = (RelativeLayout) view.findViewById(R.id.marker);
 		mapview = (RelativeLayout) view.findViewById(R.id.mapview);
-		// marker_label = (TextView) view.findViewById(R.id.textView1);
+		// marker_labeol = (TextView) view.findViewById(R.id.textView1);
 		park = (TextView) view.findViewById(R.id.park);
 		find = (TextView) view.findViewById(R.id.find);
 		report = (RelativeLayout) view.findViewById(R.id.report);
+		update = (RelativeLayout) view.findViewById(R.id.update);
 		file = (RelativeLayout) view.findViewById(R.id.file);
 		about = (RelativeLayout) view.findViewById(R.id.about);
 		height = getActivity().getWindowManager().getDefaultDisplay()
@@ -141,6 +145,7 @@ public class HomescreenActivity extends SherlockFragment implements
 		d = new downlaod();
 		setHasOptionsMenu(true);
 		if (!(vehicles.size() == 0)) {
+
 			for (int i = 0; i < vehicles.size(); i++) {
 				name.add(vehicles.get(i).getvehicle_model());
 				no.add(vehicles.get(i).getvehicle_id());
@@ -274,18 +279,36 @@ public class HomescreenActivity extends SherlockFragment implements
 
 			@Override
 			public void onClick(View arg0) {
-				Intent next = new Intent(getActivity(), ReportSighting.class);
-				startActivity(next);
-				getActivity().finish();
+				if (!atPrefs.getBoolean(info.checkllogin, true)) {
+					Intent next = new Intent(getActivity(),
+							ReportSighting.class);
+					startActivity(next);
+					getActivity().finish();
+				} else {
+					Intent next = new Intent(getActivity(), LoginActivity.class);
+					startActivity(next);
+					getActivity().finish();
+				}
+
 			}
 		});
 		file.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				 Intent next = new Intent(getActivity(), FilenewReport.class);
-				 startActivity(next);
-				 getActivity().finish();
+				if (!atPrefs.getBoolean(info.checkllogin, true)) {
+					Intent next = new Intent(getActivity(), FilenewReport.class);
+					startActivity(next);
+					getActivity().finish();
+				} else {
+					Intent next = new Intent(getActivity(), LoginActivity.class);
+					startActivity(next);
+					getActivity().finish();
+				}
+				// Intent next = new Intent(getActivity(), AboutUs.class);
+				// startActivity(next);
+				// getActivity().finish();
+
 			}
 		});
 		about.setOnClickListener(new OnClickListener() {
@@ -297,7 +320,23 @@ public class HomescreenActivity extends SherlockFragment implements
 				getActivity().finish();
 			}
 		});
+		update.setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View arg0) {
+
+				if (atPrefs.getBoolean(info.checkllogin, true)) {
+					Intent next = new Intent(getActivity(), LoginActivity.class);
+					startActivity(next);
+					getActivity().finish();
+				} else {
+					Intent next = new Intent(getActivity(), Updates.class);
+
+					startActivity(next);
+					getActivity().finish();
+				}
+			}
+		});
 		park.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -529,6 +568,22 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	}
 
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+	}
+
+	public void onPause() {
+		super.onPause();
+		// locationManager.removeUpdates(this);
+	};
+
+	public void onStop() {
+		super.onStop();
+		// locationManager.removeUpdates(this);
+	};
+
 	// @Override
 	// public void onDestroyView() {
 	// super.onDestroyView();
@@ -751,15 +806,6 @@ public class HomescreenActivity extends SherlockFragment implements
 	}
 
 	//
-	public void onPause() {
-		super.onPause();
-		// locationManager.removeUpdates(this);
-	};
-
-	public void onStop() {
-		super.onStop();
-		// locationManager.removeUpdates(this);
-	};
 
 	private class getprofile extends AsyncTask<Void, Void, Void> {
 		String success, mess, response;
@@ -1280,6 +1326,33 @@ public class HomescreenActivity extends SherlockFragment implements
 
 		}
 
+	}
+
+	class ForegroundCheckTask extends AsyncTask<Context, Void, Boolean> {
+
+		@Override
+		protected Boolean doInBackground(Context... params) {
+			final Context context = params[0].getApplicationContext();
+			return isAppOnForeground(context);
+		}
+
+		private boolean isAppOnForeground(Context context) {
+			ActivityManager activityManager = (ActivityManager) context
+					.getSystemService(Context.ACTIVITY_SERVICE);
+			List<RunningAppProcessInfo> appProcesses = activityManager
+					.getRunningAppProcesses();
+			if (appProcesses == null) {
+				return false;
+			}
+			final String packageName = context.getPackageName();
+			for (RunningAppProcessInfo appProcess : appProcesses) {
+				if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND
+						&& appProcess.processName.equals(packageName)) {
+					return true;
+				}
+			}
+			return false;
+		}
 	}
 
 }

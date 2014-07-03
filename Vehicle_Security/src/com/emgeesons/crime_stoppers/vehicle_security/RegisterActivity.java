@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashSet;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -49,6 +50,10 @@ import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.urbanairship.AirshipConfigOptions;
+import com.urbanairship.Logger;
+import com.urbanairship.UAirship;
+import com.urbanairship.push.PushManager;
 
 public class RegisterActivity extends SherlockActivity implements TextWatcher,
 		OnKeyListener {
@@ -630,6 +635,22 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 						// atPrefs.edit()
 						// .putInt(SplashscreenActivity.progress, 30)
 						// .commit();
+						AirshipConfigOptions options = AirshipConfigOptions
+								.loadDefaultOptions(RegisterActivity.this);
+						UAirship.takeOff(getApplication(), options);
+						PushManager.shared().setAlias(String.valueOf(id));
+
+						// Tags
+						HashSet<String> tags = new HashSet<String>();
+						tags.add(fname.getText().toString());
+						tags.add(lname.getText().toString());
+						PushManager.shared().setTags(tags);
+						PushManager.enablePush();
+						PushManager.shared().setIntentReceiver(
+								IntentReceiver.class);
+						String apid = PushManager.shared().getAPID();
+						Logger.info("My Application onCreate - App APID: "
+								+ apid);
 						Intent next = new Intent(RegisterActivity.this,
 								MainActivity.class);
 						startActivity(next);

@@ -1,0 +1,160 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AboutUs" >
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:background="@drawable/box_whiteb"
+        android:paddingBottom="10dp" >
+
+        <TextView
+            android:id="@+id/sdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="60dp"
+            android:text="TextView"
+            android:textSize="@dimen/medium_text" />
+
+        <ImageView
+            android:id="@+id/simageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/sdate"
+            android:layout_below="@+id/sdate"
+            android:layout_marginTop="5dp"
+            android:src="@drawable/ic_location" />
+
+        <TextView
+            android:id="@+id/slocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/sdate"
+            android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@+id/simageView1"
+            android:text="TextView"
+            android:textSize="@dimen/medium_text" />
+
+        <TextView
+            android:id="@+id/scomm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@+id/simageView1"
+            android:layout_alignRight="@+id/stime"
+            android:layout_below="@+id/slocation"
+            android:layout_marginTop="5dp"
+            android:text="locationlocationlocationlocationlocationlocation"
+            android:textColor="@color/light_black"
+            android:textSize="@dimen/medium_text" />
+
+        <RelativeLayout
+            android:id="@+id/pic"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/scomm"
+            android:layout_marginTop="15dp"
+            android:paddingBottom="5dp" >
+
+            <ImageView
+                android:id="@+id/pic1"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginLeft="27dp"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/pic2"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="3dp"
+                android:layout_toRightOf="@+id/pic1"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/pic3"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="3dp"
+                android:layout_toRightOf="@+id/pic2"
+                android:adjustViewBounds="true"
+                android:scaleType="centerCrop"
+                android:visibility="gone" >
+            </ImageView>
+        </RelativeLayout>
+
+        <TextView
+            android:id="@+id/stime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/sdate"
+            android:layout_alignBottom="@+id/sdate"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="23dp"
+            android:text="TextView"
+            android:textSize="@dimen/medium_text" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/relativeLayout2"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/relativeLayout2"
+        android:layout_margin="10dp"
+        android:layout_marginTop="18dp"
+        android:background="@drawable/box_crb"
+        android:paddingBottom="10dp" >
+
+        <TextView
+            android:id="@+id/sname"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="15dp"
+            android:text="TextView"
+            android:textColor="@color/blue_text"
+            android:textSize="@dimen/big_text" />
+
+        <TextView
+            android:id="@+id/sspot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/sname"
+            android:layout_alignBottom="@+id/sname"
+            android:layout_marginLeft="10dp"
+            android:layout_toRightOf="@+id/sname"
+            android:text="TextView"
+            android:textSize="@dimen/big_text" />
+
+        <TextView
+            android:id="@+id/stype"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBaseline="@+id/sspot"
+            android:layout_alignBottom="@+id/sspot"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="17dp"
+            android:text="TextView"
+            android:textColor="@color/red"
+            android:textSize="@dimen/big_text" />
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -61,7 +61,7 @@ import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.google.android.gms.internal.el;
 
-public class VehicleProfile extends SherlockActivity {
+public class VehicleProfile extends BaseActivity {
 	TextView title, reg, type, make, model, body, eng, vin, color, acc, cname,
 			policy, expiry, status;
 	ImageView vpic, addpic;
@@ -99,7 +99,7 @@ public class VehicleProfile extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.vehicle_profile);
+		// setContentView(R.layout.vehicle_profile);
 
 		title = (TextView) findViewById(R.id.model);
 		reg = (TextView) findViewById(R.id.reg);
@@ -327,7 +327,8 @@ public class VehicleProfile extends SherlockActivity {
 					@Override
 					public void onClick(DialogInterface dialog, int item) {
 						if (items[item].equals("Take Photo")) {
-
+							atPrefs.edit().putString(callcheck, "True")
+									.commit();
 							final Intent intent = new Intent(
 									MediaStore.ACTION_IMAGE_CAPTURE);
 							intent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -340,6 +341,8 @@ public class VehicleProfile extends SherlockActivity {
 									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 							startActivityForResult(pickPhoto, 3);
 						} else if (items[item].equals("Cancel")) {
+							atPrefs.edit().putString(callcheck, "false")
+									.commit();
 							dialog.dismiss();
 						}
 					}
@@ -459,8 +462,8 @@ public class VehicleProfile extends SherlockActivity {
 		builder.setItems(items, new DialogInterface.OnClickListener() {
 			@Override
 			public void onClick(DialogInterface dialog, int item) {
+				atPrefs.edit().putString(callcheck, "True").commit();
 				if (items[item].equals("Take Photo")) {
-
 					final Intent intent = new Intent(
 							MediaStore.ACTION_IMAGE_CAPTURE);
 					intent.putExtra(MediaStore.EXTRA_OUTPUT, setImageUri());
@@ -472,6 +475,7 @@ public class VehicleProfile extends SherlockActivity {
 							android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 					startActivityForResult(pickPhoto, 3);
 				} else if (items[item].equals("Cancel")) {
+					atPrefs.edit().putString(callcheck, "false").commit();
 					dialog.dismiss();
 				}
 			}
@@ -1156,6 +1160,12 @@ public class VehicleProfile extends SherlockActivity {
 			pDialog.dismiss();
 
 		}
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.vehicle_profile;
 	}
 
 }

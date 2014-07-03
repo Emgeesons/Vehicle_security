@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -55,6 +56,9 @@ import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
 import com.facebook.widget.LoginButton.OnErrorListener;
+import com.urbanairship.AirshipConfigOptions;
+import com.urbanairship.Logger;
+import com.urbanairship.UAirship;
 import com.urbanairship.push.PushManager;
 
 public class LoginActivity extends Activity implements TextWatcher,
@@ -198,7 +202,9 @@ public class LoginActivity extends Activity implements TextWatcher,
 			}
 		});
 		// set permission list, Don't foeget to add email
+
 		authButton.setReadPermissions(Arrays.asList("public_profile", "email"));
+
 		// authButton.setLoginBehavior(SessionLoginBehavior.SSO_WITH_FALLBACK);
 
 		// session state call back event
@@ -954,8 +960,8 @@ public class LoginActivity extends Activity implements TextWatcher,
 						atPrefs.edit().putBoolean(info.checkllogin, false)
 								.commit();
 						atPrefs.edit()
-								.putString(SplashscreenActivity.profile_pic, "profilePic.png")
-								.commit();
+								.putString(SplashscreenActivity.profile_pic,
+										"profilePic.png").commit();
 
 						SQLiteDatabase dbb = db.getReadableDatabase();
 						dbb.execSQL("delete from Vehicle_info");
@@ -1077,7 +1083,22 @@ public class LoginActivity extends Activity implements TextWatcher,
 							finish();
 
 						} else {
+							AirshipConfigOptions options = AirshipConfigOptions
+									.loadDefaultOptions(LoginActivity.this);
+							UAirship.takeOff(getApplication(), options);
+							PushManager.shared().setAlias(String.valueOf(user_id));
 
+							// Tags
+							HashSet<String> tags = new HashSet<String>();
+							tags.add(fName);
+							tags.add(lName);
+							PushManager.shared().setTags(tags);
+							PushManager.enablePush();
+							PushManager.shared().setIntentReceiver(
+									IntentReceiver.class);
+							String apid = PushManager.shared().getAPID();
+							Logger.info("My Application onCreate - App APID: "
+									+ apid);
 							atPrefs.edit().putBoolean(info.checkllogin, false)
 									.commit();
 							Intent next = new Intent(getApplicationContext(),
@@ -1354,6 +1375,22 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 							}
 						});
+						AirshipConfigOptions options = AirshipConfigOptions
+								.loadDefaultOptions(LoginActivity.this);
+						UAirship.takeOff(getApplication(), options);
+						PushManager.shared().setAlias(String.valueOf(user_id));
+
+						// Tags
+						HashSet<String> tags = new HashSet<String>();
+						tags.add(fName);
+						tags.add(lName);
+						PushManager.shared().setTags(tags);
+						PushManager.enablePush();
+						PushManager.shared().setIntentReceiver(
+								IntentReceiver.class);
+						String apid = PushManager.shared().getAPID();
+						Logger.info("My Application onCreate - App APID: "
+								+ apid);
 						thread.start();
 						atPrefs.edit().putBoolean(info.checkllogin, false)
 								.commit();

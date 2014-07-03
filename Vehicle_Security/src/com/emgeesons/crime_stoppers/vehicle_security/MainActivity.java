@@ -1,8 +1,13 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
+import android.app.ActivityManager;
+import android.app.ActivityManager.RunningAppProcessInfo;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +16,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -18,6 +24,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -26,6 +33,7 @@ import android.widget.ListView;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
+import com.urbanairship.push.PushManager;
 
 public class MainActivity extends SherlockFragmentActivity implements
 		OnItemClickListener {
@@ -41,7 +49,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 	Data info;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
-	boolean check = true;
+	// boolean check = true;
+	static String check = "check";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -223,6 +232,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
+									PushManager.disablePush();
 									SplashscreenActivity.fblogin = true;
 									atPrefs.edit()
 											.putBoolean(info.checkllogin, true)
@@ -288,6 +298,65 @@ public class MainActivity extends SherlockFragmentActivity implements
 			selectItem(0);
 		} else {
 			super.onBackPressed();
+		}
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		try {
+			boolean foregroud = new ForegroundCheckTask().execute(
+					getApplicationContext()).get();
+			atPrefs.edit().putString(check, String.valueOf(foregroud)).commit();
+			Log.i("onStop", String.valueOf(foregroud));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.onStop();
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		try {
+			boolean foregroud = new ForegroundCheckTask().execute(
+					getApplicationContext()).get();
+			Log.i("onResume", String.valueOf(foregroud));
+			String ch = atPrefs.getString(check, "true");
+			Log.i("con", ch);
+			if (ch.equalsIgnoreCase("false")) {
+
+				Intent ne = new Intent(getApplicationContext(), PinLock.class);
+				startActivity(ne);
+			}
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		try {
+			boolean foregroud = new ForegroundCheckTask().execute(
+					getApplicationContext()).get();
+			Log.i("onPause", String.valueOf(foregroud));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 

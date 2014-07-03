@@ -13,13 +13,13 @@ import android.view.Window;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class Website extends SherlockActivity {
+public class Website extends BaseActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_website);
+		// setContentView(R.layout.activity_website);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'>About Us</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -55,6 +55,12 @@ public class Website extends SherlockActivity {
 			break;
 		}
 		return true;
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.activity_website;
 	}
 
 }

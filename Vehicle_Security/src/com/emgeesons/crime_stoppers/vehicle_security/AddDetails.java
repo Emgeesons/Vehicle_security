@@ -35,7 +35,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class AddDetails extends SherlockActivity implements TextWatcher {
+public class AddDetails extends BaseActivity implements TextWatcher {
 	EditText lnumber, address, postcode;
 	Connection_Detector cd = new Connection_Detector(this);
 	Boolean IsInternetPresent;
@@ -51,7 +51,7 @@ public class AddDetails extends SherlockActivity implements TextWatcher {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.add_details);
+		// setContentView(R.layout.add_details);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'> Add Details </font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -309,5 +309,11 @@ public class AddDetails extends SherlockActivity implements TextWatcher {
 		startActivity(back);
 		finish();
 		super.onBackPressed();
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.add_details;
 	}
 }

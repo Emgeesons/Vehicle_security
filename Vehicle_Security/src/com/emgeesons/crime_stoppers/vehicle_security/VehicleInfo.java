@@ -43,7 +43,7 @@ import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
 
-public class VehicleInfo extends SherlockActivity {
+public class VehicleInfo extends BaseActivity {
 	ListView list;
 	List<VehicleData> vehicles;
 	DatabaseHandler db;
@@ -72,7 +72,7 @@ public class VehicleInfo extends SherlockActivity {
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
 		getSupportActionBar().setIcon(R.drawable.app_icon);
-		setContentView(R.layout.vehicle_info);
+		// setContentView(R.layout.vehicle_info);
 		list = (ListView) findViewById(R.id.listView1);
 		info = new Data();
 		atPrefs = PreferenceManager
@@ -668,6 +668,12 @@ public class VehicleInfo extends SherlockActivity {
 			pDialog.dismiss();
 
 		}
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.vehicle_info;
 	}
 
 }

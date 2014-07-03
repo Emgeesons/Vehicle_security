@@ -1,6 +1,7 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -17,6 +18,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -43,6 +45,10 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.Session;
+import com.urbanairship.AirshipConfigOptions;
+import com.urbanairship.Logger;
+import com.urbanairship.UAirship;
+import com.urbanairship.push.PushManager;
 
 public class FbNewuser extends SherlockActivity implements TextWatcher,
 		OnKeyListener {
@@ -66,6 +72,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 	SQLiteDatabase dbb;
 	String pin;
 	int qusvalue;
+	String fname, lname;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -448,9 +455,8 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 						dbb = db.openDataBase();
 						dbb = db.getReadableDatabase();
 
-						atPrefs.edit()
-								.putBoolean(info.checkllogin,
-										false).commit();
+						atPrefs.edit().putBoolean(info.checkllogin, false)
+								.commit();
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						dbbb.execSQL("UPDATE profile SET mobileNumber = '"
 								+ number.getText().toString() + "'");
@@ -461,6 +467,34 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 						dbbb.execSQL("UPDATE profile SET sans = '"
 								+ answer.getText().toString() + "'");
 
+						String selectQuery = "SELECT * FROM profile";
+
+						Cursor cursor = dbb.rawQuery(selectQuery, null);
+						if (cursor.moveToFirst()) {
+							do {
+								fname = cursor.getString(cursor
+										.getColumnIndex("fName"));
+								lname = cursor.getString(cursor
+										.getColumnIndex("lName"));
+							} while (cursor.moveToNext());
+						}
+
+						AirshipConfigOptions options = AirshipConfigOptions
+								.loadDefaultOptions(FbNewuser.this);
+						UAirship.takeOff(getApplication(), options);
+						PushManager.shared().setAlias(String.valueOf(userid));
+
+						// Tags
+						HashSet<String> tags = new HashSet<String>();
+						tags.add(fname);
+						tags.add(lname);
+						PushManager.shared().setTags(tags);
+						PushManager.enablePush();
+						PushManager.shared().setIntentReceiver(
+								IntentReceiver.class);
+						String apid = PushManager.shared().getAPID();
+						Logger.info("My Application onCreate - App APID: "
+								+ apid);
 						Intent next = new Intent(FbNewuser.this,
 								MainActivity.class);
 						startActivity(next);

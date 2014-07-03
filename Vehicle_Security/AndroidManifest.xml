@@ -165,12 +165,12 @@
         <activity
             android:name="com.urbanairship.actions.LandingPageActivity"
             android:exported="false"
-            android:parentActivityName="com.emgeesons.crime_stoppers.vehicle_security.SplashscreenActivity" >
+            android:parentActivityName="com.emgeesons.crime_stoppers.vehicle_security.LoginActivity" >
 
             <!-- MODIFICATION REQUIRED set or remove the parent activity -->
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.emgeesons.crime_stoppers.vehicle_security.SplashscreenActivity" />
+                android:value="com.emgeesons.crime_stoppers.vehicle_security.LoginActivity" />
 
             <intent-filter>
                 <action android:name="com.urbanairship.actions.SHOW_LANDING_PAGE_INTENT_ACTION" />
@@ -287,6 +287,36 @@
             android:name="com.emgeesons.crime_stoppers.vehicle_security.FindVehicle"
             android:label="@string/title_activity_find_vehicle"
             android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Share"
+            android:label="@string/title_activity_share" >
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="com.emgeesons.crime_stoppers.vehicle_security"
+                    android:scheme="oauth" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.ReportSubmit"
+            android:label="@string/title_activity_report_submit" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Updates"
+            android:label="@string/title_activity_updates" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Reportsummary"
+            android:label="@string/title_activity_reportsummary" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Fullimage"
+            android:label="@string/title_activity_fullimage" >
         </activity>
     </application>
 

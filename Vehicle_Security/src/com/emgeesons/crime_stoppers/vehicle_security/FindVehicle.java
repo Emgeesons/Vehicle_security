@@ -57,7 +57,7 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class FindVehicle extends SherlockActivity implements LocationListener {
+public class FindVehicle extends BaseActivity implements LocationListener {
 	private GoogleMap googleMap;
 	String vid, lat, lon, address, comments;
 	MarkerOptions markerOptions;
@@ -86,7 +86,7 @@ public class FindVehicle extends SherlockActivity implements LocationListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.find_vehicle);
+		// setContentView(R.layout.find_vehicle);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'>Find My Vehicle</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -95,6 +95,7 @@ public class FindVehicle extends SherlockActivity implements LocationListener {
 		getSupportActionBar().setIcon(R.drawable.app_icon);
 		findrel = (RelativeLayout) findViewById(R.id.findrel);
 		info = new Data();
+
 		db = new DatabaseHandler(FindVehicle.this);
 		try {
 
@@ -108,6 +109,7 @@ public class FindVehicle extends SherlockActivity implements LocationListener {
 		vehicles = db.getparkingData();
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(FindVehicle.this);
+
 		Intent intent = getIntent();
 		vid = intent.getStringExtra("id");
 		lat = intent.getStringExtra("lat");
@@ -588,6 +590,14 @@ public class FindVehicle extends SherlockActivity implements LocationListener {
 		return address;
 	}
 
+	// @Override
+	// protected void onStop() {
+	// // TODO Auto-generated method stub
+	// atPrefs.edit().putString(check, "True").commit();
+	// Log.i("find", "true");
+	// super.onStop();
+	// }
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getSupportMenuInflater().inflate(R.menu.find_vehicle, menu);
@@ -597,10 +607,11 @@ public class FindVehicle extends SherlockActivity implements LocationListener {
 					@Override
 					public boolean onMenuItemClick(MenuItem item) {
 						Intent intent = new Intent(
-								android.content.Intent.ACTION_VIEW,
 
-								Uri.parse("http://maps.google.com/maps?saddr="
+						android.content.Intent.ACTION_VIEW, Uri
+								.parse("http://maps.google.com/maps?saddr="
 										+ "&daddr=" + lat + "," + lon));
+						atPrefs.edit().putString(callcheck, "True").commit();
 						startActivity(intent);
 
 						return false;
@@ -656,6 +667,11 @@ public class FindVehicle extends SherlockActivity implements LocationListener {
 	@Override
 	public void onStatusChanged(String arg0, int arg1, Bundle arg2) {
 
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		return R.layout.find_vehicle;
 	}
 
 }

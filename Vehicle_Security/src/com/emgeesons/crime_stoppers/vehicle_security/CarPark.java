@@ -25,7 +25,7 @@ import android.widget.TextView;
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
-public class CarPark extends SherlockActivity {
+public class CarPark extends BaseActivity {
 	String Rate, notip, Address, type, vid;
 	TextView address, rates, tip, done;
 	RatingBar ratebar;
@@ -42,7 +42,7 @@ public class CarPark extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_car_park);
+		// setContentView(R.layout.activity_car_park);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'>Parking Details</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -186,5 +186,11 @@ public class CarPark extends SherlockActivity {
 			break;
 		}
 		return true;
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.activity_car_park;
 	}
 }
