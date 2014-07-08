@@ -68,7 +68,7 @@ public class Data {
 	}
 
 	public String getdateformate(String date) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddhh:mm");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh:mm");
 		Date datef;
 		String dateformat = "";
 		try {
@@ -144,7 +144,6 @@ public class Data {
 					month = Integer.valueOf(datespilt[1]);
 					date = Integer.valueOf(datespilt[2]);
 				} catch (Exception e) {
-					// TODO: handle exception
 				}
 
 				gender = cursor.getString(cursor.getColumnIndex("gender"));
@@ -216,5 +215,4 @@ public class Data {
 		}
 	}
 
-	
 }

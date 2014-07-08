@@ -260,12 +260,13 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		// Hrs -= 12;
 		// ampm = "PM";
 		// }
-		timevalue = Hrs + ":" + min;
+		 timevalue = String.format("%02d:%02d", Hrs, min);
+//		timevalue = Hrs + ":" + min;
 		datevalue = years + "-" + months + "-" + dates;
 		ctimevalue = timevalue;
 		cdatevalue = datevalue;
 		System.out.println(cdatevalue + "," + ctimevalue);
-		date.setText((info.getdateformate(datevalue + "" + timevalue)));
+		date.setText((info.getdateformate(datevalue + "-" + timevalue)));
 		height = getWindowManager().getDefaultDisplay().getHeight();
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		this.registerReceiver(this.mlocation, new IntentFilter(
@@ -409,7 +410,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 				DatePicker datePicker = (DatePicker) dialog
 						.findViewById(R.id.datePicker1);
 
-				datePicker.init(years, months, dates, datePickerListener);
+				datePicker.init(years, months-1, dates, datePickerListener);
 
 				timePicker
 						.setOnTimeChangedListener(new OnTimeChangedListener() {
@@ -433,7 +434,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 
 					@Override
 					public void onClick(View v) {
-						date.setText((info.getdateformate(datevalue + ""
+						date.setText((info.getdateformate(datevalue + "-"
 								+ timevalue)));
 						dialog.dismiss();
 					}

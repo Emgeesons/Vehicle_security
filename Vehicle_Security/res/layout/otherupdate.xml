@@ -2,72 +2,112 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/disclaimer_bg"
     tools:context=".DisclaimerActivity" >
 
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+
+    <ListView
+        android:id="@+id/data"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout1"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:clickable="false"
+        android:divider="@color/white"
+        android:dividerHeight="20dp"
+        android:padding="15dp"
+        android:scrollbars="none"
+        android:visibility="visible" >
+    </ListView>
+
     <RelativeLayout
+        android:id="@+id/vdetails"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
-        android:layout_margin="@dimen/ten"
-        android:alpha="0.6"
-        android:background="@drawable/box_white" >
+        android:visibility="gone" >
 
-        <ScrollView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_above="@+id/agree"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="30dp"
-            android:fillViewport="true"
+        <ListView
+            android:id="@+id/data1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/report"
+            android:clickable="false"
+            android:divider="@color/white"
+            android:dividerHeight="20dp"
+            android:padding="15dp"
             android:scrollbars="none" >
+        </ListView>
 
-            <RelativeLayout
+        <RelativeLayout
+            android:id="@+id/stays"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:visibility="gone" >
+
+            <TextView
+                android:id="@+id/textView1"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" >
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:text="Stay Tuned!!"
+                android:textColor="@color/blue_text"
+                android:textSize="@dimen/big_text" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignLeft="@+id/d"
-                    android:layout_below="@+id/d"
-                    android:layout_marginRight="10dp"
-                    android:layout_marginTop="14dp"
-                    android:text="Crime Stoppers South Australia Inc (CSSA) is a member of Crime Stoppers Australia, which in turn is a member of Crime Stoppers International. \n \n
-CSSA works closely with its affiliates and related State/Territory-based jurisdictions; various State and Federal government agencies including policing organisations; and the general community to help solve and prevent crime. \n \n
-CSSA also works with a range of Partners, Sponsors and Third Party service providers and undertakes all reasonable endeavours to ensure that these companies are of good repute.  However, CSSA does not provide any warranty, guarantee, promise or representation in relation to the goods or services that these companies provide, nor does it endorse these products or services. \n \n 
-CSSA uses SSL security protocol.
-
-                    "
-                    android:textSize="@dimen/medium_text" />
-
-                <TextView
-                    android:id="@+id/d"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginLeft="22dp"
-                    android:text="Disclaimer"
-                    android:textColor="@color/black"
-                    android:textSize="@dimen/big_text"
-                    android:textStyle="bold" />
-            </RelativeLayout>
-        </ScrollView>
+            <TextView
+                android:id="@+id/textView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/textView1"
+                android:layout_marginTop="16dp"
+                android:gravity="center"
+                android:text="Updates on this report will appear here"
+                android:textColor="@color/light_black"
+                android:textSize="@dimen/medium_text" />
+        </RelativeLayout>
 
         <Button
-            android:id="@+id/agree"
+            android:id="@+id/report"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:background="@drawable/green_button"
+            android:text="Report Sighting"
+            android:textColor="@color/white_trs" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/stay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:background="@color/creamy"
+        android:visibility="gone" >
+
+        <TextView
+            android:id="@+id/textView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="5dp"
-            android:layout_marginTop="10dp"
-            android:background="@drawable/blue_button"
-            android:text="I Agree"
-            android:textColor="@color/white" />
+            android:layout_centerVertical="true"
+            android:text="Hooray!! No Vehicles Reported!!"
+            android:textColor="@color/blue_text"
+            android:textSize="@dimen/big_text" />
     </RelativeLayout>
 
 </RelativeLayout>

@@ -51,6 +51,7 @@
             android:layout_above="@+id/recover"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" >
+
         </ListView>
 
         <Button
@@ -68,10 +69,8 @@
             android:id="@+id/stay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/recover"
-            android:layout_alignParentLeft="true"
-            android:layout_below="@+id/list"
-            android:background="@color/creamy"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:visibility="visible" >
 
             <TextView

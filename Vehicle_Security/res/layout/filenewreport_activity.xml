@@ -1,59 +1,60 @@
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:fillViewport="true"
-    android:scrollbars="none" >
+    tools:context=".FilenewReport" >
 
     <RelativeLayout
+        android:id="@+id/mapview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        tools:context=".FilenewReport" >
+        android:layout_height="200dp" >
+
+        <fragment
+            android:id="@+id/map"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentTop="true" />
 
         <RelativeLayout
-            android:id="@+id/mapview"
+            android:id="@+id/marker"
             android:layout_width="match_parent"
-            android:layout_height="200dp" >
+            android:layout_height="match_parent" >
 
-            <fragment
-                android:id="@+id/map"
-                android:name="com.google.android.gms.maps.MapFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentTop="true" />
+            <ImageView
+                android:id="@+id/imageView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true"
+                android:src="@drawable/location_marker" />
 
-            <RelativeLayout
-                android:id="@+id/marker"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" >
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_above="@+id/imageView1"
+                android:layout_centerHorizontal="true"
+                android:text="Large Text"
+                android:textAppearance="?android:attr/textAppearanceSmall" />
 
-                <ImageView
-                    android:id="@+id/imageView1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:src="@drawable/location_marker" />
-
-                <TextView
-                    android:id="@+id/textView1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_above="@+id/imageView1"
-                    android:layout_centerHorizontal="true"
-                    android:text="Large Text"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
-
-                <ImageView
-                    android:id="@+id/expand"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginRight="16dp"
-                    android:src="@drawable/ic_expand_map" />
-            </RelativeLayout>
+            <ImageView
+                android:id="@+id/expand"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginRight="16dp"
+                android:src="@drawable/ic_expand_map" />
         </RelativeLayout>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mapview"
+        android:fillViewport="true"
+        android:scrollbars="none" >
 
         <RelativeLayout
             android:id="@+id/details"
@@ -201,36 +202,36 @@
                 android:text="Send"
                 android:textColor="@color/white" />
         </RelativeLayout>
+    </ScrollView>
 
-        <RelativeLayout
-            android:id="@+id/adddetails"
-            android:layout_width="match_parent"
+    <RelativeLayout
+        android:id="@+id/adddetails"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mapview"
+        android:visibility="gone" >
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/mapview"
-            android:visibility="gone" >
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_margin="10dp"
+            android:scaleType="fitXY"
+            android:src="@drawable/im_complete_profile" />
 
-            <ImageView
-                android:id="@+id/imageView2"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_margin="10dp"
-                android:scaleType="fitXY"
-                android:src="@drawable/im_complete_profile" />
-
-            <Button
-                android:id="@+id/go"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@+id/imageView2"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="23dp"
-                android:background="@drawable/blue_button"
-                android:text="Let&apos;s Go"
-                android:textColor="@color/white" />
-        </RelativeLayout>
+        <Button
+            android:id="@+id/go"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/imageView2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="23dp"
+            android:background="@drawable/blue_button"
+            android:text="Let&apos;s Go"
+            android:textColor="@color/white" />
     </RelativeLayout>
 
-</ScrollView>
+</RelativeLayout>

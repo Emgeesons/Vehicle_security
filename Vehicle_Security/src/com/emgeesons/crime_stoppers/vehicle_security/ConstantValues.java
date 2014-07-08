@@ -5,8 +5,8 @@ package com.emgeesons.crime_stoppers.vehicle_security;
  * change this template use File | Settings | File Templates.
  */
 public class ConstantValues {
-	static String TWITTER_CONSUMER_KEY = "Ki2JSpTwDx5JVmnWW5Ue4BwKj";
-	static String TWITTER_CONSUMER_SECRET = "wcXngSI2QysJYpWAKjJbPyTaD5KQukuQ2oIpNszZOWu7QYdUE8";
+	static String TWITTER_CONSUMER_KEY = "ZVp4v7Y6llHOWBspbTgwatpL9";
+	static String TWITTER_CONSUMER_SECRET = "MQBdnkXP8hm69auT2ZkzFlVvaukULLJXg4jeXT80b8pn8SHWvT";
 	public static String TWITTER_CALLBACK_URL = "oauth://com.emgeesons.crime_stoppers.vehicle_security";
 	public static String URL_PARAMETER_TWITTER_OAUTH_VERIFIER = "oauth_verifier";
 	public static String PREFERENCE_TWITTER_OAUTH_TOKEN = "TWITTER_OAUTH_TOKEN";

@@ -2,14 +2,16 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.graphics.PointF;
+import android.graphics.RectF;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.View;
 import android.view.Window;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.emgeesons.crime_stoppers.vehicle_security.TouchImageView.OnTouchImageViewListener;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.assist.FailReason;
@@ -20,7 +22,8 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 public class Fullimage extends Activity {
 	DisplayImageOptions options;
 	protected ImageLoader imageLoader = ImageLoader.getInstance();
-
+	// for zoomin/out
+	TouchImageView imageView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,7 +33,8 @@ public class Fullimage extends Activity {
 		Bundle bundle = getIntent().getExtras();
 		assert bundle != null;
 		String imageUrls = bundle.getString("IMAGES");
-		ImageView imageView = (ImageView) findViewById(R.id.image);
+		imageView = (TouchImageView) findViewById(R.id.image);
+
 		final ProgressBar spinner = (ProgressBar) findViewById(R.id.loading);
 		options = new DisplayImageOptions.Builder()
 
@@ -83,7 +87,6 @@ public class Fullimage extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.fullimage, menu);
 		return true;
 	}

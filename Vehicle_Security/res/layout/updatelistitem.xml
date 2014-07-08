@@ -140,6 +140,7 @@
             android:layout_alignBaseline="@+id/sname"
             android:layout_alignBottom="@+id/sname"
             android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@+id/stype"
             android:layout_toRightOf="@+id/sname"
             android:text="TextView"
             android:textSize="@dimen/big_text" />

@@ -4,14 +4,29 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Random;
 
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -20,9 +35,9 @@ import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RatingBar;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 
 public class CarPark extends BaseActivity {
@@ -38,7 +53,10 @@ public class CarPark extends BaseActivity {
 	List<ParkingData> vehicles;
 	SharedPreferences atPrefs;
 	Data info;
-
+	RelativeLayout tips;
+	
+	JSONArray jsonMainArr;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -57,6 +75,7 @@ public class CarPark extends BaseActivity {
 		type = intent.getStringExtra("type");
 		Address = intent.getStringExtra("Address");
 		vid = intent.getStringExtra("id");
+		tips = (RelativeLayout) findViewById(R.id.tipsrel);
 		db = new DatabaseHandler(CarPark.this);
 		try {
 
@@ -76,7 +95,12 @@ public class CarPark extends BaseActivity {
 		data = (ListView) findViewById(R.id.listView1);
 		address.setText(Address);
 		rates.setText(Rate);
-		tip.setText(notip + "   " + "tips for this location");
+		if (notip.isEmpty()) {
+			tip.setVisibility(View.INVISIBLE);
+		} else {
+			tip.setText(notip + "   " + "tips for this location");
+		}
+
 		ratebar.setRating(Float.valueOf(Rate));
 
 		if (type.equalsIgnoreCase("Bicycle")) {
@@ -124,7 +148,28 @@ public class CarPark extends BaseActivity {
 
 			}
 		});
+		tips.setOnClickListener(new OnClickListener() {
 
+			@Override
+			public void onClick(View arg0) {
+				// TODO Auto-generated method stub
+				if (!notip.isEmpty()) {
+					
+					Intent next = new Intent(getApplicationContext(),
+							Tips.class);
+
+					next.putExtra("Rate", Rate);
+					next.putExtra("Address", Address);
+					next.putExtra("vid", vid);
+					
+					startActivity(next);
+					
+
+				} else {
+
+				}
+			}
+		});
 	}
 
 	private class listAdapter extends BaseAdapter {
@@ -164,6 +209,8 @@ public class CarPark extends BaseActivity {
 
 		}
 	}
+
+	
 
 	@Override
 	public void onBackPressed() {

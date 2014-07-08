@@ -158,7 +158,6 @@
                         android:layout_marginLeft="27dp"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/splashscreen"
                         android:visibility="gone" />
 
                     <ImageView
@@ -170,7 +169,6 @@
                         android:layout_toRightOf="@+id/pic1"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/splashscreen"
                         android:visibility="gone" />
 
                     <ImageView
@@ -182,7 +180,6 @@
                         android:layout_toRightOf="@+id/pic2"
                         android:adjustViewBounds="true"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/splashscreen"
                         android:visibility="gone" >
                     </ImageView>
                 </RelativeLayout>

@@ -909,10 +909,10 @@ public class LoginActivity extends Activity implements TextWatcher,
 					fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
 					fbToken = jsonMainArr.getJSONObject(0)
 							.getString("fb_token");
-					cname = jsonMainArr.getJSONObject(0).getString(
-							"emergency_contact");
-					cnumber = jsonMainArr.getJSONObject(0).getString(
-							"emergency_contact_number");
+//					cname = jsonMainArr.getJSONObject(0).getString(
+//							"emergency_contact");
+//					cnumber = jsonMainArr.getJSONObject(0).getString(
+//							"emergency_contact_number");
 					sques = jsonMainArr.getJSONObject(0).getString(
 							"security_question");
 					sans = jsonMainArr.getJSONObject(0).getString(

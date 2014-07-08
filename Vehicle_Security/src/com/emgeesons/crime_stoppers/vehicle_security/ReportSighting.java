@@ -151,6 +151,32 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		pic2 = (CircularImageView) findViewById(R.id.pic2);
 		pic3 = (CircularImageView) findViewById(R.id.pic3);
 		info = new Data();
+		Intent intent = getIntent();
+		Bundle extras = intent.getExtras();
+
+		if (extras != null) {
+
+			String types = extras.getString("type");
+			String regs = extras.getString("reg");
+			String com = extras.getString("com");
+			String make = extras.getString("make");
+			String model = extras.getString("model");
+			vmake.setText(make);
+			vmodel.setText(model);
+			reg.setText(regs);
+			comments.setText(com);
+
+			if (types.equalsIgnoreCase("Theft")) {
+				tSighting = 0;
+			} else if (types.equalsIgnoreCase("Vandalism")) {
+				tSighting = 1;
+			} else if (types.equalsIgnoreCase("Suspicious Activity")) {
+				tSighting = 2;
+			} else if (types.equalsIgnoreCase("Other")) {
+				tSighting = 3;
+			}
+			type.setText(typeSighting[tSighting]);
+		}
 		vmake.addTextChangedListener(this);
 		type.addTextChangedListener(this);
 		vmodel.addTextChangedListener(this);
@@ -226,12 +252,13 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		// locationRequest.setFastestInterval(5000);
 
 		gpscheck();
-		timevalue = Hrs + ":" + min;
+		 timevalue = String.format("%02d:%02d", Hrs, min);
+//		timevalue = Hrs + ":" + min;
 		datevalue = years + "-" + months + "-" + dates;
 		ctimevalue = timevalue;
 		cdatevalue = datevalue;
 		System.out.println(cdatevalue + "," + ctimevalue);
-		date.setText((info.getdateformate(datevalue + "" + timevalue)));
+		date.setText((info.getdateformate(datevalue + "-" + timevalue)));
 		checkpic();
 		picclick();
 		expand.setOnClickListener(new OnClickListener() {
@@ -304,7 +331,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				DatePicker datePicker = (DatePicker) dialog
 						.findViewById(R.id.datePicker1);
 
-				datePicker.init(years, months, dates, datePickerListener);
+				datePicker.init(years, months-1, dates, datePickerListener);
 
 				timePicker
 						.setOnTimeChangedListener(new OnTimeChangedListener() {
@@ -328,7 +355,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 
 					@Override
 					public void onClick(View v) {
-						date.setText((info.getdateformate(datevalue + ""
+						date.setText((info.getdateformate(datevalue + "-"
 								+ timevalue)));
 						dialog.dismiss();
 					}
@@ -349,7 +376,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 					@Override
 					public void onClick(DialogInterface dialog, int item) {
 						if (items[item].equals("Take Photo")) {
-							atPrefs.edit().putString(callcheck, "True").commit();
+							atPrefs.edit().putString(callcheck, "True")
+									.commit();
 							final Intent intent = new Intent(
 									MediaStore.ACTION_IMAGE_CAPTURE);
 							intent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -362,7 +390,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 							startActivityForResult(pickPhoto, 3);
 						} else if (items[item].equals("Cancel")) {
-							atPrefs.edit().putString(callcheck, "false").commit();
+							atPrefs.edit().putString(callcheck, "false")
+									.commit();
 							dialog.dismiss();
 						}
 					}

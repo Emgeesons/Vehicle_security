@@ -21,5 +21,6 @@
     <color name="tabtxtcolor">#FF333333</color>
     <color name="background_tab_pressed">#AA33B5E5</color>
     <color name="background_tab">#FFE5E5E5</color>
+    <color name="green">#60ba15</color>
 
 </resources>

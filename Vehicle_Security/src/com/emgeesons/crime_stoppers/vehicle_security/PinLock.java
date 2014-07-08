@@ -178,7 +178,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(PinLock.this);
-			pDialog.setMessage("Register");
+			pDialog.setMessage("Verifying Pin");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();

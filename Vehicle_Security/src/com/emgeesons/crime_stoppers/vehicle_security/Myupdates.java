@@ -44,7 +44,6 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.facebook.Session;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -54,7 +53,6 @@ import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
 import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListener;
-import com.urbanairship.push.PushManager;
 
 public class Myupdates extends Fragment {
 	int novehicles;
@@ -64,7 +62,7 @@ public class Myupdates extends Fragment {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	ListView data;
-	Connection_Detector cd = new Connection_Detector(getActivity());
+	Connection_Detector cd;
 	boolean IsInternetPresent;
 	String myUpdates_url = Data.url + "myUpdates.php";
 	ProgressDialog pDialog;
@@ -100,7 +98,9 @@ public class Myupdates extends Fragment {
 			Bundle savedInstanceState) {
 
 		rootView = inflater.inflate(R.layout.myupdates, container, false);
+		cd = new Connection_Detector(getActivity());
 		imageLoader = ImageLoader.getInstance();
+
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				getActivity()).threadPriority(Thread.NORM_PRIORITY - 2)
 				.denyCacheImageMultipleSizesInMemory()
@@ -158,7 +158,13 @@ public class Myupdates extends Fragment {
 				LONGITUDE = 0;
 				pos = "Not Found";
 			}
-			vinfo = new getinfo().execute();
+			IsInternetPresent = cd.isConnectingToInternet();
+			if (IsInternetPresent == false) {
+				cd.showNoInternetPopup();
+			} else {
+				vinfo = new getinfo().execute();
+			}
+
 			data = (ListView) rootView.findViewById(R.id.list);
 			final View v = (RelativeLayout) inflater.inflate(
 					R.layout.updateheader, null);
@@ -174,7 +180,6 @@ public class Myupdates extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					Intent next = new Intent(getActivity(), Reportsummary.class);
 					next.putExtra("data", jsonMainArr.toString());
 					startActivity(next);
@@ -189,7 +194,6 @@ public class Myupdates extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							getActivity());
 					builder.setMessage("Vehicle Recovered")
@@ -202,7 +206,6 @@ public class Myupdates extends Fragment {
 										public void onClick(
 												DialogInterface dialog,
 												int which) {
-											// TODO Auto-generated method stub
 
 										}
 									})
@@ -210,7 +213,13 @@ public class Myupdates extends Fragment {
 									new DialogInterface.OnClickListener() {
 										public void onClick(
 												DialogInterface dialog, int id) {
-											recoverv = new rec().execute();
+											IsInternetPresent = cd
+													.isConnectingToInternet();
+											if (IsInternetPresent == false) {
+												cd.showNoInternetPopup();
+											} else {
+												recoverv = new rec().execute();
+											}
 
 										}
 
@@ -316,16 +325,15 @@ public class Myupdates extends Fragment {
 						rdate.setText(dateformate(selected_date));
 						rtime.setText(selected_time);
 						rlocation.setText(locations);
-						if (inumber.isEmpty()) {
-							ins.setVisibility(View.GONE);
-						} else {
-							ins.setVisibility(View.VISIBLE);
-						}
+						// if (inumber.isEmpty()) {
+						// ins.setVisibility(View.GONE);
+						// } else {
+						// ins.setVisibility(View.VISIBLE);
+						// }
 						ins.setOnClickListener(new OnClickListener() {
 
 							@Override
 							public void onClick(View v) {
-								// TODO Auto-generated method stub
 								Intent call = new Intent(Intent.ACTION_CALL);
 								call.setData(Uri.parse("tel:" + inumber));
 								startActivity(call);
@@ -335,7 +343,6 @@ public class Myupdates extends Fragment {
 
 							@Override
 							public void onClick(View v) {
-								// TODO Auto-generated method stub
 								Intent call = new Intent(Intent.ACTION_CALL);
 								call.setData(Uri.parse("tel:" + "131444"));
 								startActivity(call);
@@ -345,7 +352,6 @@ public class Myupdates extends Fragment {
 
 							@Override
 							public void onClick(View v) {
-								// TODO Auto-generated method stub
 								main.setVisibility(View.VISIBLE);
 								Vrecover.setVisibility(View.GONE);
 							}
@@ -354,7 +360,6 @@ public class Myupdates extends Fragment {
 
 							@Override
 							public void onClick(View arg0) {
-								// TODO Auto-generated method stub
 								Intent next = new Intent(getActivity(),
 										MainActivity.class);
 								startActivity(next);
@@ -572,6 +577,7 @@ public class Myupdates extends Fragment {
 						main.setVisibility(View.VISIBLE);
 						if ((jsonarr.length() < 1)) {
 							noupdate.setVisibility(View.VISIBLE);
+							data.setAdapter(new ffAdapter());
 						} else {
 							data.setAdapter(new ffAdapter());
 						}
@@ -704,9 +710,9 @@ public class Myupdates extends Fragment {
 				}
 
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			// for next row pos*no of photo
 			if (!(position == 0)) {
 				j = position * 3;
 			}
@@ -735,7 +741,6 @@ public class Myupdates extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
 					Intent intent = new Intent(getActivity(), Fullimage.class);
 					intent.putExtra("IMAGES",
 							Updates.mStrings.get((position * 3)));
@@ -746,7 +751,6 @@ public class Myupdates extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
 					Intent intent = new Intent(getActivity(), Fullimage.class);
 					intent.putExtra("IMAGES",
 							Updates.mStrings.get((position * 3) + 1));
@@ -758,7 +762,6 @@ public class Myupdates extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
 					Intent intent = new Intent(getActivity(), Fullimage.class);
 					intent.putExtra("IMAGES",
 							Updates.mStrings.get((position * 3) + 2));

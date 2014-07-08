@@ -304,19 +304,27 @@
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.ReportSubmit"
-            android:label="@string/title_activity_report_submit" >
+            android:label="@string/title_activity_report_submit"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Updates"
-            android:label="@string/title_activity_updates" >
+            android:label="@string/title_activity_updates"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Reportsummary"
-            android:label="@string/title_activity_reportsummary" >
+            android:label="@string/title_activity_reportsummary"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Fullimage"
-            android:label="@string/title_activity_fullimage" >
+            android:label="@string/title_activity_fullimage"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Tips"
+            android:label="@string/title_activity_tips" >
         </activity>
     </application>
 

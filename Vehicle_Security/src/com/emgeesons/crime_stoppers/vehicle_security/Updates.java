@@ -1,31 +1,18 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
-import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.util.Log;
-import android.view.View;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 
@@ -43,11 +30,9 @@ public class Updates extends SherlockFragmentActivity implements
 	ProgressDialog pDialog;
 	Data info;
 	GPSTracker gps;
-	private AsyncTask<Void, Void, Void> vinfo;
-	// static String vehicle_type, make, model, rno, inumber, location,
-	// selected_date, selected_time, report_type, comments;
-	// Myupdates m;
+	SharedPreferences atPrefs;
 	static List<String> mStrings = new ArrayList<String>();
+	static List<String> OStrings = new ArrayList<String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +44,7 @@ public class Updates extends SherlockFragmentActivity implements
 		actionBar = getActionBar();
 		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 		info = new Data();
+		atPrefs = PreferenceManager.getDefaultSharedPreferences(Updates.this);
 		viewPager.setAdapter(mAdapter);
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -97,13 +83,15 @@ public class Updates extends SherlockFragmentActivity implements
 
 	@Override
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
-		// if (tab.getPosition() == 1) {
-		// Myupdates.main.setVisibility(View.GONE);
-		//
-		// vinfo = new getinfo().execute();
-		// } else {
-		//
-		// }
+		// only login user
+		if (tab.getPosition() == 1) {
+			if (atPrefs.getBoolean(Data.checkllogin, true)) {
+				Intent next = new Intent(getApplicationContext(),
+						LoginActivity.class);
+				startActivity(next);
+				finish();
+			}
+		}
 		viewPager.setCurrentItem(tab.getPosition());
 	}
 
