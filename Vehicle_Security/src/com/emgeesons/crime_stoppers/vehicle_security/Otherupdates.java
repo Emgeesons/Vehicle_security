@@ -66,12 +66,12 @@ public class Otherupdates extends Fragment {
 	private ProgressBar pBar;
 	Data info;
 	GPSTracker gps;
-	protected ImageLoader imageLoader;
+
 	DisplayImageOptions options;
 	JSONArray jsonarrs, jsonMainArrs;
 	List<UpdateData> testimonialData;
 	List<UpdateData> labels = new ArrayList<UpdateData>();
-	// int size = 0;
+	int size = 0;
 	private int visibleThreshold = 5;
 	private boolean loading = true;
 	private int previousTotal = 0;
@@ -82,8 +82,7 @@ public class Otherupdates extends Fragment {
 	RelativeLayout vdetails;
 	SharedPreferences atPrefs;
 	View vv, rootView;
-	List<String> imageList = new ArrayList<String>();
-	List<String> imageLists = new ArrayList<String>();
+
 	RelativeLayout noupdate;
 	Connection_Detector cd;
 	boolean IsInternetPresent;
@@ -95,14 +94,7 @@ public class Otherupdates extends Fragment {
 
 		rootView = inflater.inflate(R.layout.otherupdate, container, false);
 		cd = new Connection_Detector(getActivity());
-		imageLoader = ImageLoader.getInstance();
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				getActivity()).threadPriority(Thread.NORM_PRIORITY - 2)
-				.denyCacheImageMultipleSizesInMemory()
-				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
-				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
-		// Initialize ImageLoader with configuration.
-		ImageLoader.getInstance().init(config);
+		Updates.imageLoader = ImageLoader.getInstance();
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.displayer(new RoundedBitmapDisplayer(50)).build();
@@ -265,7 +257,7 @@ public class Otherupdates extends Fragment {
 				noupdate.setVisibility(View.VISIBLE);
 				data.setVisibility(View.GONE);
 			} else {
-				if (rsize == 0) {
+				if (size == 0) {
 					mListAdapter = new listAdapter();
 					data.setAdapter(mListAdapter);
 					visibleThreshold = 5;
@@ -351,18 +343,38 @@ public class Otherupdates extends Fragment {
 			} else {
 				ovtype.setImageResource(R.drawable.ic_other);
 			}
-
-			if (testimonialData.get(position).getVtype()
-					.equalsIgnoreCase("Car")) {
-				spottype.setText("spotted your car");
-			} else if (testimonialData.get(position).getVtype()
-					.equalsIgnoreCase("Bicycle")) {
-				spottype.setText("spotted your bicycle");
-			} else if (testimonialData.get(position).getVtype()
-					.equalsIgnoreCase("MotorCycle")) {
-				spottype.setText("spotted your motorcycle");
+			if (testimonialData.get(position).gettype()
+					.equalsIgnoreCase("report")) {
+				if (testimonialData.get(position).getVtype()
+						.equalsIgnoreCase("Car")) {
+					spottype.setText("reported their vehicle");
+				} else if (testimonialData.get(position).getVtype()
+						.equalsIgnoreCase("Bicycle")) {
+					spottype.setText("reported their vehicle");
+				} else if (testimonialData.get(position).getVtype()
+						.equalsIgnoreCase("MotorCycle")) {
+					spottype.setText("reported their vehicle");
+				} else {
+					spottype.setText("reported their vehicle");
+				}
 			} else {
-				spottype.setText("spotted your vehicle");
+				if (testimonialData.get(position).getVtype()
+						.equalsIgnoreCase("Car")) {
+					spottype.setText("spotted a Car");
+				} else if (testimonialData.get(position).getVtype()
+						.equalsIgnoreCase("Bicycle")) {
+					spottype.setText("spotted a Bicycle");
+				} else if (testimonialData.get(position).getVtype()
+						.equalsIgnoreCase("MotorCycle")) {
+					spottype.setText("spotted a MotorCycle");
+				} else {
+					spottype.setText("spotted a vehicle");
+				}
+			}
+
+			if (testimonialData.get(position).getVtype().isEmpty()) {
+
+				spottype.setVisibility(View.INVISIBLE);
 			}
 
 			name.setText(testimonialData.get(position).getfname());
@@ -381,9 +393,6 @@ public class Otherupdates extends Fragment {
 				olocation.setVisibility(View.GONE);
 				sloc.setVisibility(View.GONE);
 			}
-			if (testimonialData.get(position).getVtype().isEmpty()) {
-				spottype.setText("spotted your vehicle");
-			}
 
 			String[] imageUrls = { testimonialData.get(position).getp1(),
 					testimonialData.get(position).getp2(),
@@ -395,8 +404,8 @@ public class Otherupdates extends Fragment {
 			ImageView arr[] = { pic1, pic2, pic3 };
 			for (int i = j; i < j + 3; i++) {
 
-				imageLoader.displayImage(Updates.OStrings.get(i), arr[x],
-						options, animateFirstListener);
+				Updates.imageLoader.displayImage(Updates.OStrings.get(i),
+						arr[x], options, animateFirstListener);
 				arr[x].setVisibility(View.VISIBLE);
 				if (Updates.OStrings.get(i).isEmpty()) {
 					arr[x].setVisibility(View.GONE);
@@ -521,7 +530,7 @@ public class Otherupdates extends Fragment {
 				// jsonMainArr = profile.getJSONArray("response");
 				success = profile.getString("status");
 				mess = profile.getString("message");
-				jsonarr = profile.getJSONArray("response");
+				jsonarr = profile.getJSONArray("reponse");
 
 			} catch (JSONException e) {
 				System.out.println("JSONException");
@@ -562,7 +571,7 @@ public class Otherupdates extends Fragment {
 						locicon = (ImageView) v.findViewById(R.id.imageView2);
 						data1.setVisibility(View.VISIBLE);
 						data1.addHeaderView(v);
-						if (jsonarr.length() < 1) {
+						if (jsonarr.length() == 0) {
 							RelativeLayout stays = (RelativeLayout) rootView
 									.findViewById(R.id.stays);
 							stays.setVisibility(View.VISIBLE);
@@ -765,16 +774,16 @@ public class Otherupdates extends Fragment {
 
 			String[] imageUrls = { spic1, spic2, spic3 };
 			for (int i = 0; i < imageUrls.length; i++) {
-				imageLists.add(imageUrls[i]);
+				Updates.imageLists.add(imageUrls[i]);
 
 			}
 			ImageView arr[] = { pic1, pic2, pic3 };
 			for (int i = j; i < j + 3; i++) {
 
-				imageLoader.displayImage(imageLists.get(i), arr[x], options,
-						animateFirstListener);
+				Updates.imageLoader.displayImage(Updates.imageLists.get(i),
+						arr[x], options, animateFirstListener);
 				arr[x].setVisibility(View.VISIBLE);
-				if (imageLists.get(i).isEmpty()) {
+				if (Updates.imageLists.get(i).isEmpty()) {
 					arr[x].setVisibility(View.GONE);
 				}
 				x++;
@@ -785,7 +794,8 @@ public class Otherupdates extends Fragment {
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), Fullimage.class);
-					intent.putExtra("IMAGES", imageLists.get((position * 3)));
+					intent.putExtra("IMAGES",
+							Updates.imageLists.get((position * 3)));
 					startActivity(intent);
 				}
 			});
@@ -795,7 +805,7 @@ public class Otherupdates extends Fragment {
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), Fullimage.class);
 					intent.putExtra("IMAGES",
-							imageLists.get((position * 3) + 1));
+							Updates.imageLists.get((position * 3) + 1));
 					startActivity(intent);
 
 				}
@@ -806,7 +816,7 @@ public class Otherupdates extends Fragment {
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), Fullimage.class);
 					intent.putExtra("IMAGES",
-							imageLists.get((position * 3) + 2));
+							Updates.imageLists.get((position * 3) + 2));
 					startActivity(intent);
 
 				}
@@ -877,13 +887,13 @@ public class Otherupdates extends Fragment {
 				spic2 = jsonarr.getJSONObject(position).getString("photo2");
 				spic3 = jsonarr.getJSONObject(position).getString("photo3");
 				if (vehicle_type.equalsIgnoreCase("Car")) {
-					spot.setText("spotted your car");
+					spot.setText("spotted a car");
 				} else if (vehicle_type.equalsIgnoreCase("Bicycle")) {
-					spot.setText("spotted your bicycle");
+					spot.setText("spotted a bicycle");
 				} else if (vehicle_type.equalsIgnoreCase("MotorCycle")) {
-					spot.setText("spotted your motorcycle");
+					spot.setText("spotted a motorcycle");
 				} else {
-					spot.setText("spotted your vehicle");
+					spot.setText("spotted a vehicle");
 				}
 
 			} catch (JSONException e) {
@@ -899,16 +909,16 @@ public class Otherupdates extends Fragment {
 
 			String[] imageUrls = { spic1, spic2, spic3 };
 			for (int i = 0; i < imageUrls.length; i++) {
-				imageList.add(imageUrls[i]);
+				Updates.imageList.add(imageUrls[i]);
 
 			}
 			ImageView arr[] = { pic1, pic2, pic3 };
 			for (int i = j; i < j + 3; i++) {
 
-				imageLoader.displayImage(imageList.get(i), arr[x], options,
-						animateFirstListener);
+				Updates.imageLoader.displayImage(Updates.imageList.get(i),
+						arr[x], options, animateFirstListener);
 				arr[x].setVisibility(View.VISIBLE);
-				if (imageList.get(i).isEmpty()) {
+				if (Updates.imageList.get(i).isEmpty()) {
 					arr[x].setVisibility(View.GONE);
 				}
 				x++;
@@ -1176,7 +1186,7 @@ public class Otherupdates extends Fragment {
 				if (totalItemCount > previousTotal) {
 					loading = false;
 					previousTotal = totalItemCount;
-					// size += 15;
+					size += 15;
 
 				}
 			}
@@ -1212,6 +1222,7 @@ public class Otherupdates extends Fragment {
 				ImageView imageView = (ImageView) view;
 				boolean firstDisplay = !displayedImages.contains(imageUri);
 				if (firstDisplay) {
+
 					FadeInBitmapDisplayer.animate(imageView, 500);
 					displayedImages.add(imageUri);
 				}

@@ -33,8 +33,8 @@ public class Connection_Detector {
 
 	public void showNoInternetPopup() {
 		pDialog = new AlertDialog.Builder(_context).create();
-		// pDialog.setTitle("No Internet Connection");
-		pDialog.setMessage("Please make sure you are connected to the internet  and try again");
+		 pDialog.setTitle("Location Access Required");
+		pDialog.setMessage("Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services");
 		pDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
@@ -44,5 +44,4 @@ public class Connection_Detector {
 		pDialog.setCancelable(true);
 		pDialog.show();
 	}
-
 }

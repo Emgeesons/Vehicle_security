@@ -51,6 +51,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	SQLiteDatabase dbb;
 	// boolean check = true;
 	static String check = "check";
+	String callcheck = "callcheck";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -198,7 +199,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		case 4:
 
 			String message;
-			message = "Check Out My Wheels :-\n https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
+			message = "Check out My Wheels by Crime Stoppers, South Australia. Download it from - https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
 			Intent share = new Intent(Intent.ACTION_SEND);
 			share.setType("text/plain");
 			share.putExtra(Intent.EXTRA_TEXT, message);
@@ -249,7 +250,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 									atPrefs.edit()
 											.putString(
 													SplashscreenActivity.profile_pic,
-													"profilePic.png").commit();
+													"").commit();
 									Session session = Session
 											.getActiveSession();
 									if (session != null) {
@@ -328,11 +329,24 @@ public class MainActivity extends SherlockFragmentActivity implements
 					getApplicationContext()).get();
 			Log.i("onResume", String.valueOf(foregroud));
 			String ch = atPrefs.getString(check, "true");
+			String chh = atPrefs.getString(callcheck, "true");
 			Log.i("con", ch);
+			Log.i("conn", chh);
 			if (ch.equalsIgnoreCase("false")) {
+				if (chh.equalsIgnoreCase("true")) {
+					// when we open maps,pic dont show pin
+					atPrefs.edit().putString(callcheck, "false").commit();
+					return;
+				} else {
+					if (!atPrefs.getBoolean(info.checkllogin, true)) {
+//						Intent ne = new Intent(getApplicationContext(),
+//								PinLock.class);
+//						startActivity(ne);
+					}
 
-				Intent ne = new Intent(getApplicationContext(), PinLock.class);
-				startActivity(ne);
+				}
+
+			
 			}
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block

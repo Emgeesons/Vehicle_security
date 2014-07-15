@@ -4,7 +4,7 @@
     <string-array name="sec_qus">
         <item>Passport Number</item>
         <item>License Number</item>
-        <item>Mother\'s Maiden </item>
+        <item>Mother\'s Maiden Name </item>
         <item>First Pet\'s Name</item>
         <item>First Childhood Friend</item>
         <item>First Primary School </item>
@@ -23,7 +23,7 @@
         <item>Micro/Compact</item>
         <item>Convertible/Coupe</item>
         <item>Hatchback</item>
-        <item>Seden</item>
+        <item>Sedan</item>
         <item>Station Wagon</item>
         <item>SUV</item>
         <item>People Mover</item>

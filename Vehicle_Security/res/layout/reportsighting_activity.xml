@@ -25,24 +25,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
 
-                <TextView
-                    android:id="@+id/textView1"
+                <RelativeLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_above="@+id/imageView1"
                     android:layout_centerHorizontal="true"
-                    android:text="Large Text"
-                    android:textAppearance="?android:attr/textAppearanceSmall" />
+                    android:background="@color/white_trs1"
+                    android:padding="5dp" >
 
-                <ImageView
-                    android:id="@+id/expand"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentRight="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginRight="16dp"
-                    android:layout_marginTop="5dp"
-                    android:src="@drawable/ic_expand_map" />
+                    <TextView
+                        android:id="@+id/textView1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Large Text"
+                        android:textAppearance="?android:attr/textAppearanceSmall" />
+                </RelativeLayout>
 
                 <TextView
                     android:id="@+id/textView2"
@@ -86,7 +83,8 @@
                     android:layout_marginTop="10dp"
                     android:background="@drawable/box_gry"
                     android:hint="date &amp; time"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:textSize="@dimen/big_text" />
 
                 <TextView
                     android:id="@+id/type"
@@ -98,7 +96,8 @@
                     android:layout_marginTop="16dp"
                     android:background="@drawable/box_gry"
                     android:hint="type of sighting"
-                    android:padding="10dp" />
+                    android:padding="10dp"
+                    android:textSize="@dimen/big_text" />
 
                 <EditText
                     android:id="@+id/reg"
@@ -111,7 +110,8 @@
                     android:background="@drawable/box_gry"
                     android:hint="registration/serial no"
                     android:padding="10dp"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:textSize="@dimen/big_text" />
 
                 <EditText
                     android:id="@+id/vmake"
@@ -124,7 +124,8 @@
                     android:background="@drawable/box_gry"
                     android:hint="make"
                     android:padding="10dp"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:textSize="@dimen/big_text" />
 
                 <LinearLayout
                     android:id="@+id/l"
@@ -143,7 +144,8 @@
                         android:hint="vehicle model"
                         android:nextFocusDown="@+id/color"
                         android:paddingLeft="10dp"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textSize="@dimen/big_text" />
 
                     <EditText
                         android:id="@+id/color"
@@ -153,7 +155,8 @@
                         android:background="@drawable/box_gry"
                         android:hint="color"
                         android:padding="10dp"
-                        android:singleLine="true" />
+                        android:singleLine="true"
+                        android:textSize="@dimen/big_text" />
                 </LinearLayout>
 
                 <EditText
@@ -167,7 +170,8 @@
                     android:background="@drawable/box_gry"
                     android:hint="comments"
                     android:padding="10dp"
-                    android:singleLine="true" />
+                    android:singleLine="true"
+                    android:textSize="@dimen/big_text" />
 
                 <RelativeLayout
                     android:id="@+id/pic"
@@ -179,8 +183,8 @@
 
                     <com.emgeesons.crime_stoppers.vehicle_security.CircularImageView
                         android:id="@+id/pic1"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:layout_alignParentLeft="true"
                         android:layout_alignParentTop="true"
                         android:layout_marginLeft="27dp"
@@ -189,8 +193,8 @@
 
                     <com.emgeesons.crime_stoppers.vehicle_security.CircularImageView
                         android:id="@+id/pic2"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="3dp"
                         android:layout_toRightOf="@+id/pic1"
@@ -199,8 +203,8 @@
 
                     <com.emgeesons.crime_stoppers.vehicle_security.CircularImageView
                         android:id="@+id/pic3"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
+                        android:layout_width="70dp"
+                        android:layout_height="70dp"
                         android:layout_centerVertical="true"
                         android:layout_marginLeft="3dp"
                         android:layout_toRightOf="@+id/pic2"
@@ -211,8 +215,8 @@
 
                 <ImageView
                     android:id="@+id/addpic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_alignTop="@+id/pic"
                     android:layout_toRightOf="@+id/pic"
                     android:src="@drawable/add_photos"

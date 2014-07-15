@@ -79,6 +79,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String oldpin;
+	GPSTracker gps;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -429,7 +430,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 						bpin4 = false;
 
 					}
-					if (lnumber.getText().toString().length() < 7) {
+					if (lnumber.getText().toString().length() < 6) {
 						lnumber.setHintTextColor(getResources().getColor(
 								R.color.red));
 						lnumber.setTextColor(getResources().getColor(
@@ -437,14 +438,14 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 						blnumber = false;
 
 					}
-					if (address.getText().toString().length() < 7) {
+					if (address.getText().toString().length() < 6) {
 						address.setHintTextColor(getResources().getColor(
 								R.color.red));
 						address.setTextColor(getResources().getColor(
 								R.color.red));
 						baddress = false;
 					}
-					if (postcode.getText().toString().length() < 5) {
+					if (postcode.getText().toString().length() < 4) {
 						postcode.setHintTextColor(getResources().getColor(
 								R.color.red));
 						postcode.setTextColor(getResources().getColor(
@@ -492,6 +493,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
+				gps = new GPSTracker(EditInfo.this);
 				info.device();
 				info.showInfo(getApplicationContext());
 
@@ -512,7 +514,16 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				json.put("licenceNo", lnumber.getText().toString());
 				json.put("address", address.getText().toString());
 				json.put("pincode", postcode.getText().toString());
+				if (gps.canGetLocation()) {
+					double LATITUDE = gps.getLatitude();
+					double LONGITUDE = gps.getLongitude();
+					json.put("latitude", LATITUDE);
+					json.put("longitude", LONGITUDE);
 
+				} else {
+					json.put("latitude", 0);
+					json.put("longitude", 0);
+				}
 				switch (buffKey) {
 				case 0:
 					qus = "What' s your Passport Number ?";

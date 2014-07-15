@@ -22,7 +22,9 @@ public class Data {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String manufacturer, model, Version;
-	static String url = "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/";
+	// prev static String url =
+	// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/";
+	static String url = "http://emgeesonsdevelopment.in/crimestoppers/mobile2.0/";
 
 	String user_id, fName, lName, email, mobileNumber, dob, gender, licenseNo,
 			street, address, postcode, dtModified, fbId, fbToken, contact_name,
@@ -38,6 +40,18 @@ public class Data {
 	static String glatitude = "glatitude";
 	static String glongitude = "glongitude";
 	static String gcomm = "gcomm";
+	static String coach = "coachmark";
+
+	public static final String MyPREFERENCES = "Report";
+	
+	public static final String vid = "vid";
+	public static final String rtype = "rtype";
+	public static final String time = "time";
+	public static final String comm = "comm";
+	public static final String location = "location";
+	public static final String p1 = "p1";
+	public static final String p2 = "p2";
+	public static final String p3 = "p3";
 
 	public void device() {
 		manufacturer = Build.MANUFACTURER;

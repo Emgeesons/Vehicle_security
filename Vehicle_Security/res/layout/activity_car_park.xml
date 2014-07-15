@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/black"
+    android:descendantFocusability="beforeDescendants"
+    android:focusableInTouchMode="true"
     tools:context=".AboutUs" >
 
     <RelativeLayout
@@ -174,6 +176,7 @@
         android:layout_marginBottom="30dp"
         android:ems="10"
         android:hint="eg: parking level 2,A7"
+        android:singleLine="true"
         android:textColor="@color/white" >
 
         <requestFocus />

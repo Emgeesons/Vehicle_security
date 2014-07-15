@@ -6,18 +6,20 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.util.Log;
 
 public class GPSTracker implements LocationListener {
 
 	private final Context mContext;
-
+	SharedPreferences atPrefs;
 	// flag for GPS status
 	boolean isGPSEnabled = false;
 
@@ -154,13 +156,17 @@ public class GPSTracker implements LocationListener {
 	public void showSettingsAlert() {
 		AlertDialog.Builder alertDialog = new AlertDialog.Builder(mContext);
 
-		alertDialog.setTitle("No location access");
+		alertDialog.setTitle("Location Access Required");
 		alertDialog
-				.setMessage("Please allow My Wheels to access Your location . Turn it ON from Location Services");
+				.setMessage("Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services");
 
 		alertDialog.setPositiveButton("Setting",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
+						String callcheck = "callcheck";
+						atPrefs = PreferenceManager
+								.getDefaultSharedPreferences(mContext);
+						atPrefs.edit().putString(callcheck, "True").commit();
 						Intent intent = new Intent(
 								Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 						mContext.startActivity(intent);
@@ -181,8 +187,8 @@ public class GPSTracker implements LocationListener {
 
 	@Override
 	public void onLocationChanged(Location location) {
-//		HomescreenActivity h = new HomescreenActivity();
-//		h.gpscheck();
+		// HomescreenActivity h = new HomescreenActivity();
+		// h.gpscheck();
 
 	}
 

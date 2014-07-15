@@ -44,8 +44,8 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/i"
             android:layout_marginBottom="20dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             android:background="#96FFFFFF"
             android:paddingBottom="10dp" >
 
@@ -53,11 +53,9 @@
                 android:id="@+id/login"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
+                android:layout_alignLeft="@+id/facebook"
+                android:layout_alignRight="@+id/facebook"
                 android:layout_below="@+id/facebook"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn_login" />
 
@@ -65,11 +63,9 @@
                 android:id="@+id/register"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentRight="true"
+                android:layout_alignLeft="@+id/login"
+                android:layout_alignRight="@+id/login"
                 android:layout_below="@+id/login"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/btn_register" />
 
@@ -277,8 +273,8 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/i"
             android:layout_marginBottom="20dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             android:background="#96FFFFFF"
             android:paddingBottom="10dp"
             android:visibility="visible" >
@@ -287,7 +283,6 @@
                 android:id="@+id/t"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
                 android:padding="10dp"
                 android:text="please enter your  email id and we will forward the request to change your PIN"
                 android:textColor="@color/light_black"
@@ -360,8 +355,8 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/i"
             android:layout_marginBottom="20dp"
-            android:layout_marginLeft="40dp"
-            android:layout_marginRight="40dp"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
             android:background="#96FFFFFF"
             android:paddingBottom="10dp"
             android:visibility="visible" >
@@ -371,9 +366,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:gravity="center"
                 android:padding="10dp"
-                android:text="question question question"
+                android:text="questionquestionquestionquestionquestionquestionquestion question question"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 

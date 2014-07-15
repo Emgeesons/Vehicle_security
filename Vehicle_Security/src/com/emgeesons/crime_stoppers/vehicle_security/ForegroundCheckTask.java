@@ -27,6 +27,7 @@ public class ForegroundCheckTask extends AsyncTask<Context, Void, Boolean> {
 		for (RunningAppProcessInfo appProcess : appProcesses) {
 			if (appProcess.importance == RunningAppProcessInfo.IMPORTANCE_FOREGROUND
 					&& appProcess.processName.equals(packageName)) {
+
 				return true;
 			}
 		}

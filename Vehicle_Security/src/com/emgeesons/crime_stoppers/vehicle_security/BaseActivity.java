@@ -79,9 +79,12 @@ public abstract class BaseActivity extends SherlockActivity {
 					atPrefs.edit().putString(callcheck, "false").commit();
 					return;
 				} else {
-					Intent ne = new Intent(getApplicationContext(),
-							PinLock.class);
-					startActivity(ne);
+//					if (!atPrefs.getBoolean(info.checkllogin, true)) {
+//						Intent ne = new Intent(getApplicationContext(),
+//								PinLock.class);
+//						startActivity(ne);
+//					}
+
 				}
 
 			}

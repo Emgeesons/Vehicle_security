@@ -95,7 +95,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	EditText vmake, vmodel, color, reg, comments;
 	Button send;
 	TextView date, type;
-	ImageView expand, addpic;
+	// ImageView expan;
+	ImageView addpic;
 	boolean exp_col;
 	int map_height;
 	final static CharSequence[] typeSighting = { "Theft", "Vandalism",
@@ -145,7 +146,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		reg = (EditText) findViewById(R.id.reg);
 		date = (TextView) findViewById(R.id.date);
 		type = (TextView) findViewById(R.id.type);
-		expand = (ImageView) findViewById(R.id.expand);
+		// expand = (ImageView) findViewById(R.id.expand);
 		addpic = (ImageView) findViewById(R.id.addpic);
 		pic1 = (CircularImageView) findViewById(R.id.pic1);
 		pic2 = (CircularImageView) findViewById(R.id.pic2);
@@ -176,6 +177,11 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				tSighting = 3;
 			}
 			type.setText(typeSighting[tSighting]);
+			btype = true;
+			bmake = true;
+			bmodel = true;
+			breg = true;
+			bcolor = true;
 		}
 		vmake.addTextChangedListener(this);
 		type.addTextChangedListener(this);
@@ -252,8 +258,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		// locationRequest.setFastestInterval(5000);
 
 		gpscheck();
-		 timevalue = String.format("%02d:%02d", Hrs, min);
-//		timevalue = Hrs + ":" + min;
+		timevalue = String.format("%02d:%02d", Hrs, min);
+		// timevalue = Hrs + ":" + min;
 		datevalue = years + "-" + months + "-" + dates;
 		ctimevalue = timevalue;
 		cdatevalue = datevalue;
@@ -261,26 +267,26 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		date.setText((info.getdateformate(datevalue + "-" + timevalue)));
 		checkpic();
 		picclick();
-		expand.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				if (exp_col) {
-					RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-							LayoutParams.WRAP_CONTENT,
-							LayoutParams.MATCH_PARENT);
-					mapview.setLayoutParams(parms);
-					expand.setImageResource(R.drawable.ic_close_map);
-					exp_col = false;
-				} else {
-					exp_col = true;
-					expand.setImageResource(R.drawable.ic_expand_map);
-					RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-							LayoutParams.WRAP_CONTENT, map_height);
-					mapview.setLayoutParams(parms);
-				}
-			}
-		});
+		// expand.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View arg0) {
+		// if (exp_col) {
+		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
+		// LayoutParams.WRAP_CONTENT,
+		// LayoutParams.MATCH_PARENT);
+		// mapview.setLayoutParams(parms);
+		// expand.setImageResource(R.drawable.ic_close_map);
+		// exp_col = false;
+		// } else {
+		// exp_col = true;
+		// expand.setImageResource(R.drawable.ic_expand_map);
+		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
+		// LayoutParams.WRAP_CONTENT, map_height);
+		// mapview.setLayoutParams(parms);
+		// }
+		// }
+		// });
 
 		// fields
 		type.setOnClickListener(new OnClickListener() {
@@ -309,6 +315,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 						}).setCancelable(false);
 
 				AlertDialog alert = builder.create();
+				alert.setCancelable(true);
 				alert.show();
 			}
 		});
@@ -331,7 +338,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				DatePicker datePicker = (DatePicker) dialog
 						.findViewById(R.id.datePicker1);
 
-				datePicker.init(years, months-1, dates, datePickerListener);
+				datePicker.init(years, months - 1, dates, datePickerListener);
 
 				timePicker
 						.setOnTimeChangedListener(new OnTimeChangedListener() {
@@ -422,13 +429,13 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 								R.color.red));
 						bmodel = false;
 					}
-					if (!(reg.getText().toString().length() == 10)) {
-
-						reg.setTextColor(getResources().getColor(R.color.red));
-						reg.setHintTextColor(getResources().getColor(
-								R.color.red));
-						breg = false;
-					}
+					// if (!(reg.getText().toString().length() == 10)) {
+					//
+					// reg.setTextColor(getResources().getColor(R.color.red));
+					// reg.setHintTextColor(getResources().getColor(
+					// R.color.red));
+					// breg = false;
+					// }
 					if (color.getText().toString().length() < 3) {
 
 						color.setTextColor(getResources().getColor(R.color.red));
@@ -444,7 +451,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 						btype = false;
 					}
 					if (btype == true && bcolor == true && bmake == true
-							&& bmodel == true && breg == true) {
+							&& bmodel == true) {
 						map.getMyLocation();
 						new sendd().execute();
 					}
@@ -712,7 +719,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 						});
 						totalp.setText("Total Samaritan Points :" + " "
 								+ points);
-
+						dialog.setCancelable(false);
 						dialog.show();
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						dbbb.execSQL("UPDATE profile SET spoints = '" + points
@@ -899,8 +906,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 			olat = gps.getLatitude();
 			olon = gps.getLongitude();
 			position = new LatLng(LATITUDE, LONGITUDE);
-			Toast.makeText(getApplicationContext(), String.valueOf(position),
-					Toast.LENGTH_LONG).show();
+//			Toast.makeText(getApplicationContext(), String.valueOf(position),
+//					Toast.LENGTH_LONG).show();
 			map.getUiSettings().setZoomControlsEnabled(false);
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 			new update().execute();
@@ -964,6 +971,22 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 			// if (!IsAlertDialogShown) {
 			// return;
 			// }
+			map.setOnCameraChangeListener(new OnCameraChangeListener() {
+				public void onCameraChange(CameraPosition arg0) {
+
+					map.clear();
+					LATITUDE = arg0.target.latitude;
+					LONGITUDE = arg0.target.longitude;
+					slat = arg0.target.latitude;
+					slon = arg0.target.longitude;
+					new update().execute();
+					onchange();
+
+					// pos = String.valueOf(arg0.target.latitude) + " "
+					// + String.valueOf(arg0.target.longitude);
+
+				}
+			});
 			gps.showSettingsAlert();
 			// IsAlertDialogShown = false;
 		}

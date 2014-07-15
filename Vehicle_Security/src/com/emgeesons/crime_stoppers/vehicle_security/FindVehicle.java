@@ -44,17 +44,18 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMapLoadedCallback;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class FindVehicle extends BaseActivity implements LocationListener {
@@ -82,6 +83,8 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 	List<ParkingData> vehicles;
 	static String latitude = "latitude";
 	static String longitude = "longitude";
+	MarkerOptions markerOptionss;
+	int i = 0;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -131,6 +134,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		locationManager.requestLocationUpdates(
 				LocationManager.NETWORK_PROVIDER, 30000, 100, this);
 		position = new LatLng(Double.valueOf(lat), Double.valueOf(lon));
+
 		gpscheck();
 
 		findrel.setOnClickListener(new OnClickListener() {
@@ -218,7 +222,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 							}
 						}
 					});
-
+					dialog.setCancelable(false);
 					dialog.show();
 
 				} else {
@@ -242,13 +246,15 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 	private void addmarker() {
 		// runOnUiThread(new Runnable() {
 		// public void run() {
-		// // add your marker here
-
+		// // select pos
 		markerOptions = new MarkerOptions();
-		markerOptions.position(position);
+		// markerOptions.position(new LatLng(18.970585,72.836266));
+		markerOptions.position(curpos);
 		markerOptions.title(getaddress());
 		googleMap.addMarker(markerOptions);
-		googleMap.getUiSettings().setZoomControlsEnabled(false);
+
+		// googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,
+		// 20));
 		// googleMap
 		// .animateCamera(CameraUpdateFactory.newLatLng(position));
 		// googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
@@ -256,7 +262,52 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		// Log.d("marker", "asd");
 		// }
 		// });
+		if (i == 0) {
+			googleMap.setOnMapLoadedCallback(new OnMapLoadedCallback() {
 
+				@Override
+				public void onMapLoaded() {
+					// TODO Auto-generated method stub
+					googleMap.getUiSettings().setZoomControlsEnabled(false);
+					LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+					builder.include(markerOptions.getPosition());
+					builder.include(markerOptionss.getPosition());
+					LatLngBounds bounds = builder.build();
+					int padding = 50; // offset from edges of the map in pixels
+
+					// remove one zoom level to ensure no marker is on the edge.
+					CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(
+							adjustBoundsForMaxZoomLevel(bounds), padding);
+
+					googleMap.moveCamera(cu);
+
+					i++;
+				}
+			});
+		}
+
+	}
+
+	// for zooming the map
+	private LatLngBounds adjustBoundsForMaxZoomLevel(LatLngBounds bounds) {
+		LatLng sw = bounds.southwest;
+		LatLng ne = bounds.northeast;
+		double deltaLat = Math.abs(sw.latitude - ne.latitude);
+		double deltaLon = Math.abs(sw.longitude - ne.longitude);
+
+		final double zoomN = 0.005; // minimum zoom coefficient
+		if (deltaLat < zoomN) {
+			sw = new LatLng(sw.latitude - (zoomN - deltaLat / 2), sw.longitude);
+			ne = new LatLng(ne.latitude + (zoomN - deltaLat / 2), ne.longitude);
+			bounds = new LatLngBounds(sw, ne);
+		} else if (deltaLon < zoomN) {
+			sw = new LatLng(sw.latitude, sw.longitude - (zoomN - deltaLon / 2));
+			ne = new LatLng(ne.latitude, ne.longitude + (zoomN - deltaLon / 2));
+			bounds = new LatLngBounds(sw, ne);
+		}
+
+		return bounds;
 	}
 
 	private class feed extends AsyncTask<Void, Void, Void> {
@@ -365,6 +416,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 							}
 						});
 						point.setText("Total Samaritan Points :" + " " + points);
+						dialog.setCancelable(false);
 						dialog.show();
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						if (vehicles.size() == 0) {
@@ -478,18 +530,20 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		// // add your marker here
 		BitmapDescriptor icon = BitmapDescriptorFactory
 				.fromResource(R.drawable.location_marker_green);
-		MarkerOptions markerOptionss = new MarkerOptions();
+		markerOptionss = new MarkerOptions();
 		markerOptionss.position(curpos);
 		markerOptionss.icon(icon);
 		markerOptionss.title(curgetaddress());
 		googleMap.clear();
 		googleMap.addMarker(markerOptionss);
-		CameraPosition cameraPosition = new CameraPosition.Builder()
-				.target(midPoint(curLATITUDE, curLONGITUDE,
-						Double.valueOf(lat), Double.valueOf(lon))).zoom(5)
-				.build();
-		googleMap.animateCamera(CameraUpdateFactory
-				.newCameraPosition(cameraPosition));
+
+		// CameraPosition cameraPosition = new CameraPosition.Builder()
+		// .target(midPoint(curLATITUDE, curLONGITUDE,
+		// Double.valueOf(lat), Double.valueOf(lon))).zoom(5)
+		// .build();
+		// googleMap.animateCamera(CameraUpdateFactory
+		// .newCameraPosition(cameraPosition));
+
 		// googleMap.animateCamera(CameraUpdateFactory.newLatLng(curpos));
 		// googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curpos, 15));
 		// }

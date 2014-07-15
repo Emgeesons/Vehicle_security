@@ -39,9 +39,13 @@ import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class Tips extends BaseActivity {
+	TextView addresss, rates;
+	RatingBar ratebar;
+	double LATITUDE, LONGITUDE;
 	String rate, address, feedback, date, vid;
 	List<TipData> tipdata;
 	List<TipData> labels = new ArrayList<TipData>();
@@ -78,14 +82,29 @@ public class Tips extends BaseActivity {
 		rate = intent.getStringExtra("Rate");
 		address = intent.getStringExtra("Address");
 		vid = intent.getStringExtra("vid");
+		addresss = (TextView) findViewById(R.id.address);
+		rates = (TextView) findViewById(R.id.rate);
+		ratebar = (RatingBar) findViewById(R.id.ratebar);
 		IsInternetPresent = cd.isConnectingToInternet();
 		if (IsInternetPresent == false) {
 			cd.showNoInternetPopup();
 		} else {
 			vinfo = new getTip().execute();
 		}
-		data = (ListView) findViewById(R.id.data);
+		addresss.setText(address);
+		rates.setText(rate);
 
+		ratebar.setRating(Float.valueOf(rate));
+		data = (ListView) findViewById(R.id.data);
+		gps = new GPSTracker(Tips.this);
+		if (gps.canGetLocation()) {
+			LATITUDE = gps.getLatitude();
+			LONGITUDE = gps.getLongitude();
+
+		} else {
+			LATITUDE = 0;
+			LONGITUDE = 0;
+		}
 		data.setOnScrollListener(new EndlessScrollListener());
 	}
 
@@ -122,28 +141,20 @@ public class Tips extends BaseActivity {
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
 					json.put("userId", info.user_id);
 					json.put("vehicleId", vid);
-					// json.put("pin", info.pin);
+					json.put("pin", info.pin);
 				} else {
 
 					json.put("userId", 0);
 					json.put("vehicleId", 0);
 					//
-					// json.put("pin", "0" + "0" + "0" + "0");
+					json.put("pin", "0" + "0" + "0" + "0");
 				}
 				json.put("noTips", size);
 
-				gps = new GPSTracker(Tips.this);
-				if (gps.canGetLocation()) {
-					double LATITUDE = gps.getLatitude();
-					double LONGITUDE = gps.getLongitude();
-					json.put("latitude", LATITUDE);
-					json.put("longitude", LONGITUDE);
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
 
-				} else {
-					json.put("latitude", 0);
-					json.put("longitude", 0);
-				}
-				json.put("vehicleId", vid);
+				// json.put("vehicleId", vid);
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
@@ -380,6 +391,7 @@ public class Tips extends BaseActivity {
 		// TODO Auto-generated method stub
 		return R.layout.tips;
 	}
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {

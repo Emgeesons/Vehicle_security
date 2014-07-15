@@ -53,7 +53,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	int typevalue;
-
+	GPSTracker gps;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -75,6 +75,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		colour = (EditText) findViewById(R.id.Colour);
 		acc = (EditText) findViewById(R.id.acc);
 		info = new Data();
+		
 		db = new DatabaseHandler(getApplicationContext());
 		try {
 
@@ -127,6 +128,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 						}).setCancelable(false);
 
 				AlertDialog alert = builder.create();
+				alert.setCancelable(false);
 				alert.show();
 			}
 		});
@@ -159,6 +161,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 						}).setCancelable(false);
 
 				AlertDialog alert = builder.create();
+				alert.setCancelable(false);
 				alert.show();
 			}
 		});
@@ -306,7 +309,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(Addvehicle.this);
-			pDialog.setMessage("Register");
+			pDialog.setMessage("Adding Vehicle");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -322,6 +325,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
+				gps = new GPSTracker(Addvehicle.this);
 				info.device();
 				info.showInfo(getApplicationContext());
 				json.put("userId", info.user_id);
@@ -344,6 +348,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
+				json.put("pin", info.pin);
 				System.out.println("Elements-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()

@@ -58,6 +58,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.view.MenuItem;
+import com.google.android.gms.internal.el;
 
 public class ProfileScreen extends BaseActivity {
 	TextView name, age, number, email, profile_comp, pts, samaritan, status;
@@ -86,10 +87,12 @@ public class ProfileScreen extends BaseActivity {
 	File[] listFile;
 	int height;
 
+	GPSTracker gps;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		setContentView(R.layout.profilescreen);
+		// setContentView(R.layout.profilescreen);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'> My Profile </font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -345,7 +348,8 @@ public class ProfileScreen extends BaseActivity {
 									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 							startActivityForResult(pickPhoto, 3);
 						} else if (items[item].equals("Cancel")) {
-							atPrefs.edit().putString(callcheck, "false").commit();
+							atPrefs.edit().putString(callcheck, "false")
+									.commit();
 							dialog.dismiss();
 						}
 					}
@@ -434,14 +438,19 @@ public class ProfileScreen extends BaseActivity {
 		names = atPrefs.getString(SplashscreenActivity.profile_pic,
 				"profilePic.png");
 		File f = new File(sdRoot, dir + names);
-		if (f.exists()) {
-			imagepath = f.getAbsolutePath();
-			Bitmap photo = (Bitmap) decodeFile(imagepath);
-			profilepic.setImageBitmap(photo);
-		} else {
-			profilepic.setImageResource(R.drawable.default_profile);
-		}
 
+		if (names.isEmpty()) {
+			profilepic.setImageResource(R.drawable.default_profile);
+		} else {
+
+			if (f.exists()) {
+				imagepath = f.getAbsolutePath();
+				Bitmap photo = (Bitmap) decodeFile(imagepath);
+				profilepic.setImageBitmap(photo);
+			} else {
+				profilepic.setImageResource(R.drawable.default_profile);
+			}
+		}
 	}
 
 	public class ProgressBarAnimation extends Animation {
@@ -657,12 +666,25 @@ public class ProfileScreen extends BaseActivity {
 		ContentBody cbFile = new FileBody(file);
 		info.device();
 		info.showInfo(getApplicationContext());
+		gps = new GPSTracker(ProfileScreen.this);
 		mpEntity.addPart("image", cbFile);
 		mpEntity.addPart("make", new StringBody(info.manufacturer));
 		mpEntity.addPart("os", new StringBody("Android" + " " + info.Version));
 		mpEntity.addPart("model", new StringBody(info.model));
 		mpEntity.addPart("userId", new StringBody(info.user_id));
+		mpEntity.addPart("pin", new StringBody(info.pin));
+		if (gps.canGetLocation()) {
+			double LATITUDE = gps.getLatitude();
+			double LONGITUDE = gps.getLongitude();
+			mpEntity.addPart("latitude",
+					new StringBody(String.valueOf(LATITUDE)));
+			mpEntity.addPart("longitude",
+					new StringBody(String.valueOf(LONGITUDE)));
 
+		} else {
+			mpEntity.addPart("latitude", new StringBody(String.valueOf(0)));
+			mpEntity.addPart("longitude", new StringBody(String.valueOf(0)));
+		}
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
 		HttpResponse response = httpclient.execute(httppost);

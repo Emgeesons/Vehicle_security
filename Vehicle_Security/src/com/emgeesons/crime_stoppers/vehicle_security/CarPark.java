@@ -1,6 +1,7 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
 
@@ -54,9 +55,9 @@ public class CarPark extends BaseActivity {
 	SharedPreferences atPrefs;
 	Data info;
 	RelativeLayout tips;
-	
+
 	JSONArray jsonMainArr;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -70,12 +71,15 @@ public class CarPark extends BaseActivity {
 		info = new Data();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(CarPark.this);
 		Intent intent = getIntent();
+		
 		Rate = intent.getStringExtra("Rate");
 		notip = intent.getStringExtra("tips");
 		type = intent.getStringExtra("type");
 		Address = intent.getStringExtra("Address");
 		vid = intent.getStringExtra("id");
 		tips = (RelativeLayout) findViewById(R.id.tipsrel);
+		String s = String.format("%.2f", Double.valueOf(Rate));
+		Rate = String.valueOf(s);
 		db = new DatabaseHandler(CarPark.this);
 		try {
 
@@ -90,6 +94,7 @@ public class CarPark extends BaseActivity {
 		rates = (TextView) findViewById(R.id.rate);
 		ratebar = (RatingBar) findViewById(R.id.ratebar);
 		comm = (EditText) findViewById(R.id.editText1);
+		comm.clearFocus();
 		done = (TextView) findViewById(R.id.done);
 		tip = (TextView) findViewById(R.id.tip);
 		data = (ListView) findViewById(R.id.listView1);
@@ -98,7 +103,7 @@ public class CarPark extends BaseActivity {
 		if (notip.isEmpty()) {
 			tip.setVisibility(View.INVISIBLE);
 		} else {
-			tip.setText(notip + "   " + "tips for this location");
+			tip.setText(notip + "  " + "tips for this location");
 		}
 
 		ratebar.setRating(Float.valueOf(Rate));
@@ -154,16 +159,15 @@ public class CarPark extends BaseActivity {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				if (!notip.isEmpty()) {
-					
+
 					Intent next = new Intent(getApplicationContext(),
 							Tips.class);
 
 					next.putExtra("Rate", Rate);
 					next.putExtra("Address", Address);
 					next.putExtra("vid", vid);
-					
+
 					startActivity(next);
-					
 
 				} else {
 
@@ -209,8 +213,6 @@ public class CarPark extends BaseActivity {
 
 		}
 	}
-
-	
 
 	@Override
 	public void onBackPressed() {

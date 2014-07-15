@@ -47,6 +47,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	SharedPreferences atPrefs;
+	GPSTracker gps;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,16 +103,27 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
+				gps = new GPSTracker(AddDetails.this);
 				info.device();
 				info.showInfo(getApplicationContext());
 				json.put("userId", info.user_id);
+				json.put("pin", info.pin);
 				json.put("licenceNo", lnumber.getText().toString());
 				json.put("address", address.getText().toString());
 				json.put("pincode", postcode.getText().toString());
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
+				if (gps.canGetLocation()) {
+					double LATITUDE = gps.getLatitude();
+					double LONGITUDE = gps.getLongitude();
+					json.put("latitude", LATITUDE);
+					json.put("longitude", LONGITUDE);
 
+				} else {
+					json.put("latitude", 0);
+					json.put("longitude", 0);
+				}
 				System.out.println("Elements-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()

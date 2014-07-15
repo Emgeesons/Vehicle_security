@@ -29,23 +29,21 @@
                 android:layout_centerVertical="true"
                 android:src="@drawable/location_marker" />
 
-            <TextView
-                android:id="@+id/textView1"
+            <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_above="@+id/imageView1"
                 android:layout_centerHorizontal="true"
-                android:text="Large Text"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
+                android:background="@color/white_trs1"
+                android:padding="5dp" >
 
-            <ImageView
-                android:id="@+id/expand"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginRight="16dp"
-                android:src="@drawable/ic_expand_map" />
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Large Text"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </RelativeLayout>
         </RelativeLayout>
     </RelativeLayout>
 
@@ -61,6 +59,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/mapview"
+                android:padding="@dimen/ten"
             android:visibility="visible" >
 
             <TextView
@@ -69,7 +68,7 @@
                 android:layout_height="40dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/pic"
+                android:layout_below="@+id/vdetails"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/box_gry"
                 android:ems="10"
@@ -104,57 +103,28 @@
                 android:hint="comments"
                 android:padding="10dp" />
 
-            <ImageView
-                android:id="@+id/typeimage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_marginLeft="11dp"
-                android:layout_marginTop="14dp"
-                android:src="@drawable/ic_car" />
-
-            <TextView
-                android:id="@+id/name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginLeft="14dp"
-                android:layout_marginTop="10dp"
-                android:layout_toRightOf="@+id/typeimage"
-                android:text="name"
-                android:textColor="@color/blue_text"
-                android:textSize="@dimen/big_text" />
-
-            <TextView
-                android:id="@+id/reg"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignLeft="@+id/name"
-                android:layout_below="@+id/name"
-                android:text="reg"
-                android:textSize="@dimen/medium_text" />
-
             <RelativeLayout
                 android:id="@+id/pic"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentLeft="true"
-                android:layout_below="@+id/reg"
-                android:layout_marginTop="15dp" >
+                android:layout_below="@+id/comments"
+                android:layout_marginTop="22dp" >
 
                 <com.emgeesons.crime_stoppers.vehicle_security.CircularImageView
                     android:id="@+id/pic1"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
                     android:layout_marginLeft="27dp"
                     android:src="@drawable/splashscreen"
-                    android:visibility="invisible" />
+                    android:visibility="gone" />
 
                 <com.emgeesons.crime_stoppers.vehicle_security.CircularImageView
                     android:id="@+id/pic2"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="3dp"
                     android:layout_toRightOf="@+id/pic1"
@@ -163,8 +133,8 @@
 
                 <com.emgeesons.crime_stoppers.vehicle_security.CircularImageView
                     android:id="@+id/pic3"
-                    android:layout_width="80dp"
-                    android:layout_height="80dp"
+                    android:layout_width="70dp"
+                    android:layout_height="70dp"
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="3dp"
                     android:layout_toRightOf="@+id/pic2"
@@ -175,32 +145,72 @@
 
             <ImageView
                 android:id="@+id/addpic"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="70dp"
+                android:layout_height="70dp"
                 android:layout_alignTop="@+id/pic"
                 android:layout_toRightOf="@+id/pic"
                 android:src="@drawable/add_photos"
                 android:visibility="visible" />
 
-            <ImageView
-                android:id="@+id/edit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_above="@+id/reg"
-                android:layout_alignParentRight="true"
-                android:layout_marginRight="15dp"
-                android:src="@drawable/edit" />
-
             <Button
                 android:id="@+id/send"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/comments"
+                android:layout_below="@+id/pic"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="23dp"
+                android:layout_marginTop="70dp"
                 android:background="@drawable/blue_button"
                 android:text="Send"
                 android:textColor="@color/white" />
+
+            <RelativeLayout
+                android:id="@+id/vdetails"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginLeft="11dp"
+                android:layout_marginTop="14dp" >
+
+                <ImageView
+                    android:id="@+id/typeimage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_marginLeft="11dp"
+                    android:layout_marginTop="14dp"
+                    android:src="@drawable/ic_car" />
+
+                <TextView
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="14dp"
+                    android:layout_marginTop="10dp"
+                    android:layout_toRightOf="@+id/typeimage"
+                    android:text="name"
+                    android:textColor="@color/blue_text"
+                    android:textSize="@dimen/big_text" />
+
+                <TextView
+                    android:id="@+id/reg"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignLeft="@+id/name"
+                    android:layout_below="@+id/name"
+                    android:text="reg"
+                    android:textSize="@dimen/medium_text" />
+
+                <ImageView
+                    android:id="@+id/edit"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_alignTop="@+id/typeimage"
+                    android:layout_marginRight="23dp"
+                    android:src="@drawable/edit" />
+
+            </RelativeLayout>
         </RelativeLayout>
     </ScrollView>
 

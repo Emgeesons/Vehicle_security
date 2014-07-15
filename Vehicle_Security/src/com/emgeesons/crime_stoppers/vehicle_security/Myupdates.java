@@ -43,11 +43,13 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.FailReason;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
@@ -81,9 +83,9 @@ public class Myupdates extends Fragment {
 	View rootView;
 	String recover_url = Data.url + "vehicleRecovered.php";
 	private AsyncTask<Void, Void, Void> recoverv;
-
+	View v;
 	DisplayImageOptions options;
-	protected ImageLoader imageLoader;
+
 	String spic1, spic2, spic3;;
 	double LATITUDE, LONGITUDE;
 
@@ -99,15 +101,7 @@ public class Myupdates extends Fragment {
 
 		rootView = inflater.inflate(R.layout.myupdates, container, false);
 		cd = new Connection_Detector(getActivity());
-		imageLoader = ImageLoader.getInstance();
 
-		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
-				getActivity()).threadPriority(Thread.NORM_PRIORITY - 2)
-				.denyCacheImageMultipleSizesInMemory()
-				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
-				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
-		// Initialize ImageLoader with configuration.
-		ImageLoader.getInstance().init(config);
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.displayer(new RoundedBitmapDisplayer(50)).build();
@@ -166,8 +160,7 @@ public class Myupdates extends Fragment {
 			}
 
 			data = (ListView) rootView.findViewById(R.id.list);
-			final View v = (RelativeLayout) inflater.inflate(
-					R.layout.updateheader, null);
+			v = (RelativeLayout) inflater.inflate(R.layout.updateheader, null);
 			name = (TextView) v.findViewById(R.id.name);
 			reg = (TextView) v.findViewById(R.id.reg);
 			type = (TextView) v.findViewById(R.id.type);
@@ -470,8 +463,13 @@ public class Myupdates extends Fragment {
 		name.setText(model);
 		reg.setText("Registration Number:" + " " + rno);
 		type.setText(report_type);
-		date.setText(dateformate(selected_date));
-		time.setText(selected_time);
+		if (!selected_date.isEmpty()) {
+			date.setText(dateformate(selected_date));
+		}
+		if (!selected_time.isEmpty()) {
+			time.setText(selected_time);
+		}
+
 		location.setText(locations);
 
 		if (vehicle_type.equalsIgnoreCase("Car")) {
@@ -535,25 +533,6 @@ public class Myupdates extends Fragment {
 				jsonarr = profile.getJSONArray("sightings");
 				success = profile.getString("status");
 				mess = profile.getString("message");
-				vehicle_id = jsonMainArr.getJSONObject(0).getString(
-						"vehicle_id");
-				vehicle_type = jsonMainArr.getJSONObject(0).getString(
-						"vehicle_type");
-				report_id = jsonMainArr.getJSONObject(0).getString("report_id");
-				make = jsonMainArr.getJSONObject(0).getString("make");
-				model = jsonMainArr.getJSONObject(0).getString("model");
-				rno = jsonMainArr.getJSONObject(0).getString(
-						"registration_serial_no");
-				inumber = jsonMainArr.getJSONObject(0).getString(
-						"insurance_company_number");
-				locations = jsonMainArr.getJSONObject(0).getString("location");
-				selected_date = jsonMainArr.getJSONObject(0).getString(
-						"selected_date");
-				selected_time = jsonMainArr.getJSONObject(0).getString(
-						"selected_time");
-				report_type = jsonMainArr.getJSONObject(0).getString(
-						"report_type");
-				comments = jsonMainArr.getJSONObject(0).getString("comments");
 
 			} catch (JSONException e) {
 				System.out.println("JSONException");
@@ -571,8 +550,48 @@ public class Myupdates extends Fragment {
 
 					public void run() {
 						pBar.setVisibility(View.GONE);
-						String[] datespilt = selected_time.split("\\:");
-						selected_time = datespilt[0] + ":" + datespilt[1];
+						if (!(jsonMainArr.length() == 0)) {
+							try {
+								vehicle_id = jsonMainArr.getJSONObject(0)
+										.getString("vehicle_id");
+								vehicle_type = jsonMainArr.getJSONObject(0)
+										.getString("vehicle_type");
+								report_id = jsonMainArr.getJSONObject(0)
+										.getString("report_id");
+								make = jsonMainArr.getJSONObject(0).getString(
+										"make");
+								model = jsonMainArr.getJSONObject(0).getString(
+										"model");
+								rno = jsonMainArr.getJSONObject(0).getString(
+										"registration_serial_no");
+								inumber = jsonMainArr.getJSONObject(0)
+										.getString("insurance_company_number");
+								locations = jsonMainArr.getJSONObject(0)
+										.getString("location");
+								selected_date = jsonMainArr.getJSONObject(0)
+										.getString("selected_date");
+								selected_time = jsonMainArr.getJSONObject(0)
+										.getString("selected_time");
+								report_type = jsonMainArr.getJSONObject(0)
+										.getString("report_type");
+								comments = jsonMainArr.getJSONObject(0)
+										.getString("comments");
+								String[] datespilt = selected_time.split("\\:");
+								selected_time = datespilt[0] + ":"
+										+ datespilt[1];
+								onchange();
+							} catch (JSONException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+
+						} else {
+							data.removeHeaderView(v);
+							recover.setVisibility(View.GONE);
+							selected_time = "";
+							selected_date = "";
+						}
+
 						addetails.setVisibility(View.GONE);
 						main.setVisibility(View.VISIBLE);
 						if ((jsonarr.length() < 1)) {
@@ -581,7 +600,6 @@ public class Myupdates extends Fragment {
 						} else {
 							data.setAdapter(new ffAdapter());
 						}
-						onchange();
 
 					}
 				});
@@ -728,13 +746,14 @@ public class Myupdates extends Fragment {
 			ImageView arr[] = { pic1, pic2, pic3 };
 			for (int i = j; i < j + 3; i++) {
 
-				imageLoader.displayImage(Updates.mStrings.get(i), arr[x],
-						options, animateFirstListener);
+				Updates.imageLoader.displayImage(Updates.mStrings.get(i),
+						arr[x], options, animateFirstListener);
 				arr[x].setVisibility(View.VISIBLE);
 				if (Updates.mStrings.get(i).isEmpty()) {
 					arr[x].setVisibility(View.GONE);
 				}
 				x++;
+
 			}
 
 			pic1.setOnClickListener(new OnClickListener() {

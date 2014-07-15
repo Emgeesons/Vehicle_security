@@ -69,7 +69,7 @@ public class VehicleProfile extends BaseActivity {
 	Data info;
 	RelativeLayout ins;
 	Button addins, edit, Delete;
-
+	GPSTracker gps;
 	int ttype;
 	String dir, imgPath;
 	private String imagepath = null;
@@ -83,7 +83,6 @@ public class VehicleProfile extends BaseActivity {
 	Boolean IsInternetPresent;
 	private AsyncTask<Void, Void, Void> upload, getprofile;
 	String uploadPhoto_url = Data.url + "uploadVehiclePic.php";
-
 	private AsyncTask<Void, Void, Void> del;
 	String del_url = Data.url + "deleteVehicle.php";
 	ProgressDialog pDialog;
@@ -95,6 +94,8 @@ public class VehicleProfile extends BaseActivity {
 	JSONArray jsonVehicleArr;
 	String profile_url = Data.url + "getProfile.php";
 	SharedPreferences atPrefs;
+	double LATITUDE;
+	double LONGITUDE;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -138,6 +139,8 @@ public class VehicleProfile extends BaseActivity {
 		vin.setText(info.vin);
 		color.setText(info.color);
 		acc.setText(info.acc);
+		atPrefs = PreferenceManager
+				.getDefaultSharedPreferences(VehicleProfile.this);
 		db = new DatabaseHandler(getApplicationContext());
 		try {
 
@@ -314,6 +317,16 @@ public class VehicleProfile extends BaseActivity {
 		// click on pic
 		picclick();
 
+		gps = new GPSTracker(VehicleProfile.this);
+		if (gps.canGetLocation()) {
+			LATITUDE = gps.getLatitude();
+			LONGITUDE = gps.getLongitude();
+
+		} else {
+			LATITUDE = 0;
+			LONGITUDE = 0;
+
+		}
 		addpic.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -326,9 +339,9 @@ public class VehicleProfile extends BaseActivity {
 				builder.setItems(items, new DialogInterface.OnClickListener() {
 					@Override
 					public void onClick(DialogInterface dialog, int item) {
+						atPrefs.edit().putString(callcheck, "True").commit();
 						if (items[item].equals("Take Photo")) {
-							atPrefs.edit().putString(callcheck, "True")
-									.commit();
+
 							final Intent intent = new Intent(
 									MediaStore.ACTION_IMAGE_CAPTURE);
 							intent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -642,6 +655,7 @@ public class VehicleProfile extends BaseActivity {
 				info.vehicleInfo(getApplicationContext(), id);
 
 				json.put("userId", info.user_id);
+				json.put("pin", info.pin);
 				json.put("vehicleId", id);
 				if (no.length == 0) {
 					json.put("photosExist", 0);
@@ -863,18 +877,20 @@ public class VehicleProfile extends BaseActivity {
 		ContentBody cbFile = new FileBody(file);
 		info.device();
 		info.showInfo(getApplicationContext());
-
 		mpEntity.addPart("image", cbFile);
 		mpEntity.addPart("make", new StringBody(info.manufacturer));
 		mpEntity.addPart("os", new StringBody("Android" + " " + info.Version));
 		mpEntity.addPart("model", new StringBody(info.model));
 		mpEntity.addPart("userId", new StringBody(info.user_id));
+		mpEntity.addPart("pin", new StringBody(info.pin));
 		mpEntity.addPart("vehicleId", new StringBody(id));
 		File[] no = folder.listFiles();
 		mpEntity.addPart("noPhotos", new StringBody(String.valueOf(no.length)));
 		mpEntity.addPart("noVehicles",
 				new StringBody(String.valueOf(vehicles.size())));
 		mpEntity.addPart("position", new StringBody(String.valueOf(nopic)));
+		mpEntity.addPart("latitude", new StringBody(String.valueOf(LATITUDE)));
+		mpEntity.addPart("longitude", new StringBody(String.valueOf(LONGITUDE)));
 
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
@@ -976,12 +992,18 @@ public class VehicleProfile extends BaseActivity {
 
 			JSONObject json = new JSONObject();
 			try {
+
 				info.device();
 				info.showInfo(VehicleProfile.this);
 				json.put("userId", info.user_id);
+				json.put("pin", info.pin);
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
+
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
+
 				System.out.println("Element1-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()

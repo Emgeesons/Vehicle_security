@@ -9,12 +9,15 @@ import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
+import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 
 public class Updates extends SherlockFragmentActivity implements
 		ActionBar.TabListener {
@@ -33,6 +36,9 @@ public class Updates extends SherlockFragmentActivity implements
 	SharedPreferences atPrefs;
 	static List<String> mStrings = new ArrayList<String>();
 	static List<String> OStrings = new ArrayList<String>();
+	static List<String> imageList = new ArrayList<String>();
+	static List<String> imageLists = new ArrayList<String>();
+	protected static ImageLoader imageLoader;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -48,7 +54,12 @@ public class Updates extends SherlockFragmentActivity implements
 		viewPager.setAdapter(mAdapter);
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
+				Updates.this).threadPriority(Thread.NORM_PRIORITY - 2)
+				.denyCacheImageMultipleSizesInMemory()
+				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
+				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
+		ImageLoader.getInstance().init(config);
 		// Adding Tabs
 		for (String tab_name : tabs) {
 			actionBar.addTab(actionBar.newTab().setText(tab_name)
@@ -101,8 +112,9 @@ public class Updates extends SherlockFragmentActivity implements
 
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		mStrings.clear();
+		imageLoader.clearMemoryCache();
+		imageLoader.clearDiskCache();
 		Intent next = new Intent(getApplicationContext(), MainActivity.class);
 		startActivity(next);
 		finish();

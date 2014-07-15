@@ -151,7 +151,8 @@
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.HomescreenActivity"
-            android:label="@string/title_activity_homescreen" >
+            android:label="@string/title_activity_homescreen"
+            android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name="com.facebook.LoginActivity"
@@ -237,6 +238,7 @@
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.PinLock"
             android:label="@string/title_activity_pin_lock"
+            android:screenOrientation="portrait"
             android:theme="@style/Theme.Transparent" >
         </activity>
         <activity
@@ -246,7 +248,8 @@
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Addvehicle"
             android:label="@string/title_activity_addvehicle"
-            android:screenOrientation="portrait" >
+            android:screenOrientation="portrait" 
+            android:windowSoftInputMode="stateHidden">
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.VehicleProfile"
@@ -281,6 +284,7 @@
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.CarPark"
             android:label="@string/title_activity_car_park"
+            android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" >
         </activity>
         <activity
@@ -324,7 +328,14 @@
         </activity>
         <activity
             android:name="com.emgeesons.crime_stoppers.vehicle_security.Tips"
-            android:label="@string/title_activity_tips" >
+            android:label="@string/title_activity_tips"
+            android:screenOrientation="portrait" >
+        </activity>
+        <activity
+            android:name="com.emgeesons.crime_stoppers.vehicle_security.Coachmark"
+            android:label="@string/title_activity_coachmark"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Transparent" >
         </activity>
     </application>
 

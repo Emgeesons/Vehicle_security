@@ -272,7 +272,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(FbNewuser.this);
-			pDialog.setMessage("Register");
+			pDialog.setMessage("Registering …");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -478,7 +478,9 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 										.getColumnIndex("lName"));
 							} while (cursor.moveToNext());
 						}
-
+						atPrefs.edit()
+								.putInt(SplashscreenActivity.progress, 30)
+								.commit();
 						AirshipConfigOptions options = AirshipConfigOptions
 								.loadDefaultOptions(FbNewuser.this);
 						UAirship.takeOff(getApplication(), options);

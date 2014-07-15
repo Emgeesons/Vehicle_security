@@ -13,9 +13,12 @@ import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
+import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -32,7 +35,6 @@ import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.FacebookRequestError;
 import com.facebook.HttpMethod;
@@ -40,6 +42,8 @@ import com.facebook.Request;
 import com.facebook.RequestAsyncTask;
 import com.facebook.Response;
 import com.facebook.Session;
+import com.facebook.Session.Builder;
+import com.facebook.Session.OpenRequest;
 import com.facebook.Session.StatusCallback;
 import com.facebook.SessionState;
 import com.facebook.model.GraphUser;
@@ -56,11 +60,14 @@ public class Share extends BaseActivity {
 	Bundle extras;
 	boolean isUseWebViewForAuthentication = false;
 	boolean check = true;
-
+	String as;
 	// twitter callback
 	SharedPreferences atPrefs;
+	SharedPreferences sharepreferences;
+
 	static String twittercallback = "true";
 	String fphoto, tphoto;
+	public static final String Shares = "Shares";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -71,27 +78,42 @@ public class Share extends BaseActivity {
 		fbtext = (EditText) findViewById(R.id.fbtext);
 		twtext = (EditText) findViewById(R.id.twtext);
 		post = (Button) findViewById(R.id.post);
-		skip = (Button) findViewById(R.id.skip);
+		skip = (Button) findViewById(R.id.Skip);
 		extras = getIntent().getExtras();
+		sharepreferences = getSharedPreferences(Shares, Context.MODE_PRIVATE);
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(Share.this);
 		// if (extras != null && atPrefs.getBoolean(twittercallback, true)) {
 		// photourl = extras.getString("link");
 		// tphotourl = extras.getString("tlink");
 		//
 		// }
+
+		if (!sharepreferences.getString("facebook", "").isEmpty()) {
+			fbtext.setText(sharepreferences.getString("facebook", "appfb"));
+			twtext.setText(sharepreferences.getString("twitter", "apptw"));
+			fb.setChecked(sharepreferences.getBoolean("fb", false));
+			tw.setChecked(sharepreferences.getBoolean("tw", false));
+		}
 		fphoto = atPrefs.getString(FilenewReport.fphoto, "fphoto");
 		tphoto = atPrefs.getString(FilenewReport.tphoto, "tphoto");
 		skip.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
+
+				Editor editor = sharepreferences.edit();
+
+				editor.remove("facebook").commit();
+				editor.remove("twitter").commit();
+				editor.remove("fb").commit();
+				editor.remove("tw").commit();
 				Intent next = new Intent(getApplicationContext(),
 						ReportSubmit.class);
 				startActivity(next);
 				finish();
 			}
 		});
-		initControl();
+
 		fb.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
 			@Override
@@ -132,6 +154,12 @@ public class Share extends BaseActivity {
 			@Override
 			public void onClick(View arg0) {
 				// twitter post
+				Editor editor = sharepreferences.edit();
+
+				editor.remove("facebook").commit();
+				editor.remove("twitter").commit();
+				editor.remove("fb").commit();
+				editor.remove("tw").commit();
 				Thread thread = new Thread() {
 					@Override
 					public void run() {
@@ -149,7 +177,7 @@ public class Share extends BaseActivity {
 									.openActiveSessionFromCache(Share.this);
 							Bundle postParams = new Bundle();
 							postParams.putString("message", fbtext.getText()
-									.toString());
+									.toString() + " " + "#MyWheels");
 							postParams.putString("name", "My Wheel");
 							if (!fphoto.equalsIgnoreCase("fphoto")) {
 								postParams.putString("picture", fphoto);
@@ -175,7 +203,7 @@ public class Share extends BaseActivity {
 				thread.start();
 			}
 		});
-
+		initControl();
 	}
 
 	class TwitterUpdateStatusTask extends AsyncTask<String, String, Boolean> {
@@ -188,11 +216,11 @@ public class Share extends BaseActivity {
 				// startActivity(next);
 				// finish();
 				gotonext();
-				Toast.makeText(getApplicationContext(), "Tweet successfully",
-						Toast.LENGTH_SHORT).show();
+				// Toast.makeText(getApplicationContext(), "Tweet successfully",
+				// Toast.LENGTH_SHORT).show();
 			} else {
-				Toast.makeText(getApplicationContext(), "Tweet failed",
-						Toast.LENGTH_SHORT).show();
+				// Toast.makeText(getApplicationContext(), "Tweet failed",
+				// Toast.LENGTH_SHORT).show();
 			}
 		}
 
@@ -212,7 +240,7 @@ public class Share extends BaseActivity {
 					AccessToken accessToken = new AccessToken(
 							accessTokenString, accessTokenSecret);
 					// StatusUpdate ad = new StatusUpdate(
-					String as = twtext.getText().toString();
+					String as = twtext.getText().toString() + " " + "#MyWheels";
 					StatusUpdate status = new StatusUpdate(as);
 					if (!tphoto.equalsIgnoreCase("tphoto")) {
 						System.out.println("photo");
@@ -336,8 +364,8 @@ public class Share extends BaseActivity {
 				ConstantValues.PREFERENCE_TWITTER_IS_LOGGED_IN, false)) {
 			new TwitterAuthenticateTask().execute();
 		} else {
-			Toast.makeText(getApplicationContext(), "Already",
-					Toast.LENGTH_LONG).show();
+			// Toast.makeText(getApplicationContext(), "Already",
+			// Toast.LENGTH_LONG).show();
 			// Intent intent = new Intent(this, TwitterActivity.class);
 			// startActivity(intent);
 			// finish();
@@ -395,6 +423,7 @@ public class Share extends BaseActivity {
 					// }
 					// });
 					// alert.show();
+
 					Dialog dialog = new Dialog(Share.this);
 					dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
 					dialog.setContentView(R.layout.dialog);
@@ -441,8 +470,18 @@ public class Share extends BaseActivity {
 					//
 					// });
 
-					vw.getSettings().setJavaScriptEnabled(true);
+					// vw.getSettings().setJavaScriptEnabled(true);
 					dialog.show();
+
+					Editor editor = sharepreferences.edit();
+
+					editor.putString("facebook", fbtext.getText().toString());
+					editor.putString("twitter", twtext.getText().toString());
+					editor.putBoolean("fb", fb.isChecked());
+					editor.putBoolean("tw", tw.isChecked());
+
+					editor.commit();
+
 					// Intent intent = new Intent(Intent.ACTION_VIEW,
 					// Uri.parse(requestToken.getAuthenticationURL()));
 					// startActivity(intent);
@@ -454,8 +493,8 @@ public class Share extends BaseActivity {
 					// requestToken.getAuthenticationURL());
 					// startActivity(intent);
 					// finish();
-					Toast.makeText(getApplicationContext(), "enter",
-							Toast.LENGTH_LONG).show();
+//					Toast.makeText(getApplicationContext(), "enter",
+//							Toast.LENGTH_LONG).show();
 				}
 			}
 		}
@@ -555,13 +594,25 @@ public class Share extends BaseActivity {
 
 		else {
 			// need for login
+
 			Session.openActiveSession(this, true, new StatusCallback() {
 
 				@SuppressWarnings("deprecation")
 				@Override
-				public void call(Session session, SessionState state,
+				public void call(final Session session, SessionState state,
 						Exception exception) {
 					if (session.isOpened()) {
+						// List<String> permissions = session
+						// .getPermissions();
+						// if (!isSubsetOf(PERMISSIONS,
+						// permissions)) {
+						// pendingPublishReauthorization = true;
+						// Session.NewPermissionsRequest newPermissionsRequest =
+						// new Session.NewPermissionsRequest(
+						// Share.this, PERMISSIONS);
+						// session.requestNewPublishPermissions(newPermissionsRequest);
+						// return;
+						// }
 						Request.executeMeRequestAsync(session,
 								new Request.GraphUserCallback() {
 
@@ -575,7 +626,16 @@ public class Share extends BaseActivity {
 											// getApplicationContext(),
 											// user.getName(),
 											// Toast.LENGTH_LONG).show();
-
+											List<String> permissions = session
+													.getPermissions();
+											if (!isSubsetOf(PERMISSIONS,
+													permissions)) {
+												pendingPublishReauthorization = true;
+												Session.NewPermissionsRequest newPermissionsRequest = new Session.NewPermissionsRequest(
+														Share.this, PERMISSIONS);
+												session.requestNewPublishPermissions(newPermissionsRequest);
+												return;
+											}
 										}
 									}
 								});
@@ -636,4 +696,5 @@ public class Share extends BaseActivity {
 		// TODO Auto-generated method stub
 		return R.layout.share;
 	}
+
 }

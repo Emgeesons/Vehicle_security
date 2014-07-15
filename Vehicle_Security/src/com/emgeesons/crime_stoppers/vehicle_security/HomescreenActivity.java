@@ -2,9 +2,7 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
@@ -60,6 +58,8 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.google.android.gms.internal.at;
+import com.google.android.gms.internal.el;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -68,14 +68,14 @@ import com.google.android.gms.maps.model.MarkerOptions;
 
 public class HomescreenActivity extends SherlockFragment implements
 		LocationListener {
-	double LATITUDE,LONGITUDE;
+	double LATITUDE, LONGITUDE;
 	GPSTracker gps;
 	static LatLng currlocation;
 	private GoogleMap map;
 	RelativeLayout mapview, marker;
 	int height;
 	private LocationManager locationManager;
-	SharedPreferences atPrefs;
+	SharedPreferences atPrefs, sharedpreferences;
 	LatLng position;
 	TextView marker_label;
 	String pos;
@@ -117,6 +117,8 @@ public class HomescreenActivity extends SherlockFragment implements
 		view = inflater.inflate(R.layout.homescreen_activity, container, false);
 		cd = new Connection_Detector(getActivity());
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+		sharedpreferences = getActivity().getSharedPreferences(
+				Data.MyPREFERENCES, Context.MODE_PRIVATE);
 		db = new DatabaseHandler(getActivity());
 		try {
 
@@ -143,6 +145,16 @@ public class HomescreenActivity extends SherlockFragment implements
 				.getHeight();
 		d = new downlaod();
 		setHasOptionsMenu(true);
+		gps = new GPSTracker(getActivity());
+		// COACHMARK
+
+		if (!atPrefs.getBoolean(info.checkllogin, true)
+				&& atPrefs.getBoolean(Data.coach, true)) {
+
+			Intent coach = new Intent(getActivity(), Coachmark.class);
+			startActivityForResult(coach, 0);
+		}
+
 		if (!(vehicles.size() == 0)) {
 
 			for (int i = 0; i < vehicles.size(); i++) {
@@ -209,13 +221,18 @@ public class HomescreenActivity extends SherlockFragment implements
 		sdRoot = Environment.getExternalStorageDirectory();
 		dir = "My Wheel/";
 		File f = new File(sdRoot, dir + names);
-		if (f.exists()) {
-			imagepath = f.getAbsolutePath();
-			Bitmap photo = (Bitmap) decodeFile(imagepath);
-			profilepic.setImageBitmap(photo);
-		} else {
+		if (names.isEmpty()) {
 			profilepic.setImageResource(R.drawable.default_profile);
+		} else {
+			if (f.exists()) {
+				imagepath = f.getAbsolutePath();
+				Bitmap photo = (Bitmap) decodeFile(imagepath);
+				profilepic.setImageBitmap(photo);
+			} else {
+				profilepic.setImageResource(R.drawable.default_profile);
+			}
 		}
+
 		profilepic.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -272,6 +289,7 @@ public class HomescreenActivity extends SherlockFragment implements
 
 		IsAlertDialogShown = true;
 		// check gps is on\off and set location
+
 		gpscheck();
 
 		report.setOnClickListener(new OnClickListener() {
@@ -339,6 +357,7 @@ public class HomescreenActivity extends SherlockFragment implements
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
+
 					if (gps.canGetLocation() || !(LATITUDE == 0.0)
 							|| !(LONGITUDE == 0.0)) {
 
@@ -612,7 +631,12 @@ public class HomescreenActivity extends SherlockFragment implements
 		// BitmapDescriptor icon = BitmapDescriptorFactory
 		// .fromResource(R.drawable.ic_location_marker);
 		markerOptions.position(position);
+		// new Runnable() {
+		// public void run() {
 		markerOptions.title(getaddress());
+		// }
+		// };
+
 		// markerOptions.icon(icon);
 		map.clear();
 		map.addMarker(markerOptions);
@@ -667,11 +691,17 @@ public class HomescreenActivity extends SherlockFragment implements
 			LONGITUDE = gps.getLongitude();
 
 			position = new LatLng(LATITUDE, LONGITUDE);
-			Toast.makeText(getActivity(), String.valueOf(position),
-					Toast.LENGTH_LONG).show();
+			// Toast.makeText(getActivity(), String.valueOf(position),
+			// Toast.LENGTH_LONG).show();
 			map.getUiSettings().setZoomControlsEnabled(false);
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
-			onchange();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					onchange();
+				}
+			}
+
+			);
 
 		} else {
 
@@ -691,10 +721,11 @@ public class HomescreenActivity extends SherlockFragment implements
 			LONGITUDE = gps.getLongitude();
 
 			position = new LatLng(LATITUDE, LONGITUDE);
-			Toast.makeText(getActivity(), String.valueOf(position),
-					Toast.LENGTH_LONG).show();
+			// Toast.makeText(getActivity(), String.valueOf(position),
+			// Toast.LENGTH_LONG).show();
 			map.getUiSettings().setZoomControlsEnabled(false);
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
+
 			onchange();
 
 		} else {
@@ -997,12 +1028,12 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	public void showAlert() {
 		HomescreenActivity n = new HomescreenActivity();
-		if (!(n == null)) {
+		if (n != null) {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			builder.setTitle("No location access")
+			builder.setTitle("Location Access Required")
 					.setMessage(
-							"Please allow User App to access your location.Turn it On From Location Services")
+							"Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services")
 					.setCancelable(false)
 					.setNegativeButton("Cancel",
 							new DialogInterface.OnClickListener() {
@@ -1015,6 +1046,9 @@ public class HomescreenActivity extends SherlockFragment implements
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
+									String callcheck = "callcheck";
+									atPrefs.edit().putString(callcheck, "True")
+											.commit();
 									Intent intent = new Intent(
 											Settings.ACTION_LOCATION_SOURCE_SETTINGS);
 									startActivity(intent);
@@ -1130,7 +1164,7 @@ public class HomescreenActivity extends SherlockFragment implements
 						} else {
 							Toast.makeText(
 									getActivity(),
-									"Please allow My Wheels to access Your location . Turn it ON from Location Services",
+									"Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services",
 									Toast.LENGTH_LONG).show();
 						}
 					}
@@ -1279,4 +1313,11 @@ public class HomescreenActivity extends SherlockFragment implements
 		}
 	}
 
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == getActivity().RESULT_OK) {
+			getActivity().setResult(getActivity().RESULT_OK);
+			getActivity().finish();
+		}
+	}
 }

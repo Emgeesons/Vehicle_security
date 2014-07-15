@@ -51,7 +51,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 	TextView cname, expiry;
 	EditText other_name, policy, number;
 	String type, id, call;
-
+	double LATITUDE, LONGITUDE;
 	static int buffKey = -1;
 	static CharSequence[] cnametype;
 	static CharSequence[] cnotype;
@@ -74,6 +74,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 	String profile_url = Data.url + "getProfile.php";
 	SharedPreferences atPrefs;
 	String expdate = null;
+	GPSTracker gps;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -248,7 +249,15 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 			}
 
 		}
+		gps = new GPSTracker(AddInsurance.this);
+		if (gps.canGetLocation()) {
+			LATITUDE = gps.getLatitude();
+			LONGITUDE = gps.getLongitude();
 
+		} else {
+			LATITUDE = 0;
+			LONGITUDE = 0;
+		}
 		cname.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -284,6 +293,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 						}).setCancelable(false);
 
 				AlertDialog alert = builder.create();
+				alert.setCancelable(true);
 				alert.show();
 			}
 		});
@@ -379,7 +389,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(AddInsurance.this);
-			pDialog.setMessage("Register");
+			pDialog.setMessage("Adding Insurance");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -395,6 +405,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
+			
 				info.device();
 				info.showInfo(getApplicationContext());
 
@@ -420,6 +431,10 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
 
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
+
+				json.put("pin", info.pin);
 				System.out.println("Elements-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()

@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="41dp"
+            android:layout_marginTop="3dp"
             android:src="@drawable/points_bg" />
 
         <TextView
@@ -26,7 +26,7 @@
             android:layout_alignParentRight="true"
             android:layout_below="@+id/imageView1"
             android:layout_marginLeft="15dp"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="10dp"
             android:text="Thank you for your review .You  earned yourself 20 good Samaritan points!!!"
             android:textSize="@dimen/big_text" />
 

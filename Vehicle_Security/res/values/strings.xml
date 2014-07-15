@@ -34,5 +34,6 @@
     <string name="title_activity_reportsummary">Reportsummary</string>
     <string name="title_activity_fullimage">Fullimage</string>
     <string name="title_activity_tips">Tips</string>
+    <string name="title_activity_coachmark">Coachmark</string>
 
 </resources>

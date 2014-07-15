@@ -62,6 +62,7 @@ public class VehicleInfo extends BaseActivity {
 	JSONArray jsonVehicleArr;
 	String profile_url = Data.url + "getProfile.php";
 	SharedPreferences atPrefs;
+	GPSTracker gps;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -464,14 +465,25 @@ public class VehicleInfo extends BaseActivity {
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
+				gps = new GPSTracker(VehicleInfo.this);
 				info.device();
 				info.showInfo(getApplicationContext());
 				json.put("userId", info.user_id);
+				json.put("pin", info.pin);
 				json.put("vehicleId", id);
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
+				if (gps.canGetLocation()) {
+					double LATITUDE = gps.getLatitude();
+					double LONGITUDE = gps.getLongitude();
+					json.put("latitude", LATITUDE);
+					json.put("longitude", LONGITUDE);
 
+				} else {
+					json.put("latitude", 0);
+					json.put("longitude", 0);
+				}
 				System.out.println("Elements-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()

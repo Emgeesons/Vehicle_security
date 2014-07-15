@@ -1,5 +1,6 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
+import java.io.File;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,7 +10,9 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -48,6 +51,8 @@ public class Reportsummary extends SherlockActivity {
 	protected ImageLoader imageLoader = ImageLoader.getInstance();
 	Button call;
 	List<String> mStrings = new ArrayList<String>();
+	SharedPreferences sharedpreferences;
+	Data info;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -69,6 +74,7 @@ public class Reportsummary extends SherlockActivity {
 				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config);
+		
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
 				.displayer(new RoundedBitmapDisplayer(50)).build();
@@ -83,47 +89,92 @@ public class Reportsummary extends SherlockActivity {
 				startActivity(call);
 			}
 		});
-		try {
+		sharedpreferences = getSharedPreferences(Data.MyPREFERENCES,
+				Context.MODE_PRIVATE);
+		String vid = sharedpreferences.getString(Data.vid, "notcall");
+		if (vid.isEmpty() || !vid.equalsIgnoreCase("notcall")) {
+			location = sharedpreferences.getString(Data.location, "");
+			comments = sharedpreferences.getString(Data.comm, "");
+			report_type = sharedpreferences.getString(Data.rtype, "");
+			File f = new File(sharedpreferences.getString(Data.p1, ""));
+			Uri imageUri1 = Uri.fromFile(f);
+			spic1 = imageUri1.toString().replaceAll("%20", " ");
+			File f2 = new File(sharedpreferences.getString(Data.p2, ""));
+			Uri imageUri2 = Uri.fromFile(f2);
+			spic2 = imageUri2.toString().replaceAll("%20", " ");
+			File f3 = new File(sharedpreferences.getString(Data.p3, ""));
+			Uri imageUri3 = Uri.fromFile(f3);
+			spic3 = imageUri3.toString().replaceAll("%20", " ");
 
-			JSONArray array = new JSONArray(jsonArray);
-			vehicle_type = array.getJSONObject(0).getString("vehicle_type");
-			make = array.getJSONObject(0).getString("make");
-			model = array.getJSONObject(0).getString("model");
-			body_type = array.getJSONObject(0).getString("body_type");
-			engine_no = array.getJSONObject(0).getString("engine_no");
-			chassis = array.getJSONObject(0).getString("vin_chassis_no");
-			colour = array.getJSONObject(0).getString("colour");
-			acc = array.getJSONObject(0).getString(
-					"accessories_unique_features");
-			reg = array.getJSONObject(0).getString("registration_serial_no");
-			icom = array.getJSONObject(0).getString("insurance_company_name");
-			ipno = array.getJSONObject(0).getString("insurance_policy_no");
-			iexp = array.getJSONObject(0).getString("insurance_expiry_date");
-			insurance_company_number = array.getJSONObject(0).getString(
-					"insurance_company_number");
-			location = array.getJSONObject(0).getString("location");
-			selected_date = array.getJSONObject(0).getString("selected_date");
-			selected_time = array.getJSONObject(0).getString("selected_time");
-			report_type = array.getJSONObject(0).getString("report_type");
-			comments = array.getJSONObject(0).getString("comments");
-			spic1 = "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
-			spic2 = "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
-			spic3 = "";
-			// spic1 = array.getJSONObject(0).getString("photo1");
-			// spic2 = array.getJSONObject(0).getString("photo2");
-			// spic3 = array.getJSONObject(0).getString("photo3");
+			String date = sharedpreferences.getString(Data.time, "");
+			String[] datespilt = date.split("\\*");
+			selected_time = datespilt[1];
+			selected_date = datespilt[0];
+			info = new Data();
+			info.vehicleInfo(getApplicationContext(), vid);
+			vehicle_type = (info.type);
+			make = (info.make);
+			model = (info.vmodel);
+			engine_no = (info.eng);
+			body_type = (info.body);
+			chassis = (info.vin);
+			colour = (info.color);
+			acc = (info.acc);
+			reg = (info.reg);
+			icom = info.iname;
+			ipno = info.ipolicy;
+			iexp = info.exp;
 
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} else {
+
+			try {
+
+				JSONArray array = new JSONArray(jsonArray);
+				vehicle_type = array.getJSONObject(0).getString("vehicle_type");
+				make = array.getJSONObject(0).getString("make");
+				model = array.getJSONObject(0).getString("model");
+				body_type = array.getJSONObject(0).getString("body_type");
+				engine_no = array.getJSONObject(0).getString("engine_no");
+				chassis = array.getJSONObject(0).getString("vin_chassis_no");
+				colour = array.getJSONObject(0).getString("colour");
+				acc = array.getJSONObject(0).getString(
+						"accessories_unique_features");
+				reg = array.getJSONObject(0)
+						.getString("registration_serial_no");
+				icom = array.getJSONObject(0).getString(
+						"insurance_company_name");
+				ipno = array.getJSONObject(0).getString("insurance_policy_no");
+				iexp = array.getJSONObject(0)
+						.getString("insurance_expiry_date");
+				insurance_company_number = array.getJSONObject(0).getString(
+						"insurance_company_number");
+				location = array.getJSONObject(0).getString("location");
+				selected_date = array.getJSONObject(0).getString(
+						"selected_date");
+				selected_time = array.getJSONObject(0).getString(
+						"selected_time");
+				report_type = array.getJSONObject(0).getString("report_type");
+				comments = array.getJSONObject(0).getString("comments");
+				// spic1 =
+				// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
+				// spic2 =
+				// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
+				// spic3 = "";
+				spic1 = array.getJSONObject(0).getString("photo1");
+				spic2 = array.getJSONObject(0).getString("photo2");
+				spic3 = array.getJSONObject(0).getString("photo3");
+				String[] datespilt = selected_time.split("\\:");
+				selected_time = datespilt[0] + ":" + datespilt[1];
+
+			} catch (JSONException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
-
 		pic1 = (ImageView) findViewById(R.id.pic1);
 		pic2 = (ImageView) findViewById(R.id.pic2);
 		pic3 = (ImageView) findViewById(R.id.pic3);
 
-		String[] datespilt = selected_time.split("\\:");
-		selected_time = datespilt[0] + ":" + datespilt[1];
 		name = (TextView) findViewById(R.id.name);
 		regs = (TextView) findViewById(R.id.reg);
 		rtype = (TextView) findViewById(R.id.rtype);
@@ -154,6 +205,7 @@ public class Reportsummary extends SherlockActivity {
 		date.setText(dateformate(selected_date));
 		time.setText(selected_time);
 		locations.setText(location);
+		comment.setText(comments);
 		if (comments.isEmpty() && spic1.isEmpty()) {
 			adv.setVisibility(View.GONE);
 		}
@@ -189,11 +241,12 @@ public class Reportsummary extends SherlockActivity {
 			mStrings.add(imageUrls[i]);
 
 		}
+		imageLoader.clearDiscCache();
+		imageLoader.clearMemoryCache();
 		for (int j = 0; j < mStrings.size(); j++) {
-
 			imageLoader.displayImage(mStrings.get(j), images[j], options);
 			images[j].setVisibility(View.VISIBLE);
-			if (mStrings.get(j).isEmpty()) {
+			if (mStrings.get(j).isEmpty()||mStrings.get(j).equalsIgnoreCase("notcall")) {
 				images[j].setVisibility(View.GONE);
 
 			}
@@ -303,7 +356,7 @@ public class Reportsummary extends SherlockActivity {
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
 		mStrings.clear();
-
+		
 		super.onBackPressed();
 	}
 }

@@ -493,7 +493,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(RegisterActivity.this);
-			pDialog.setMessage("Register");
+			pDialog.setMessage("Registering …..");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();

@@ -28,7 +28,8 @@
                 android:hint="First name"
                 android:inputType="textPersonName"
                 android:nextFocusDown="@+id/lname"
-                android:paddingLeft="5dp" >
+                android:paddingLeft="5dp"
+                android:textSize="@dimen/big_text" >
             </EditText>
 
             <EditText
@@ -41,7 +42,8 @@
                 android:ems="10"
                 android:hint="Last name"
                 android:inputType="textPersonName"
-                android:paddingLeft="5dp" >
+                android:paddingLeft="5dp"
+                android:textSize="@dimen/big_text" >
             </EditText>
         </LinearLayout>
 
@@ -57,7 +59,8 @@
             android:ems="10"
             android:hint="Email id"
             android:inputType="textEmailAddress"
-            android:paddingLeft="5dp" >
+            android:paddingLeft="5dp"
+            android:textSize="@dimen/big_text" >
         </EditText>
 
         <TextView
@@ -73,7 +76,8 @@
             android:hint="  Age"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textSize="@dimen/big_text" />
 
         <ImageView
             android:id="@+id/female"
@@ -114,7 +118,8 @@
             android:ems="10"
             android:hint="Mobile number"
             android:inputType="phone"
-            android:paddingLeft="5dp" />
+            android:paddingLeft="5dp"
+            android:textSize="@dimen/big_text" />
 
         <EditText
             android:id="@+id/pin2"
@@ -213,7 +218,8 @@
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/big_text" />
 
         <EditText
             android:id="@+id/sec_other_qus"
@@ -244,7 +250,8 @@
             android:paddingLeft="10dp"
             android:paddingTop="5dp"
             android:singleLine="true"
-            android:textColor="@color/black" />
+            android:textColor="@color/black"
+            android:textSize="@dimen/big_text" />
 
         <EditText
             android:id="@+id/pin1"
@@ -285,7 +292,8 @@
             android:ems="10"
             android:hint="Licence number"
             android:paddingLeft="10dp"
-            android:singleLine="true" >
+            android:singleLine="true"
+            android:textSize="@dimen/big_text" >
         </EditText>
 
         <EditText
@@ -300,7 +308,8 @@
             android:ems="10"
             android:hint="Address"
             android:paddingLeft="10dp"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:textSize="@dimen/big_text" />
 
         <EditText
             android:id="@+id/postcode"
@@ -314,7 +323,8 @@
             android:ems="10"
             android:hint="postcode"
             android:inputType="number"
-            android:paddingLeft="10dp" >
+            android:paddingLeft="10dp"
+            android:textSize="@dimen/big_text" >
         </EditText>
     </RelativeLayout>
 

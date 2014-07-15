@@ -116,8 +116,9 @@ public class Feedback extends SherlockFragment {
 				info.showInfo(getActivity());
 
 				json.put("userId", info.user_id);
+				json.put("pin", info.pin);
 				json.put("rating", rates);
-				json.put("feedback ", feedback.getText().toString());
+				json.put("feedback", feedback.getText().toString());
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);

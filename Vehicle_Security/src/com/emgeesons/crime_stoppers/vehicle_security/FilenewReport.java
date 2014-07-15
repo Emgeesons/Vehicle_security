@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -40,6 +39,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -76,7 +76,6 @@ import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.facebook.FacebookRequestError;
 import com.facebook.HttpMethod;
@@ -99,7 +98,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 	private GoogleMap map;
 	int height;
 	String pos, reponse, mess;
-	RelativeLayout mapview, marker;
+	RelativeLayout mapview, marker, vdetails;
 	TextView marker_label;
 	LocationManager locationManager;
 	LatLng position;
@@ -107,14 +106,16 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 	TextView date, type;
 	boolean exp_col;
 	int map_height;
-	final static CharSequence[] typeReport = { "Theft", "Vandalism", "Other" };
+	final static CharSequence[] typeReport = { "Theft", "Vandalism",
+			"Stolen /Abandoned Vehicle?" };
 	int tReport;
 	static int buffKey = 0;
 	// fordate and time
 	String datevalue, timevalue;
 	int years, months, dates, Hrs, min;
 	String ctimevalue, cdatevalue;
-	ImageView typeimage, edit, addpic, expand;
+	ImageView typeimage, edit, addpic;
+	// ImageView expand;
 	TextView name, reg;
 	List<VehicleData> vehicles;
 	ArrayList<String> names = new ArrayList<String>();
@@ -146,11 +147,12 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 	SharedPreferences atPrefs;
 	static String fphoto = "fphoto";
 	static String tphoto = "tphoto";
+	SharedPreferences sharedpreferences;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		 setContentView(R.layout.filenewreport_activity);
+		// setContentView(R.layout.filenewreport_activity);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'>File New Report </font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -158,6 +160,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 				new ColorDrawable(Color.parseColor("#060606")));
 		getSupportActionBar().setIcon(R.drawable.app_icon);
 
+		sharedpreferences = getSharedPreferences(Data.MyPREFERENCES,
+				Context.MODE_PRIVATE);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(FilenewReport.this);
 		db = new DatabaseHandler(FilenewReport.this);
@@ -195,9 +199,10 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		comments = (EditText) findViewById(R.id.comments);
 		date = (TextView) findViewById(R.id.date);
 		type = (TextView) findViewById(R.id.type);
-		expand = (ImageView) findViewById(R.id.expand);
+		// expand = (ImageView) findViewById(R.id.expand);
 		typeimage = (ImageView) findViewById(R.id.typeimage);
 		edit = (ImageView) findViewById(R.id.edit);
+		vdetails = (RelativeLayout) findViewById(R.id.vdetails);
 		name = (TextView) findViewById(R.id.name);
 		reg = (TextView) findViewById(R.id.reg);
 		addpic = (ImageView) findViewById(R.id.addpic);
@@ -236,6 +241,19 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 
 		checkpic();
 		picclick();
+		vdetails.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				dialog = new Dialog(FilenewReport.this);
+				dialog.setContentView(R.layout.vehicle_info);
+				dialog.setTitle("Select Vehicle");
+				ListView list = (ListView) dialog.findViewById(R.id.listView1);
+				list.setAdapter(new ffAdapter());
+
+				dialog.show();
+			}
+		});
 		edit.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -260,8 +278,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		// Hrs -= 12;
 		// ampm = "PM";
 		// }
-		 timevalue = String.format("%02d:%02d", Hrs, min);
-//		timevalue = Hrs + ":" + min;
+		timevalue = String.format("%02d:%02d", Hrs, min);
+		// timevalue = Hrs + ":" + min;
 		datevalue = years + "-" + months + "-" + dates;
 		ctimevalue = timevalue;
 		cdatevalue = datevalue;
@@ -295,6 +313,10 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 						btype = false;
 					}
 					if (btype == true) {
+						// Intent share = new Intent(getApplicationContext(),
+						// Share.class);
+						// startActivity(share);
+						// finish();
 						new sendd().execute();
 					}
 
@@ -305,27 +327,27 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 			}
 		});
 
-		expand.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				if (exp_col) {
-					RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-							LayoutParams.WRAP_CONTENT,
-							LayoutParams.MATCH_PARENT);
-					expand.setImageResource(R.drawable.ic_close_map);
-					mapview.setLayoutParams(parms);
-					exp_col = false;
-				} else {
-					exp_col = true;
-					expand.setImageResource(R.drawable.ic_expand_map);
-					RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-							LayoutParams.WRAP_CONTENT, map_height);
-
-					mapview.setLayoutParams(parms);
-				}
-			}
-		});
+		// expand.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View arg0) {
+		// if (exp_col) {
+		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
+		// LayoutParams.WRAP_CONTENT,
+		// LayoutParams.MATCH_PARENT);
+		// expand.setImageResource(R.drawable.ic_close_map);
+		// mapview.setLayoutParams(parms);
+		// exp_col = false;
+		// } else {
+		// exp_col = true;
+		// expand.setImageResource(R.drawable.ic_expand_map);
+		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
+		// LayoutParams.WRAP_CONTENT, map_height);
+		//
+		// mapview.setLayoutParams(parms);
+		// }
+		// }
+		// });
 		type.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -333,13 +355,13 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 				AlertDialog.Builder builder = new AlertDialog.Builder(
 						FilenewReport.this);
 				builder.setTitle(" Type Of Sighting ");
-
 				builder.setSingleChoiceItems(typeReport, tReport,
 						new DialogInterface.OnClickListener() {
 
 							@Override
 							public void onClick(DialogInterface dialog,
 									int which) {
+
 								// set to buffKey instead of selected
 								// (when cancel not save to selected)
 								// int sel = atPrefs.getInt(blood_value, 0);
@@ -356,6 +378,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 						}).setCancelable(false);
 
 				AlertDialog alert = builder.create();
+				alert.setCancelable(true);
 				alert.show();
 			}
 		});
@@ -385,7 +408,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 									android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
 							startActivityForResult(pickPhoto, 3);
 						} else if (items[item].equals("Cancel")) {
-							atPrefs.edit().putString(callcheck, "false").commit();
+							atPrefs.edit().putString(callcheck, "false")
+									.commit();
 							dialog.dismiss();
 						}
 					}
@@ -410,7 +434,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 				DatePicker datePicker = (DatePicker) dialog
 						.findViewById(R.id.datePicker1);
 
-				datePicker.init(years, months-1, dates, datePickerListener);
+				datePicker.init(years, months - 1, dates, datePickerListener);
 
 				timePicker
 						.setOnTimeChangedListener(new OnTimeChangedListener() {
@@ -680,9 +704,14 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		HttpPost httppost = new HttpPost(url);
 		MultipartEntity mpEntity = null;
 		mpEntity = new MultipartEntity();
+		String[] im = { Data.p1, Data.p2, Data.p3 };
+		Editor editor = sharedpreferences.edit();
+
 		for (int i = 0; i < f.size(); i++) {
 
 			File file = new File(f.get(i));
+			editor.putString(im[i], f.get(i));
+			editor.commit();
 			ContentBody cbFile = new FileBody(file);
 			mpEntity.addPart("image" + "" + (i + 1), cbFile);
 		}
@@ -746,13 +775,23 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 										.commit();
 								atPrefs.edit().putString(tphoto, tphotourl)
 										.commit();
-								// share.putExtra("link", photourl);
-								// share.putExtra("tlink", tphotourl);
 
 							} catch (JSONException e) {
 								e.printStackTrace();
 							}
 						}
+
+						Editor editor = sharedpreferences.edit();
+
+						editor.putString(Data.vid,
+								String.valueOf(nos.get(selected)));
+						editor.putString(Data.rtype, type.getText().toString());
+						editor.putString(Data.time, datevalue + "*" + timevalue);
+						editor.putString(Data.comm, comments.getText()
+								.toString());
+						editor.putString(Data.location, pos);
+
+						editor.commit();
 						startActivity(share);
 						finish();
 					}
@@ -995,6 +1034,22 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 			// if (!IsAlertDialogShown) {
 			// return;
 			// }
+			map.setOnCameraChangeListener(new OnCameraChangeListener() {
+				public void onCameraChange(CameraPosition arg0) {
+
+					map.clear();
+					LATITUDE = arg0.target.latitude;
+					LONGITUDE = arg0.target.longitude;
+					slat = arg0.target.latitude;
+					slon = arg0.target.longitude;
+					new update().execute();
+					onchange();
+
+					// pos = String.valueOf(arg0.target.latitude) + " "
+					// + String.valueOf(arg0.target.longitude);
+
+				}
+			});
 			gps.showSettingsAlert();
 			// IsAlertDialogShown = false;
 		}
