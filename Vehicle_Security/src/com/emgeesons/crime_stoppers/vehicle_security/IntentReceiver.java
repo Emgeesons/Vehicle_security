@@ -3,6 +3,8 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.util.Log;
 
 import com.urbanairship.UAirship;
@@ -13,7 +15,7 @@ import java.util.List;
 import java.util.Set;
 
 public class IntentReceiver extends BroadcastReceiver {
-
+	static SharedPreferences atPrefs;
 	private static final String logTag = "PushSample";
 
 	@Override
@@ -24,12 +26,17 @@ public class IntentReceiver extends BroadcastReceiver {
 		if (action.equals(PushManager.ACTION_PUSH_RECEIVED)) {
 
 			int id = intent.getIntExtra(PushManager.EXTRA_NOTIFICATION_ID, 0);
-
+			// String mess = intent.getStringExtra(PushManager.EXTRA_ALERT);
 			Log.i(logTag,
 					"Received push notification. Alert: "
 							+ intent.getStringExtra(PushManager.EXTRA_ALERT)
 							+ " [NotificationID=" + id + "]");
-
+			atPrefs = PreferenceManager.getDefaultSharedPreferences(context);
+			// for updates @homescreen
+			int no = atPrefs.getInt("updates", 0);
+			atPrefs.edit().putInt("updates", no+1)	.commit();
+			//refresh homescreen ui for update
+			HomescreenActivity.checkupdate();
 			logPushExtras(intent);
 
 		} else if (action.equals(PushManager.ACTION_NOTIFICATION_OPENED)) {
@@ -43,7 +50,7 @@ public class IntentReceiver extends BroadcastReceiver {
 			Intent launch = new Intent(Intent.ACTION_MAIN);
 			// onclick
 			launch.setClass(UAirship.shared().getApplicationContext(),
-					LoginActivity.class);
+					MainActivity.class);
 			launch.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 
 			UAirship.shared().getApplicationContext().startActivity(launch);

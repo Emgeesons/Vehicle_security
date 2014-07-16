@@ -197,6 +197,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		mapview = (RelativeLayout) findViewById(R.id.mapview);
 		marker_label = (TextView) findViewById(R.id.textView1);
 		comments = (EditText) findViewById(R.id.comments);
+
 		date = (TextView) findViewById(R.id.date);
 		type = (TextView) findViewById(R.id.type);
 		// expand = (ImageView) findViewById(R.id.expand);

@@ -688,4 +688,10 @@ public class VehicleInfo extends BaseActivity {
 		return R.layout.vehicle_info;
 	}
 
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		db.close();
+		super.onPause();
+	}
 }

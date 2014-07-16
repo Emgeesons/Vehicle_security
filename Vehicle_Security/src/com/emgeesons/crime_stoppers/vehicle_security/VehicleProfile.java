@@ -372,6 +372,7 @@ public class VehicleProfile extends BaseActivity {
 						Editvehicle.class);
 				next.putExtra("id", id);
 				startActivity(next);
+				
 				finish();
 
 			}
@@ -1190,4 +1191,11 @@ public class VehicleProfile extends BaseActivity {
 		return R.layout.vehicle_profile;
 	}
 
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+//		db.close();
+//		dbb.close();
+		super.onPause();
+	}
 }

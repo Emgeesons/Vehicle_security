@@ -15,6 +15,7 @@ import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import android.app.Activity;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -68,7 +69,7 @@ public class Share extends BaseActivity {
 	static String twittercallback = "true";
 	String fphoto, tphoto;
 	public static final String Shares = "Shares";
-
+	ProgressDialog pDialog;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -160,9 +161,9 @@ public class Share extends BaseActivity {
 				editor.remove("twitter").commit();
 				editor.remove("fb").commit();
 				editor.remove("tw").commit();
-				Thread thread = new Thread() {
-					@Override
-					public void run() {
+//				Thread thread = new Thread() {
+//					@Override
+//					public void run() {
 
 						if (tw.isChecked()) {
 
@@ -197,10 +198,16 @@ public class Share extends BaseActivity {
 								}
 							});
 						}
-					}
-				};
-
-				thread.start();
+//					}
+//				};
+//
+//				thread.start();
+				pDialog = new ProgressDialog(Share.this);
+				pDialog.setMessage("Sharing...");
+				pDialog.setIndeterminate(false);
+				pDialog.setCancelable(false);
+				pDialog.show();
+				
 			}
 		});
 		initControl();
@@ -269,6 +276,7 @@ public class Share extends BaseActivity {
 		// TODO Auto-generated method stub
 		if (check == true) {
 			check = false;
+			pDialog.dismiss();
 			Intent next = new Intent(getApplicationContext(),
 					ReportSubmit.class);
 			startActivity(next);

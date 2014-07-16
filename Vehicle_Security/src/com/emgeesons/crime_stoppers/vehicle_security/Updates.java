@@ -12,6 +12,8 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.view.View;
+import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
@@ -51,6 +53,7 @@ public class Updates extends SherlockFragmentActivity implements
 		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 		info = new Data();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(Updates.this);
+		atPrefs.edit().putInt("updates", 0).commit();
 		viewPager.setAdapter(mAdapter);
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -103,6 +106,7 @@ public class Updates extends SherlockFragmentActivity implements
 				finish();
 			}
 		}
+
 		viewPager.setCurrentItem(tab.getPosition());
 	}
 

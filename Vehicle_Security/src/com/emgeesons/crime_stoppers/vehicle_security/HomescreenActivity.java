@@ -75,13 +75,14 @@ public class HomescreenActivity extends SherlockFragment implements
 	RelativeLayout mapview, marker;
 	int height;
 	private LocationManager locationManager;
-	SharedPreferences atPrefs, sharedpreferences;
+	static SharedPreferences atPrefs;
+	SharedPreferences sharedpreferences;
 	LatLng position;
 	TextView marker_label;
 	String pos;
 	boolean IsAlertDialogShown;
 	TextView park, find;
-	View view;
+	static View view;
 	Fragment fragment;
 	RelativeLayout report, file, about, update;
 	MarkerOptions markerOptions;
@@ -120,6 +121,9 @@ public class HomescreenActivity extends SherlockFragment implements
 		sharedpreferences = getActivity().getSharedPreferences(
 				Data.MyPREFERENCES, Context.MODE_PRIVATE);
 		db = new DatabaseHandler(getActivity());
+		atPrefs.edit()
+				.putString("time", String.valueOf(System.currentTimeMillis()))
+				.commit();
 		try {
 
 			db.createDataBase();
@@ -146,8 +150,9 @@ public class HomescreenActivity extends SherlockFragment implements
 		d = new downlaod();
 		setHasOptionsMenu(true);
 		gps = new GPSTracker(getActivity());
+		// checkupdate cno
+		checkupdate();
 		// COACHMARK
-
 		if (!atPrefs.getBoolean(info.checkllogin, true)
 				&& atPrefs.getBoolean(Data.coach, true)) {
 
@@ -374,6 +379,22 @@ public class HomescreenActivity extends SherlockFragment implements
 			}
 		});
 		return view;
+
+	}
+
+	static void checkupdate() {
+		// TODO Auto-generated method stub
+		RelativeLayout updates;
+		updates = (RelativeLayout) view.findViewById(R.id.updatesc);
+		int no = atPrefs.getInt("updates", 0);
+		if (no != 0) {
+
+			updates.setVisibility(View.VISIBLE);
+			TextView nos = (TextView) view.findViewById(R.id.no);
+			nos.setText(String.valueOf(no));
+		} else {
+			updates.setVisibility(View.GONE);
+		}
 
 	}
 

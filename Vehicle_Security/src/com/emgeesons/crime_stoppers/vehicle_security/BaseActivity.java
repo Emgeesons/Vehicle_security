@@ -63,38 +63,35 @@ public abstract class BaseActivity extends SherlockActivity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		try {
-			boolean foregroud = new ForegroundCheckTask().execute(
-					BaseActivity.this).get();
-			Log.i("onResume", String.valueOf(foregroud));
-			String ch = atPrefs.getString(check, "true");
-			String chh = atPrefs.getString(callcheck, "true");
-			Log.i("con", ch);
-			Log.i("cons", chh);
-			Log.i("call form", getClass().getName());
-			if (ch.equalsIgnoreCase("false")) {
+		// pin check 
+		// time @10min
+		String time = atPrefs.getString("time", "");
+		String times = String.valueOf(System.currentTimeMillis());
+		double t = Double.valueOf(time);
+		double tw = Double.valueOf(times);
+		String ch = atPrefs.getString(check, "true");
+		String chh = atPrefs.getString(callcheck, "true");
+		Log.i("con", ch);
+		Log.i("cons", chh);
+		Log.i("call form", getClass().getName());
+		if (ch.equalsIgnoreCase("false")) {
 
-				if (chh.equalsIgnoreCase("true")) {
-					// when we open maps,pic dont show pin
-					atPrefs.edit().putString(callcheck, "false").commit();
-					return;
-				} else {
-//					if (!atPrefs.getBoolean(info.checkllogin, true)) {
-//						Intent ne = new Intent(getApplicationContext(),
-//								PinLock.class);
-//						startActivity(ne);
-//					}
+			if (chh.equalsIgnoreCase("true")) {
+				// when we open maps,pic dont show pin
+				atPrefs.edit().putString(callcheck, "false").commit();
+				return;
+			} else {
 
+				if (!atPrefs.getBoolean(info.checkllogin, true) && tw >= t) {
+					Intent ne = new Intent(getApplicationContext(),
+							PinLock.class);
+					startActivity(ne);
 				}
 
 			}
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
+
 	}
 
 	@Override

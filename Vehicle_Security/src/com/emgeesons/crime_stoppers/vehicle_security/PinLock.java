@@ -27,6 +27,7 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.Time;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -51,6 +52,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 	SharedPreferences atPrefs;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
+	String time;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 		pin2.setOnKeyListener(this);
 		pin3.setOnKeyListener(this);
 		pin4.setOnKeyListener(this);
+		pin1.requestFocus();
 		info = new Data();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(PinLock.this);
 		Sign.setOnClickListener(new OnClickListener() {
@@ -233,6 +236,12 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 					public void run() {
 						atPrefs.edit().putString(BaseActivity.check, "true")
 								.commit();
+						atPrefs.edit()
+								.putString(
+										"time",
+										String.valueOf(System
+												.currentTimeMillis()
+												+ (10 * 60 * 1000))).commit();
 						finish();
 
 					}

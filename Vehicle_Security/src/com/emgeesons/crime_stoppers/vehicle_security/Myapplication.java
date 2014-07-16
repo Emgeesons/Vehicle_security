@@ -1,7 +1,5 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
-import java.util.HashSet;
-
 import android.app.Application;
 
 import com.urbanairship.AirshipConfigOptions;
@@ -25,7 +23,7 @@ public class Myapplication extends Application {
 //		tags.add("tag2sss");
 //		PushManager.shared().setTags(tags);
 //		PushManager.enablePush();
-//		PushManager.shared().setIntentReceiver(IntentReceiver.class);
+		PushManager.shared().setIntentReceiver(IntentReceiver.class);
 		String apid = PushManager.shared().getAPID();
 		Logger.info("My Application onCreate - App APID: " + apid);
 		

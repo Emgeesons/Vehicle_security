@@ -58,7 +58,8 @@ public class Otherupdates extends Fragment {
 
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
-	ListView data, data1;
+	static ListView data;
+	ListView data1;
 	private AsyncTask<Void, Void, Void> vinfo;
 	String otherUpdates_url = Data.url + "otherUpdates.php";
 	String DetailsUpdates_url = Data.url + "otherUpdatesDetails.php", vid,
@@ -66,7 +67,6 @@ public class Otherupdates extends Fragment {
 	private ProgressBar pBar;
 	Data info;
 	GPSTracker gps;
-
 	DisplayImageOptions options;
 	JSONArray jsonarrs, jsonMainArrs;
 	List<UpdateData> testimonialData;
@@ -82,11 +82,11 @@ public class Otherupdates extends Fragment {
 	RelativeLayout vdetails;
 	SharedPreferences atPrefs;
 	View vv, rootView;
-
 	RelativeLayout noupdate;
 	Connection_Detector cd;
 	boolean IsInternetPresent;
 	int rsize = 0, ssize = 0;
+	double LATITUDE, LONGITUDE;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -114,6 +114,15 @@ public class Otherupdates extends Fragment {
 		}
 
 		info = new Data();
+		gps = new GPSTracker(getActivity());
+		if (gps.canGetLocation()) {
+			LATITUDE = gps.getLatitude();
+			LONGITUDE = gps.getLongitude();
+
+		} else {
+			LATITUDE = 0.0;
+			LONGITUDE = 0.0;
+		}
 		return rootView;
 	}
 
@@ -149,17 +158,8 @@ public class Otherupdates extends Fragment {
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
-				gps = new GPSTracker(getActivity());
-				if (gps.canGetLocation()) {
-					double LATITUDE = gps.getLatitude();
-					double LONGITUDE = gps.getLongitude();
-					json.put("latitude", LATITUDE);
-					json.put("longitude", LONGITUDE);
-
-				} else {
-					json.put("latitude", 0);
-					json.put("longitude", 0);
-				}
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
 				json.put("countReports", rsize);
 				json.put("countSightings", ssize);
 
@@ -343,39 +343,8 @@ public class Otherupdates extends Fragment {
 			} else {
 				ovtype.setImageResource(R.drawable.ic_other);
 			}
-			if (testimonialData.get(position).gettype()
-					.equalsIgnoreCase("report")) {
-				if (testimonialData.get(position).getVtype()
-						.equalsIgnoreCase("Car")) {
-					spottype.setText("reported their vehicle");
-				} else if (testimonialData.get(position).getVtype()
-						.equalsIgnoreCase("Bicycle")) {
-					spottype.setText("reported their vehicle");
-				} else if (testimonialData.get(position).getVtype()
-						.equalsIgnoreCase("MotorCycle")) {
-					spottype.setText("reported their vehicle");
-				} else {
-					spottype.setText("reported their vehicle");
-				}
-			} else {
-				if (testimonialData.get(position).getVtype()
-						.equalsIgnoreCase("Car")) {
-					spottype.setText("spotted a Car");
-				} else if (testimonialData.get(position).getVtype()
-						.equalsIgnoreCase("Bicycle")) {
-					spottype.setText("spotted a Bicycle");
-				} else if (testimonialData.get(position).getVtype()
-						.equalsIgnoreCase("MotorCycle")) {
-					spottype.setText("spotted a MotorCycle");
-				} else {
-					spottype.setText("spotted a vehicle");
-				}
-			}
 
-			if (testimonialData.get(position).getVtype().isEmpty()) {
-
-				spottype.setVisibility(View.INVISIBLE);
-			}
+			spottype.setText(testimonialData.get(position).getsstat());
 
 			name.setText(testimonialData.get(position).getfname());
 			// for next row pos*no of photo
@@ -530,7 +499,7 @@ public class Otherupdates extends Fragment {
 				// jsonMainArr = profile.getJSONArray("response");
 				success = profile.getString("status");
 				mess = profile.getString("message");
-				jsonarr = profile.getJSONArray("reponse");
+				jsonarr = profile.getJSONArray("response");
 
 			} catch (JSONException e) {
 				System.out.println("JSONException");
@@ -575,6 +544,7 @@ public class Otherupdates extends Fragment {
 							RelativeLayout stays = (RelativeLayout) rootView
 									.findViewById(R.id.stays);
 							stays.setVisibility(View.VISIBLE);
+
 						}
 						data1.setAdapter(new Adapter());
 						atPrefs = PreferenceManager
@@ -731,7 +701,6 @@ public class Otherupdates extends Fragment {
 			try {
 				name.setText(jsonarr.getJSONObject(position).getString(
 						"first_name"));
-
 				String[] datespilt = jsonarr.getJSONObject(position)
 						.getString("selected_time").split("\\:");
 				time.setText(datespilt[0] + ":" + datespilt[1]);
@@ -747,13 +716,13 @@ public class Otherupdates extends Fragment {
 				spic2 = jsonarr.getJSONObject(position).getString("photo2");
 				spic3 = jsonarr.getJSONObject(position).getString("photo3");
 				if (vtypes.equalsIgnoreCase("Car")) {
-					spot.setText("spotted your car");
+					spot.setText("spotted a car");
 				} else if (vtypes.equalsIgnoreCase("Bicycle")) {
-					spot.setText("spotted your bicycle");
+					spot.setText("spotted a bicycle");
 				} else if (vtypes.equalsIgnoreCase("MotorCycle")) {
-					spot.setText("spotted your motorcycle");
+					spot.setText("spotted a motorcycle");
 				} else {
-					spot.setText("spotted your vehicle");
+					spot.setText("spotted a vehicle");
 				}
 
 			} catch (JSONException e) {
@@ -871,7 +840,6 @@ public class Otherupdates extends Fragment {
 			try {
 				name.setText(jsonarr.getJSONObject(position).getString(
 						"first_name"));
-
 				String[] datespilt = jsonarr.getJSONObject(position)
 						.getString("selected_time").split("\\:");
 				time.setText(datespilt[0] + ":" + datespilt[1]);
@@ -1007,11 +975,15 @@ public class Otherupdates extends Fragment {
 			String photo3 = jsonMainArrs.getJSONObject(i).getString("photo3");
 			String status = jsonMainArrs.getJSONObject(i).getString("status");
 			String type = "Report";
+			String sta = "reported their vehicle";
+
+			//
+
 			UpdateData med = new UpdateData(report_id, first_name,
 					vehicle_type, vehicle_id, make, model,
 					registration_serial_no, location, selected_date,
 					selected_time, report_type, comments, photo1, photo2,
-					photo3, status, "", type);
+					photo3, status, "", type, sta);
 			labels.add(med);
 			rsize++;
 
@@ -1045,10 +1017,22 @@ public class Otherupdates extends Fragment {
 			String photo2 = jsonarrs.getJSONObject(i).getString("photo2");
 			String photo3 = jsonarrs.getJSONObject(i).getString("photo3");
 			String type = "sighting";
+			String sta;
+			// if (testimonialData.get(i).getVtype().equalsIgnoreCase("Car")) {
+			// sta = "spotted a Car";
+			// } else if (testimonialData.get(i).getVtype()
+			// .equalsIgnoreCase("Bicycle")) {
+			// sta = "spotted a Bicycle";
+			// } else if (testimonialData.get(i).getVtype()
+			// .equalsIgnoreCase("MotorCycle")) {
+			// sta = "spotted a MotorCycle";
+			// } else {
+			sta = "spotted a vehicle";
+			// }
 			UpdateData med = new UpdateData(sightings_id, first_name, "", "",
 					vehicle_make, vehicle_model, registration_number, location,
 					selected_date, selected_time, sighting_type, comments,
-					photo1, photo2, photo3, "", vehicle_colour, type);
+					photo1, photo2, photo3, "", vehicle_colour, type, sta);
 			labels.add(med);
 			ssize++;
 		}
@@ -1062,7 +1046,8 @@ public class Otherupdates extends Fragment {
 		public String _report_id, _first_name, _vehicle_type, _vehicle_id,
 				_make, _model, _registration_serial_no, _location,
 				_selected_date, _selected_time, _report_type, _comments,
-				_photo1, _photo2, _photo3, _status, svehicle_colour, _type;
+				_photo1, _photo2, _photo3, _status, svehicle_colour, _type,
+				_stat;
 
 		public UpdateData(String _report_id, String _first_name,
 				String _vehicle_type, String _vehicle_id, String _make,
@@ -1070,7 +1055,7 @@ public class Otherupdates extends Fragment {
 				String _location, String _selected_date, String _selected_time,
 				String _report_type, String _comments, String _photo1,
 				String _photo2, String _photo3, String _status,
-				String svehicle_colour, String _type
+				String svehicle_colour, String _type, String _stat
 
 		) {
 
@@ -1092,7 +1077,12 @@ public class Otherupdates extends Fragment {
 			this._photo3 = _photo3;
 			this._status = _status;
 			this._type = _type;
+			this._stat = _stat;
 
+		}
+
+		public String getsstat() {
+			return this._stat;
 		}
 
 		public String getscolor() {

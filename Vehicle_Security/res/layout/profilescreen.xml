@@ -197,7 +197,7 @@
             android:text="Add Vehicle" />
     </LinearLayout>
 
-    <com.emgeesons.crime_stoppers.vehicle_security.CustomImageView
+    <com.emgeesons.crime_stoppers.vehicle_security.CircularImageView
         android:id="@+id/profile"
         android:layout_width="80dp"
         android:layout_height="80dp"

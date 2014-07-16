@@ -64,7 +64,7 @@ public class ProfileScreen extends BaseActivity {
 	TextView name, age, number, email, profile_comp, pts, samaritan, status;
 	ImageView edit, gender, bg;
 	Button adddetails, addvehicle;
-	CustomImageView profilepic;
+	CircularImageView profilepic;
 	RelativeLayout pointsrel, relbg;
 	Data info;
 	File sdRoot;
@@ -118,7 +118,7 @@ public class ProfileScreen extends BaseActivity {
 		pts = (TextView) findViewById(R.id.pts);
 		status = (TextView) findViewById(R.id.textView1);
 		profile_comp = (TextView) findViewById(R.id.profile_comp);
-		profilepic = (CustomImageView) findViewById(R.id.profile);
+		profilepic = (CircularImageView) findViewById(R.id.profile);
 		// edit = (ImageView) findViewById(R.id.edit);
 		gender = (ImageView) findViewById(R.id.male_female);
 		adddetails = (Button) findViewById(R.id.adddetails);
@@ -476,13 +476,14 @@ public class ProfileScreen extends BaseActivity {
 
 	}
 
-	// @Override
-	// protected void onResume() {
-	// Intent n = new Intent(getApplicationContext(), PinLock.class);
-	// startActivity(n);
-	// super.onResume();
-	//
-	// };
+	@Override
+	protected void onResume() {
+		// Intent n = new Intent(getApplicationContext(), PinLock.class);
+		// startActivity(n);
+		db.close();
+		super.onResume();
+
+	};
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
