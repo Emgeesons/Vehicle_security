@@ -4,6 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
+    <ProgressBar
+        android:id="@+id/progressBar1"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true" />
+
     <RelativeLayout
         android:id="@+id/adddetails"
         android:layout_width="match_parent"
@@ -51,7 +59,6 @@
             android:layout_above="@+id/recover"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true" >
-
         </ListView>
 
         <Button
@@ -102,7 +109,7 @@
         android:id="@+id/ress"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="gone" >
+        android:visibility="gone">
 
         <RelativeLayout
             android:id="@+id/relativeLayout2"
@@ -127,6 +134,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="13dp"
                 android:layout_marginTop="20dp"
+                android:layout_toLeftOf="@+id/typess"
                 android:layout_toRightOf="@+id/vtypess"
                 android:text="TextView"
                 android:textColor="@color/blue_text"
@@ -140,17 +148,6 @@
                 android:layout_below="@+id/namess"
                 android:layout_marginTop="5dp"
                 android:text="TextView"
-                android:textSize="@dimen/medium_text" />
-
-            <TextView
-                android:id="@+id/typess"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_alignTop="@+id/namess"
-                android:layout_marginRight="36dp"
-                android:text="TextView"
-                android:textColor="@color/red"
                 android:textSize="@dimen/medium_text" />
 
             <RelativeLayout
@@ -203,15 +200,42 @@
                 android:layout_toRightOf="@+id/imageView2"
                 android:text="TextView"
                 android:textSize="@dimen/medium_text" />
+
+            <TextView
+                android:id="@+id/typess"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/vtypess"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="19dp"
+                android:ellipsize="end"
+                android:gravity="right"
+                android:singleLine="true"
+                android:text="TextView"
+                android:textColor="@color/red"
+                android:textSize="@dimen/medium_text" />
         </RelativeLayout>
+
+        <Button
+            android:id="@+id/vrech"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/relativeLayout2"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="22dp"
+            android:background="@drawable/blue_button"
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp"
+            android:text="Vehicle Recovered"
+            android:textColor="@color/white" />
 
         <LinearLayout
             android:id="@+id/linearLayout1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="32dp"
-            android:layout_marginTop="5dp"
+            android:layout_alignParentLeft="true"
+            android:layout_marginBottom="16dp"
             android:weightSum="2" >
 
             <Button
@@ -238,41 +262,54 @@
                 android:textColor="@color/white" />
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/update"
+        <ImageView
+            android:id="@+id/imageView4"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/relativeLayout2"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp"
-            android:text="View update history" />
+            android:layout_alignTop="@+id/rloc"
+            android:layout_marginTop="5dp"
+            android:layout_toLeftOf="@+id/rloc"
+            android:src="@drawable/ic_location" />
 
-        <Button
-            android:id="@+id/vrech"
+        <TextView
+            android:id="@+id/rloc"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/linearLayout1"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:background="@drawable/blue_button"
-            android:text="Done"
-            android:textColor="@color/white" />
+            android:layout_marginBottom="18dp"
+            android:gravity="center"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/rtime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/imageView4"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/rdate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/rtime"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="10dp"
+            android:gravity="center"
+            android:text="TextView" />
 
         <ImageView
             android:id="@+id/imageView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/linearLayout1"
-            android:layout_alignRight="@+id/vrech"
-            android:layout_marginBottom="14dp"
+            android:layout_above="@+id/rdate"
+            android:layout_centerHorizontal="true"
+            android:layout_marginBottom="114dp"
             android:src="@drawable/target_symbol" />
-    </RelativeLayout>
 
-    <ProgressBar
-        android:id="@+id/progressBar1"
-        style="?android:attr/progressBarStyleLarge"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true" />
+    </RelativeLayout>
 
 </RelativeLayout>

@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
@@ -25,6 +26,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -43,6 +46,7 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
@@ -79,7 +83,7 @@ public class Otherupdates extends Fragment {
 	JSONArray jsonarr, jsonMainArr;
 	String vehicle_type, make, model, rno, inumber, locations, selected_date,
 			selected_time, report_type, comments, vehicle_id, report_id;
-	RelativeLayout vdetails;
+	static RelativeLayout vdetails;
 	SharedPreferences atPrefs;
 	View vv, rootView;
 	RelativeLayout noupdate;
@@ -87,6 +91,7 @@ public class Otherupdates extends Fragment {
 	boolean IsInternetPresent;
 	int rsize = 0, ssize = 0;
 	double LATITUDE, LONGITUDE;
+	String pos;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -96,11 +101,10 @@ public class Otherupdates extends Fragment {
 		cd = new Connection_Detector(getActivity());
 		Updates.imageLoader = ImageLoader.getInstance();
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
-				.cacheOnDisk(true).considerExifParams(true)
+				.cacheOnDisk(true).considerExifParams(true).showImageOnLoading(R.drawable.add_photos_grey)
 				.displayer(new RoundedBitmapDisplayer(50)).build();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		pBar = (ProgressBar) rootView.findViewById(R.id.progressBar1);
-
 		noupdate = (RelativeLayout) rootView.findViewById(R.id.stay);
 		data = (ListView) rootView.findViewById(R.id.data);
 		data1 = (ListView) rootView.findViewById(R.id.data1);
@@ -118,12 +122,54 @@ public class Otherupdates extends Fragment {
 		if (gps.canGetLocation()) {
 			LATITUDE = gps.getLatitude();
 			LONGITUDE = gps.getLongitude();
-
+			pos = getaddress();
 		} else {
 			LATITUDE = 0.0;
 			LONGITUDE = 0.0;
+			Toast.makeText(
+					getActivity(),
+					"Please allow My Wheels to access Your location . Go back and enable it ",
+					Toast.LENGTH_LONG).show();
+			pos = "";
 		}
 		return rootView;
+	}
+
+	String getaddress() {
+		Geocoder geocoder = new Geocoder(getActivity(), Locale.ENGLISH);
+
+		try {
+			List<Address> addresses = geocoder.getFromLocation(LATITUDE,
+					LONGITUDE, 1);
+
+			if (addresses != null && addresses.size() > 0) {
+				Address returnedAddress = addresses.get(0);
+				StringBuilder strReturnedAddress = new StringBuilder("");
+				for (int i = 0; i < returnedAddress.getMaxAddressLineIndex(); i++) {
+					strReturnedAddress
+							.append(returnedAddress.getAddressLine(i)).append(
+									"\n");
+				}
+
+				pos = strReturnedAddress.toString();
+
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+			pos = "";
+			getActivity().runOnUiThread(new Runnable() {
+
+				public void run() {
+					// checking response and display resp screen
+
+					// onchange();
+
+				}
+			});
+
+		}
+		return pos;
 	}
 
 	private class getinfo extends AsyncTask<Void, Void, Void> {
@@ -158,11 +204,12 @@ public class Otherupdates extends Fragment {
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
+				
 				json.put("latitude", LATITUDE);
 				json.put("longitude", LONGITUDE);
 				json.put("countReports", rsize);
 				json.put("countSightings", ssize);
-
+				json.put("location", pos);
 				System.out.println("Element1-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()

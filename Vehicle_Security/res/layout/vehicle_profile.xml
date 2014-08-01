@@ -22,21 +22,11 @@
                 android:id="@+id/model"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="10dp"
                 android:layout_marginTop="18dp"
                 android:layout_toRightOf="@+id/imagetype"
                 android:text="TextView"
                 android:textSize="@dimen/big_text" />
-
-            <ImageView
-                android:id="@+id/imagetype"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:layout_marginLeft="14dp"
-                android:layout_marginTop="21dp"
-                android:src="@drawable/ic_car" />
 
             <TextView
                 android:id="@+id/reg"
@@ -76,7 +66,7 @@
                 android:layout_height="wrap_content"
                 android:layout_alignBaseline="@+id/type"
                 android:layout_alignBottom="@+id/type"
-                android:layout_marginLeft="5dp"
+                android:layout_marginLeft="1dp"
                 android:layout_toRightOf="@+id/type"
                 android:text="TextView"
                 android:textSize="@dimen/medium_text" />
@@ -234,7 +224,7 @@
                 android:layout_height="2dp"
                 android:layout_alignParentLeft="true"
                 android:layout_alignParentRight="true"
-                android:layout_below="@+id/accessories"
+                android:layout_below="@+id/state"
                 android:layout_marginTop="10dp"
                 android:background="@color/gry" >
             </RelativeLayout>
@@ -262,7 +252,27 @@
                     android:layout_alignBaseline="@+id/name"
                     android:layout_alignBottom="@+id/name"
                     android:layout_toRightOf="@+id/name"
-                    android:text="TextView"
+                    android:text=""
+                    android:textSize="@dimen/medium_text" />
+
+                <TextView
+                    android:id="@+id/number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@+id/name"
+                    android:layout_marginTop="5dp"
+                    android:text="Insurance Company Number :"
+                    android:textColor="@color/light_black"
+                    android:textSize="@dimen/medium_text" />
+
+                <TextView
+                    android:id="@+id/vnumber"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignBaseline="@+id/number"
+                    android:layout_alignBottom="@+id/number"
+                    android:layout_toRightOf="@+id/number"
+                    android:text=""
                     android:textSize="@dimen/medium_text" />
 
                 <TextView
@@ -270,7 +280,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
-                    android:layout_below="@+id/name"
+                    android:layout_below="@+id/number"
                     android:layout_marginTop="5dp"
                     android:text="Insurance Policy No:"
                     android:textColor="@color/light_black"
@@ -282,7 +292,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignTop="@+id/policy"
                     android:layout_toRightOf="@+id/policy"
-                    android:text="TextView"
+                    android:text=""
                     android:textSize="@dimen/medium_text" />
 
                 <TextView
@@ -303,7 +313,7 @@
                     android:layout_alignBaseline="@+id/expiry"
                     android:layout_alignBottom="@+id/expiry"
                     android:layout_toRightOf="@+id/expiry"
-                    android:text="TextView"
+                    android:text=""
                     android:textSize="@dimen/medium_text" />
 
                 <RelativeLayout
@@ -389,6 +399,36 @@
                 android:textColor="@color/yellow"
                 android:textSize="@dimen/regular_text"
                 android:visibility="visible" />
+
+            <ImageView
+                android:id="@+id/imagetype"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/ins"
+                android:layout_alignTop="@+id/model"
+                android:layout_marginTop="15dp"
+                android:src="@drawable/ic_car" />
+
+            <TextView
+                android:id="@+id/state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/accessories"
+                android:layout_below="@+id/accessories"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/light_black"
+                android:textSize="@dimen/medium_text"
+                android:text="State Of Registration: " />
+
+            <TextView
+                android:id="@+id/vstate"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/state"
+                android:layout_toRightOf="@+id/state"
+                android:textSize="@dimen/medium_text"
+                android:text="TextView" />
+
         </RelativeLayout>
     </ScrollView>
 

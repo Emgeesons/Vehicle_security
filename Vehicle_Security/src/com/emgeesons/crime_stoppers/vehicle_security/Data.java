@@ -22,15 +22,15 @@ public class Data {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String manufacturer, model, Version;
-	// prev static String url =
-	// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/";
 	static String url = "http://emgeesonsdevelopment.in/crimestoppers/mobile2.0/";
+	// static String url = "https://mywheels.biz/mobile2.0/";
+	// static String Testurl = "https://mywheels.biz/mobile2.0/";
 
 	String user_id, fName, lName, email, mobileNumber, dob, gender, licenseNo,
 			street, address, postcode, dtModified, fbId, fbToken, contact_name,
 			contact_number, pin, sans, type, make, vmodel, reg, body, eng, vin,
-			color, acc, iname, ipolicy, exp, spoints, status;
-	int squs;
+			color, acc, iname, ipolicy, exp, spoints, status, inum, state;
+	String squs;
 	int year, month, date;
 
 	static String lock = "lock";
@@ -43,7 +43,7 @@ public class Data {
 	static String coach = "coachmark";
 
 	public static final String MyPREFERENCES = "Report";
-	
+
 	public static final String vid = "vid";
 	public static final String rtype = "rtype";
 	public static final String time = "time";
@@ -87,7 +87,7 @@ public class Data {
 		String dateformat = "";
 		try {
 			datef = sdf.parse(date);
-			sdf.applyPattern("E,MMMM dd,yyyy, HH:mm aaa");
+			sdf.applyPattern("E, MMMM dd, yyyy, HH:mm aaa");
 			dateformat = sdf.format(datef);
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -176,7 +176,7 @@ public class Data {
 				contact_number = cursor.getString(cursor
 						.getColumnIndex("contact_number"));
 				pin = cursor.getString(cursor.getColumnIndex("pin"));
-				squs = cursor.getInt(cursor.getColumnIndex("squs"));
+				squs = cursor.getString(cursor.getColumnIndex("squs"));
 				sans = cursor.getString(cursor.getColumnIndex("sans"));
 				spoints = cursor.getString(cursor.getColumnIndex("spoints"));
 			} while (cursor.moveToNext());
@@ -225,6 +225,11 @@ public class Data {
 				exp = cursor.getString(cursor.getColumnIndex("vehicle_insexp"));
 				status = cursor.getString(cursor
 						.getColumnIndex("vehicle_status"));
+				inum = cursor
+						.getString(cursor.getColumnIndex("vehicle_insnum"));
+
+				state = cursor
+						.getString(cursor.getColumnIndex("vehicle_state"));
 			} while (cursor.moveToNext());
 		}
 	}

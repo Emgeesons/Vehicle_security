@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -61,7 +62,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 	TextView pint, qus;
 	static int buffKey = 0;
 	static CharSequence[] secqus;
-	int tqus;
+	int tqus = -1;
 	Data info;
 	boolean bnumber, bpin1, bpin2, bpin3, bpin4, bans, bqus;
 	private AsyncTask<Void, Void, Void> regcheck;
@@ -71,7 +72,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String pin;
-	int qusvalue;
+	// int qusvalue;
 	String fname, lname;
 
 	@Override
@@ -92,6 +93,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 		Log.i("data", email + userid + oldpin);
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(FbNewuser.this);
 		info = new Data();
+
 		number = (EditText) findViewById(R.id.number);
 		pin1 = (EditText) findViewById(R.id.pin1);
 		pin2 = (EditText) findViewById(R.id.pin2);
@@ -185,6 +187,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 								R.color.red));
 						bqus = false;
 					}
+
 					if (pin1.getText().toString().isEmpty()
 							|| pin2.getText().toString().isEmpty()
 							|| pin3.getText().toString().isEmpty()
@@ -237,26 +240,43 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 								} else {
 									otherqus.setVisibility(View.GONE);
 								}
+								qus.setText(secqus[buffKey]);
+								qus.setTextColor(getResources().getColor(
+										R.color.black));
+								// int selectedPosition = ((AlertDialog) dialog)
+								// .getListView().getCheckedItemPosition();
+
+								tqus = buffKey;
+								if (qus.getText().toString()
+										.equalsIgnoreCase("Other")) {
+									otherqus.setVisibility(View.VISIBLE);
+								} else {
+									otherqus.setVisibility(View.GONE);
+								}
+								dialog.dismiss();
+
 							}
 						}).setCancelable(false)
 
-				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						qus.setText(secqus[buffKey]);
-						qus.setTextColor(getResources().getColor(R.color.black));
-						int selectedPosition = ((AlertDialog) dialog)
-								.getListView().getCheckedItemPosition();
-
-						tqus = buffKey;
-						if (qus.getText().toString().equalsIgnoreCase("Other")) {
-							otherqus.setVisibility(View.VISIBLE);
-						} else {
-							otherqus.setVisibility(View.GONE);
-						}
-
-					}
-				});
+				// .setPositiveButton("Ok", new
+				// DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog, int which) {
+				// qus.setText(secqus[buffKey]);
+				// qus.setTextColor(getResources().getColor(R.color.black));
+				// int selectedPosition = ((AlertDialog) dialog)
+				// .getListView().getCheckedItemPosition();
+				//
+				// tqus = buffKey;
+				// if (qus.getText().toString().equalsIgnoreCase("Other")) {
+				// otherqus.setVisibility(View.VISIBLE);
+				// } else {
+				// otherqus.setVisibility(View.GONE);
+				// }
+				//
+				// }
+				// })
+				;
 
 				AlertDialog alert = builder.create();
 				alert.show();
@@ -444,7 +464,8 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-						qusvalue = info.qusvalues(quss);
+						quss = DatabaseUtils.sqlEscapeString(quss);
+
 						db = new DatabaseHandler(FbNewuser.this);
 						try {
 
@@ -462,8 +483,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 								+ number.getText().toString() + "'");
 
 						dbbb.execSQL("UPDATE profile SET pin = '" + pin + "'");
-						dbbb.execSQL("UPDATE profile SET squs = '"
-								+ String.valueOf(qusvalue) + "'");
+						dbbb.execSQL("UPDATE profile SET squs = " + quss + "");
 						dbbb.execSQL("UPDATE profile SET sans = '"
 								+ answer.getText().toString() + "'");
 

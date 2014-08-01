@@ -242,10 +242,17 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 
 			number.setText(cnotype[tname]);
 			policy.setText(info.ipolicy);
-			if (info.exp.contains("0000-00-00")) {
+			if (info.exp.contains("0000-00-00") || info.exp.equalsIgnoreCase("null")) {
 				expiry.setHint("Expiry");
 			} else {
-				expiry.setText(info.exp);
+				expiry.setText(getdateformate(info.exp));
+
+				String dates[] = info.exp.split("-");
+				int year = Integer.valueOf(dates[0]);
+				int month = Integer.valueOf(dates[1]);
+				int day = Integer.valueOf(dates[2]);
+				expdate = year + "-" + month + "-" + day;
+
 			}
 
 		}
@@ -255,8 +262,8 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 			LONGITUDE = gps.getLongitude();
 
 		} else {
-			LATITUDE = 0;
-			LONGITUDE = 0;
+			LATITUDE = 0.0;
+			LONGITUDE = 0.0;
 		}
 		cname.setOnClickListener(new OnClickListener() {
 
@@ -405,7 +412,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
-			
+
 				info.device();
 				info.showInfo(getApplicationContext());
 
@@ -420,6 +427,8 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 
 				}
 				json.put("insuranceCompanyName", name);
+				json.put("insuranceCompanyNumber", number.getText().toString());
+
 				json.put("insurancePolicyNumber", policy.getText().toString());
 				if (expiry.getText().toString().isEmpty()) {
 					json.put("insuranceExpiryDate", "000-00-00");
@@ -469,6 +478,8 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 								+ policy.getText().toString()
 								+ "',vehicle_insexp = '"
 								+ expdate
+								+ "',vehicle_insnum = '"
+								+ number.getText().toString()
 								+ "'WHERE vehicle_id='" + id + "'");
 
 						Intent next = new Intent(AddInsurance.this,

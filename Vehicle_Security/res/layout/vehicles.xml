@@ -10,16 +10,6 @@
         android:background="@drawable/box_whiteb"
         android:paddingBottom="5dp" >
 
-        <ImageView
-            android:id="@+id/imageView1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginLeft="17dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/ic_car" />
-
         <TextView
             android:id="@+id/model"
             android:layout_width="wrap_content"
@@ -63,6 +53,16 @@
             android:textColor="@color/yellow"
             android:textSize="@dimen/regular_text"
             android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="18dp"
+            android:src="@drawable/ic_car" />
+
     </RelativeLayout>
 
 </RelativeLayout>

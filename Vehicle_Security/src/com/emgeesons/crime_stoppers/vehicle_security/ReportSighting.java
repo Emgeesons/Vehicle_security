@@ -101,7 +101,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	int map_height;
 	final static CharSequence[] typeSighting = { "Theft", "Vandalism",
 			"Suspicious Activity", "Other" };
-	int tSighting;
+	int tSighting = -1;
 	Data info;
 	static int buffKey = 0;
 	String datevalue, timevalue;
@@ -173,7 +173,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				tSighting = 1;
 			} else if (types.equalsIgnoreCase("Suspicious Activity")) {
 				tSighting = 2;
-			} else if (types.equalsIgnoreCase("Other")) {
+			} else {
 				tSighting = 3;
 			}
 			type.setText(typeSighting[tSighting]);
@@ -416,31 +416,31 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				} else {
 					if (vmake.getText().toString().length() < 2) {
 
-						vmake.setTextColor(getResources().getColor(R.color.red));
-						vmake.setHintTextColor(getResources().getColor(
-								R.color.red));
+						// vmake.setTextColor(getResources().getColor(R.color.red));
+						// vmake.setHintTextColor(getResources().getColor(
+						// R.color.red));
 						bmake = false;
 					}
 					if (vmodel.getText().toString().length() < 2) {
 
-						vmodel.setTextColor(getResources()
-								.getColor(R.color.red));
-						vmodel.setHintTextColor(getResources().getColor(
-								R.color.red));
+						// vmodel.setTextColor(getResources()
+						// .getColor(R.color.red));
+						// vmodel.setHintTextColor(getResources().getColor(
+						// R.color.red));
 						bmodel = false;
 					}
-					// if (!(reg.getText().toString().length() == 10)) {
-					//
-					// reg.setTextColor(getResources().getColor(R.color.red));
-					// reg.setHintTextColor(getResources().getColor(
-					// R.color.red));
-					// breg = false;
-					// }
+					if ((reg.getText().toString().isEmpty())) {
+
+						reg.setTextColor(getResources().getColor(R.color.red));
+						reg.setHintTextColor(getResources().getColor(
+								R.color.red));
+						breg = false;
+					}
 					if (color.getText().toString().length() < 3) {
 
-						color.setTextColor(getResources().getColor(R.color.red));
-						color.setHintTextColor(getResources().getColor(
-								R.color.red));
+						// color.setTextColor(getResources().getColor(R.color.red));
+						// color.setHintTextColor(getResources().getColor(
+						// R.color.red));
 						bcolor = false;
 					}
 					if (type.getText().toString().isEmpty()) {
@@ -450,10 +450,14 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 								R.color.red));
 						btype = false;
 					}
-					if (btype == true && bcolor == true && bmake == true
-							&& bmodel == true) {
-						map.getMyLocation();
-						new sendd().execute();
+					if (btype == true) {
+						if (breg == true || bcolor == true || bmake == true
+								|| bmodel == true) {
+							map.getMyLocation();
+
+							new sendd().execute();
+						}
+
 					}
 
 				}
@@ -632,7 +636,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		String currentTime = sdfs.format(new Date());
 		String currentDate = sdf.format(new Date());
 		mpEntity.addPart("originalDate", new StringBody(currentDate));
-		mpEntity.addPart("orginalTime", new StringBody(currentTime));
+		mpEntity.addPart("originalTime", new StringBody(currentTime));
 		mpEntity.addPart("selectedDate", new StringBody(datevalue));
 		mpEntity.addPart("selectedTime", new StringBody(timevalue));
 		mpEntity.addPart("sightingType", new StringBody(type.getText()
@@ -644,7 +648,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		mpEntity.addPart("vehicleColour", new StringBody(color.getText()
 				.toString()));
 		mpEntity.addPart("noPhotos", new StringBody(String.valueOf(f.size())));
-		mpEntity.addPart("registerationNumber", new StringBody(reg.getText()
+		mpEntity.addPart("registrationNumber", new StringBody(reg.getText()
 				.toString()));
 		mpEntity.addPart("comments", new StringBody(comments.getText()
 				.toString()));
@@ -652,8 +656,10 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		mpEntity.addPart("make", new StringBody("Android" + " " + info.Version));
 		mpEntity.addPart("model", new StringBody(info.model));
 		mpEntity.addPart("userId", new StringBody(info.user_id));
+		mpEntity.addPart("location", new StringBody(marker_label.getText()
+				.toString()));
 		mpEntity.addPart("pin", new StringBody(info.pin));
-		mpEntity.addPart("selectedLatitutde",
+		mpEntity.addPart("selectedLatitude",
 				new StringBody(String.valueOf(slat)));
 		mpEntity.addPart("selectedLongitude",
 				new StringBody(String.valueOf(slon)));
@@ -906,8 +912,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 			olat = gps.getLatitude();
 			olon = gps.getLongitude();
 			position = new LatLng(LATITUDE, LONGITUDE);
-//			Toast.makeText(getApplicationContext(), String.valueOf(position),
-//					Toast.LENGTH_LONG).show();
+			// Toast.makeText(getApplicationContext(), String.valueOf(position),
+			// Toast.LENGTH_LONG).show();
 			map.getUiSettings().setZoomControlsEnabled(false);
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 			new update().execute();

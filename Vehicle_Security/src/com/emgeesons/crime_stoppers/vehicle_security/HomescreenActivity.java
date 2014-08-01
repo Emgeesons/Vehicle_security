@@ -121,11 +121,28 @@ public class HomescreenActivity extends SherlockFragment implements
 		sharedpreferences = getActivity().getSharedPreferences(
 				Data.MyPREFERENCES, Context.MODE_PRIVATE);
 		db = new DatabaseHandler(getActivity());
-		atPrefs.edit()
-				.putString("time", String.valueOf(System.currentTimeMillis()))
-				.commit();
-		try {
+		String time = atPrefs.getString("time", "");
+		double curtime = System.currentTimeMillis();
 
+		if (time.isEmpty()) {
+			atPrefs.edit()
+					.putString(
+							"time",
+							String.valueOf(System.currentTimeMillis() + 30 * 60 * 1000))
+					.commit();
+		}
+		// else {
+		//
+		// double prevtime = Double.valueOf(time);
+		// if (curtime > (prevtime + 30 * 60 * 1000)) {
+		// atPrefs.edit()
+		// .putString("time",
+		// String.valueOf(System.currentTimeMillis()))
+		// .commit();
+		// }
+		// }
+
+		try {
 			db.createDataBase();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -151,11 +168,12 @@ public class HomescreenActivity extends SherlockFragment implements
 		setHasOptionsMenu(true);
 		gps = new GPSTracker(getActivity());
 		// checkupdate cno
+
 		checkupdate();
+
 		// COACHMARK
 		if (!atPrefs.getBoolean(info.checkllogin, true)
 				&& atPrefs.getBoolean(Data.coach, true)) {
-
 			Intent coach = new Intent(getActivity(), Coachmark.class);
 			startActivityForResult(coach, 0);
 		}
@@ -183,13 +201,12 @@ public class HomescreenActivity extends SherlockFragment implements
 			getSherlockActivity().getSupportActionBar().setNavigationMode(
 					com.actionbarsherlock.app.ActionBar.NAVIGATION_MODE_LIST);
 		}
-
 		ActionBar.OnNavigationListener navigationListener = new OnNavigationListener() {
 
 			@Override
 			public boolean onNavigationItemSelected(int itemPosition,
 					long itemId) {
-
+				atPrefs.edit().putInt("selected", itemPosition).commit();
 				typename = type.get(itemPosition);
 				vid = no.get(itemPosition);
 				// Toast.makeText(getActivity(),
@@ -204,6 +221,11 @@ public class HomescreenActivity extends SherlockFragment implements
 		getSherlockActivity().getSupportActionBar().setListNavigationCallbacks(
 				adapter, navigationListener);
 		adapter.setDropDownViewResource(R.layout.nav_item);
+		//Get selected pos for spinner
+		if (!atPrefs.getBoolean(info.checkllogin, true) && type.size()>1 ) {
+			getSherlockActivity().getSupportActionBar()
+					.setSelectedNavigationItem(atPrefs.getInt("selected", 0));
+		}
 
 		// add images at right side
 		getSherlockActivity().getSupportActionBar().setDisplayShowTitleEnabled(
@@ -225,6 +247,7 @@ public class HomescreenActivity extends SherlockFragment implements
 				"profilePic.png");
 		sdRoot = Environment.getExternalStorageDirectory();
 		dir = "My Wheel/";
+
 		File f = new File(sdRoot, dir + names);
 		if (names.isEmpty()) {
 			profilepic.setImageResource(R.drawable.default_profile);
@@ -253,7 +276,6 @@ public class HomescreenActivity extends SherlockFragment implements
 					Intent nextscreen = new Intent(getActivity(),
 							ProfileScreen.class);
 					startActivity(nextscreen);
-
 					getActivity().finish();
 
 				}
@@ -296,7 +318,6 @@ public class HomescreenActivity extends SherlockFragment implements
 		// check gps is on\off and set location
 
 		gpscheck();
-
 		report.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -431,7 +452,7 @@ public class HomescreenActivity extends SherlockFragment implements
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(getActivity());
-			pDialog.setMessage("Parking Details");
+			pDialog.setMessage("Parking Details...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -1050,33 +1071,40 @@ public class HomescreenActivity extends SherlockFragment implements
 	public void showAlert() {
 		HomescreenActivity n = new HomescreenActivity();
 		if (n != null) {
+			try {
 
-			AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-			builder.setTitle("Location Access Required")
-					.setMessage(
-							"Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services")
-					.setCancelable(false)
-					.setNegativeButton("Cancel",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.dismiss();
-								}
-							})
-					.setPositiveButton("Settings",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									String callcheck = "callcheck";
-									atPrefs.edit().putString(callcheck, "True")
-											.commit();
-									Intent intent = new Intent(
-											Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-									startActivity(intent);
-								}
-							});
-			alert = builder.create();
-			alert.show();
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						getActivity());
+				builder.setTitle("Location Access Required")
+						.setMessage(
+								"Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services")
+						.setCancelable(false)
+						.setNegativeButton("Cancel",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										dialog.dismiss();
+									}
+								})
+						.setPositiveButton("Settings",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										String callcheck = "callcheck";
+										atPrefs.edit()
+												.putString(callcheck, "True")
+												.commit();
+										Intent intent = new Intent(
+												Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+										startActivity(intent);
+									}
+								});
+				alert = builder.create();
+				alert.show();
+			} catch (Exception e) {
+				// TODO: handle exception
+			}
+
 		}
 	}
 

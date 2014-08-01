@@ -48,6 +48,7 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -84,6 +85,7 @@ import com.facebook.RequestAsyncTask;
 import com.facebook.Response;
 import com.facebook.Session;
 import com.facebook.android.Facebook;
+import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
@@ -91,7 +93,8 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 
-public class FilenewReport extends BaseActivity implements TextWatcher {
+public class FilenewReport extends BaseActivity implements TextWatcher,
+		LocationListener, android.location.LocationListener {
 	double LATITUDE, LONGITUDE, slat, slon, olat, olon;
 	GPSTracker gps;
 	static LatLng currlocation;
@@ -108,7 +111,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 	int map_height;
 	final static CharSequence[] typeReport = { "Theft", "Vandalism",
 			"Stolen /Abandoned Vehicle?" };
-	int tReport;
+	int tReport = -1;
 	static int buffKey = 0;
 	// fordate and time
 	String datevalue, timevalue;
@@ -288,14 +291,21 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		date.setText((info.getdateformate(datevalue + "-" + timevalue)));
 		height = getWindowManager().getDefaultDisplay().getHeight();
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+
+		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+				30000, 100, this);
+		locationManager.requestLocationUpdates(
+				LocationManager.NETWORK_PROVIDER, 30000, 100, this);
 		this.registerReceiver(this.mlocation, new IntentFilter(
 				android.location.LocationManager.PROVIDERS_CHANGED_ACTION));
+
 		map_height = height * 30 / 100;
 		RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
 				LayoutParams.WRAP_CONTENT, map_height);
 		mapview.setLayoutParams(parms);
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
+		map.setMyLocationEnabled(true);
 		// check gps is on\off and set location
 		gpscheck();
 		send.setOnClickListener(new OnClickListener() {
@@ -536,15 +546,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 
 	}
 
-	private boolean isSubsetOf(Collection<String> subset,
-			Collection<String> superset) {
-		for (String string : subset) {
-			if (!superset.contains(string)) {
-				return false;
-			}
-		}
-		return true;
-	}
+	
 
 	private void checkpic() {
 		if (pic1.getVisibility() == View.VISIBLE
@@ -676,7 +678,6 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (JSONException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -729,7 +730,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		mpEntity.addPart("vehicleId",
 				new StringBody(String.valueOf(nos.get(selected))));
 		mpEntity.addPart("originalDate", new StringBody(currentDate));
-		mpEntity.addPart("orginalTime", new StringBody(currentTime));
+		mpEntity.addPart("originalTime", new StringBody(currentTime));
 		mpEntity.addPart("selectedDate", new StringBody(datevalue));
 		mpEntity.addPart("selectedTime", new StringBody(timevalue));
 		mpEntity.addPart("noPhotos", new StringBody(String.valueOf(f.size())));
@@ -740,7 +741,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 		mpEntity.addPart("model", new StringBody(info.model));
 		mpEntity.addPart("userId", new StringBody(info.user_id));
 		mpEntity.addPart("pin", new StringBody(info.pin));
-		mpEntity.addPart("selectedLatitutde",
+		mpEntity.addPart("selectedLatitude",
 				new StringBody(String.valueOf(slat)));
 		mpEntity.addPart("selectedLongitude",
 				new StringBody(String.valueOf(slon)));
@@ -748,6 +749,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 				new StringBody(String.valueOf(olat)));
 		mpEntity.addPart("originalLongitude",
 				new StringBody(String.valueOf(olon)));
+		mpEntity.addPart("location", new StringBody(marker_label.getText()
+				.toString()));
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
 		HttpResponse response = httpclient.execute(httppost);
@@ -970,8 +973,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 			olat = gps.getLatitude();
 			olon = gps.getLongitude();
 			position = new LatLng(LATITUDE, LONGITUDE);
-			Toast.makeText(getApplicationContext(), String.valueOf(position),
-					Toast.LENGTH_LONG).show();
+			// Toast.makeText(getApplicationContext(), String.valueOf(position),
+			// Toast.LENGTH_LONG).show();
 			map.getUiSettings().setZoomControlsEnabled(false);
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 			new update().execute();
@@ -1274,8 +1277,27 @@ public class FilenewReport extends BaseActivity implements TextWatcher {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.filenewreport_activity;
+	}
+
+	@Override
+	public void onLocationChanged(Location arg0) {
+		gpscheck();
+	}
+
+	@Override
+	public void onProviderDisabled(String provider) {
+
+	}
+
+	@Override
+	public void onProviderEnabled(String provider) {
+
+	}
+
+	@Override
+	public void onStatusChanged(String provider, int status, Bundle extras) {
+
 	}
 
 }

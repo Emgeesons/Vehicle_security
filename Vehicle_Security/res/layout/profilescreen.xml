@@ -7,19 +7,21 @@
 
     <RelativeLayout
         android:id="@+id/relbg"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="250dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:background="@color/black" >
 
         <ImageView
             android:id="@+id/imageView1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
             android:scaleType="fitXY"
-            android:src="@drawable/default_profile_bg" />
+            android:src="@drawable/green_button" />
+
     </RelativeLayout>
 
     <RelativeLayout
@@ -55,7 +57,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
                 android:layout_centerVertical="true"
-                android:text="100"
+                android:text="0"
                 android:paddingBottom="8dp"
                 android:layout_marginBottom="10dp"
                 android:textColor="@color/light_black"
@@ -94,6 +96,7 @@
         android:layout_marginLeft="5dp"
         android:layout_toRightOf="@+id/name"
         android:text="20Yrs"
+        android:visibility="gone"
         android:textColor="@color/white"
         android:textSize="@dimen/medium_text" />
 

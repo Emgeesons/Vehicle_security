@@ -21,7 +21,7 @@
             android:layout_marginTop="25dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  First Name"
+            android:hint="  first name*"
             android:inputType="textPersonName"
             android:paddingLeft="10dp"
             android:singleLine="true"
@@ -38,7 +38,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Last Name"
+            android:hint="  last name*"
             android:inputType="textPersonName"
             android:paddingLeft="10dp"
             android:singleLine="true"
@@ -54,7 +54,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Age"
+            android:hint="  dob*"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
@@ -70,7 +70,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Email Address"
+            android:hint="  email address*"
             android:inputType="textEmailAddress"
             android:paddingLeft="10dp"
             android:singleLine="true"
@@ -87,7 +87,7 @@
             android:background="@drawable/box_gry"
             android:digits="0123456789"
             android:ems="10"
-            android:hint="  Mobile Number"
+            android:hint="  mobile number*"
             android:inputType="phone"
             android:nextFocusDown="@+id/pin1"
             android:paddingLeft="10dp"
@@ -228,7 +228,7 @@
             android:layout_below="@+id/sec_other_qus"
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
-            android:hint="answer"
+            android:hint="answer*"
             android:paddingLeft="10dp"
             android:paddingTop="5dp"
             android:singleLine="true"
@@ -281,6 +281,7 @@
             android:layout_below="@+id/relativeLayout1"
             android:layout_marginTop="8dp"
             android:text="Show PIN" />
+       
     </RelativeLayout>
 
 </ScrollView>

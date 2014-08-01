@@ -12,10 +12,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
-import android.view.View;
-import android.widget.RelativeLayout;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.MenuItem;
 import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -41,6 +40,7 @@ public class Updates extends SherlockFragmentActivity implements
 	static List<String> imageList = new ArrayList<String>();
 	static List<String> imageLists = new ArrayList<String>();
 	protected static ImageLoader imageLoader;
+	boolean check;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -50,12 +50,14 @@ public class Updates extends SherlockFragmentActivity implements
 		// Initilization
 		viewPager = (ViewPager) findViewById(R.id.pager);
 		actionBar = getActionBar();
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 		info = new Data();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(Updates.this);
 		atPrefs.edit().putInt("updates", 0).commit();
 		viewPager.setAdapter(mAdapter);
-		actionBar.setHomeButtonEnabled(false);
+		// actionBar.setHomeButtonEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(
 				Updates.this).threadPriority(Thread.NORM_PRIORITY - 2)
@@ -79,6 +81,7 @@ public class Updates extends SherlockFragmentActivity implements
 				// on changing the page
 				// make respected tab selected
 				actionBar.setSelectedNavigationItem(position);
+
 			}
 
 			@Override
@@ -87,6 +90,14 @@ public class Updates extends SherlockFragmentActivity implements
 
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
+				if (arg0 == 1) {
+					if (atPrefs.getBoolean(Data.checkllogin, true)) {
+						Intent next = new Intent(getApplicationContext(),
+								LoginActivity.class);
+						startActivity(next);
+						finish();
+					}
+				}
 			}
 		});
 	}
@@ -112,6 +123,18 @@ public class Updates extends SherlockFragmentActivity implements
 
 	@Override
 	public void onTabUnselected(Tab tab, FragmentTransaction ft) {
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+
+			onBackPressed();
+
+			break;
+		}
+		return true;
 	}
 
 	@Override

@@ -25,8 +25,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/imageView1"
-            android:layout_marginLeft="15dp"
             android:layout_marginTop="10dp"
+            android:gravity="center_horizontal"
             android:text="Thank you for your review .You  earned yourself 20 good Samaritan points!!!"
             android:textSize="@dimen/big_text" />
 
@@ -37,7 +37,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/textView1"
-            android:layout_marginLeft="15dp"
+            android:gravity="center_horizontal"
             android:layout_marginTop="16dp"
             android:text="Thank you for your review .You  earned yourself 20 good Samaritan points!!!"
             android:textSize="@dimen/big_text"

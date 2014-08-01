@@ -34,11 +34,12 @@ public class NotificationSpawn extends BroadcastReceiver {
 		Intent in = new Intent(context, MainActivity.class);
 
 		in.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		PendingIntent pIntent = PendingIntent.getActivity(context, 0, in, 0);
+		PendingIntent pIntent = PendingIntent.getActivity(context, 0, in,
+				PendingIntent.FLAG_UPDATE_CURRENT);
 
 		Uri alarmSound = RingtoneManager
 				.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-		name = intent.getStringExtra("time");
+		String time = intent.getStringExtra("time");
 		db = new DatabaseHandler(context);
 		try {
 
@@ -50,7 +51,7 @@ public class NotificationSpawn extends BroadcastReceiver {
 		dbb = db.getReadableDatabase();
 		SQLiteDatabase dbbb = this.db.getReadableDatabase();
 		String selectQuery = "SELECT vehicle_model FROM Vehicle_info WHERE vehicle_expmil = '"
-				+ name + "'";
+				+ time + "'";
 		Cursor cursor = dbbb.rawQuery(selectQuery, null);
 		if (cursor.moveToFirst()) {
 			do {
@@ -75,15 +76,14 @@ public class NotificationSpawn extends BroadcastReceiver {
 		wl.release();
 	}
 
-	public static void SetAlarm(Context context, long time, String title) {
+	public static void SetAlarm(Context context, long time) {
 
 		AlarmManager am = (AlarmManager) context
 				.getSystemService(Context.ALARM_SERVICE);
 		Intent i = new Intent(context, NotificationSpawn.class);
-
 		i.putExtra("time", String.valueOf(time));
-		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i, 0);
-
+		PendingIntent pi = PendingIntent.getBroadcast(context, 0, i,
+				PendingIntent.FLAG_UPDATE_CURRENT);
 		// time check .
 		if (System.currentTimeMillis() <= time) {
 			System.out.println(System.currentTimeMillis() - time + "" + time);

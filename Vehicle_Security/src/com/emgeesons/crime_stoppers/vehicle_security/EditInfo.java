@@ -21,6 +21,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -80,6 +81,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 	SQLiteDatabase dbb;
 	String oldpin;
 	GPSTracker gps;
+	double LATITUDE, LONGITUDE;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -136,7 +138,17 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		pin2.setOnKeyListener(this);
 		pin3.setOnKeyListener(this);
 		pin4.setOnKeyListener(this);
+		gps = new GPSTracker(EditInfo.this);
+		if (gps.canGetLocation()) {
+			LATITUDE = gps.getLatitude();
+			LONGITUDE = gps.getLongitude();
 
+		} else {
+
+			LATITUDE = 0.0;
+			LONGITUDE = 0.0;
+
+		}
 		info = new Data();
 		secqus = getResources().getStringArray(R.array.sec_qus);
 		if (!atPrefs.getBoolean(info.checkllogin, true)) {
@@ -147,10 +159,12 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			email.setText(info.email);
 			number.setText(info.mobileNumber);
 			if (info.year == 0 || info.month == 0 || info.date == 0) {
-				dob.setHint("Age");
+				dob.setHint("dob");
 			} else {
-				int AGe = info.getAge(info.year, info.month, info.date);
-				dob.setText(AGe + " " + "Yrs");
+				// int AGe = info.getAge(info.year, info.month, info.date);
+				String AGe = String.valueOf(info.date + "-" + info.month + "-"
+						+ info.year);
+				dob.setText(AGe);
 			}
 			oldpin = info.pin;
 			String[] pinnumber = info.pin.split("(?!^)");
@@ -170,14 +184,16 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				title = "Female";
 			}
 			lnumber.setText(info.licenseNo);
-			address.setText(info.address);
+			address.setText(info.street);
 			postcode.setText(info.postcode);
-			tqus = info.squs;
+			tqus = info.qusvalues(info.squs);
+			
 
 			if (tqus == 9) {
 
 				otherqus.setVisibility(View.VISIBLE);
-				otherqus.setText(secqus[tqus]);
+				otherqus.setText(info.squs);
+				qus.setText(secqus[tqus]);
 			} else {
 				qus.setText(secqus[tqus]);
 			}
@@ -273,26 +289,42 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 								} else {
 									otherqus.setVisibility(View.GONE);
 								}
+								qus.setText(secqus[buffKey]);
+								qus.setTextColor(getResources().getColor(
+										R.color.black));
+								// int selectedPosition = ((AlertDialog) dialog)
+								// .getListView().getCheckedItemPosition();
+
+								tqus = buffKey;
+								if (qus.getText().toString()
+										.equalsIgnoreCase("Other")) {
+									otherqus.setVisibility(View.VISIBLE);
+								} else {
+									otherqus.setVisibility(View.GONE);
+								}
+								dialog.dismiss();
 							}
 						}).setCancelable(false)
 
-				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						qus.setText(secqus[buffKey]);
-						qus.setTextColor(getResources().getColor(R.color.black));
-						int selectedPosition = ((AlertDialog) dialog)
-								.getListView().getCheckedItemPosition();
+				// .setPositiveButton("Ok", new
+				// DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog, int which) {
+				// qus.setText(secqus[buffKey]);
+				// qus.setTextColor(getResources().getColor(R.color.black));
+				// int selectedPosition = ((AlertDialog) dialog)
+				// .getListView().getCheckedItemPosition();
+				//
+				// tqus = buffKey;
+				// if (qus.getText().toString().equalsIgnoreCase("Other")) {
+				// otherqus.setVisibility(View.VISIBLE);
+				// } else {
+				// otherqus.setVisibility(View.GONE);
+				// }
 
-						tqus = buffKey;
-						if (qus.getText().toString().equalsIgnoreCase("Other")) {
-							otherqus.setVisibility(View.VISIBLE);
-						} else {
-							otherqus.setVisibility(View.GONE);
-						}
-
-					}
-				});
+				// }
+				// })
+				;
 
 				AlertDialog alert = builder.create();
 				alert.show();
@@ -308,7 +340,14 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			// set time picker as current date
 			DatePickerDialog dialog = new DatePickerDialog(this,
 					datePickerListener, years, months, date);
-			dialog.getDatePicker().setMaxDate(new Date().getTime());
+			Calendar calendars = Calendar.getInstance();
+			calendars.set(Calendar.YEAR, years-13);
+			calendars.set(Calendar.MONTH, months);
+			calendars.set(Calendar.MINUTE, date);
+			dialog.getDatePicker().setMaxDate(calendars.getTimeInMillis());
+			// 13 year
+//			dialog.getDatePicker().setMaxDate(
+//					new Date().getTime() - 1L * 13 * 365 * 24 * 60 * 60 * 1000);
 			return dialog;
 
 		}
@@ -338,7 +377,8 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			System.out.println(input_date);
 			int AGE = info.getAge(years, months, date);
 			// Log.d("My", "age is :" + AGE);
-			dob.setText(String.valueOf(AGE) + " " + "Yrs");
+			String age = date + "-" + months + "-" + years;
+			dob.setText(age);
 
 		}
 
@@ -430,14 +470,14 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 						bpin4 = false;
 
 					}
-					if (lnumber.getText().toString().length() < 6) {
-						lnumber.setHintTextColor(getResources().getColor(
-								R.color.red));
-						lnumber.setTextColor(getResources().getColor(
-								R.color.red));
-						blnumber = false;
-
-					}
+//					if (lnumber.getText().toString().length() < 6) {
+//						lnumber.setHintTextColor(getResources().getColor(
+//								R.color.red));
+//						lnumber.setTextColor(getResources().getColor(
+//								R.color.red));
+//						blnumber = false;
+//
+//					}
 					if (address.getText().toString().length() < 6) {
 						address.setHintTextColor(getResources().getColor(
 								R.color.red));
@@ -477,7 +517,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(EditInfo.this);
-			pDialog.setMessage("Register");
+			pDialog.setMessage("Updating Information...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -493,7 +533,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
-				gps = new GPSTracker(EditInfo.this);
+				
 				info.device();
 				info.showInfo(getApplicationContext());
 
@@ -514,19 +554,11 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				json.put("licenceNo", lnumber.getText().toString());
 				json.put("address", address.getText().toString());
 				json.put("pincode", postcode.getText().toString());
-				if (gps.canGetLocation()) {
-					double LATITUDE = gps.getLatitude();
-					double LONGITUDE = gps.getLongitude();
-					json.put("latitude", LATITUDE);
-					json.put("longitude", LONGITUDE);
-
-				} else {
-					json.put("latitude", 0);
-					json.put("longitude", 0);
-				}
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
 				switch (buffKey) {
 				case 0:
-					qus = "What' s your Passport Number ?";
+					qus = "What's your Passport Number ?";
 					break;
 				case 1:
 					qus = "What's your License Number ?";
@@ -592,8 +624,9 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-						qusvalue = info.qusvalues(qus);
+						// qusvalue = info.qusvalues(qus);
 
+						qus = DatabaseUtils.sqlEscapeString(qus);
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						dbbb.execSQL("UPDATE profile SET user_id = '" + id
 								+ "',fName = '" + fname.getText().toString()
@@ -604,13 +637,12 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 								+ input_date + "',gender = '" + title
 								+ "',licenseNo = '"
 								+ lnumber.getText().toString()
-								+ "',address = '"
+								+ "',street = '"
 								+ address.getText().toString()
 								+ "',postcode = '"
 								+ postcode.getText().toString() + "',pin = '"
-								+ pin + "',squs = '" + String.valueOf(qusvalue)
-								+ "',sans = '" + answer.getText().toString()
-								+ "'");
+								+ pin + "',squs = " + qus + ",sans = '"
+								+ answer.getText().toString() + "'");
 
 						atPrefs.edit().putBoolean(info.checkllogin, false)
 								.commit();
@@ -746,13 +778,13 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 
 		if (keyCode == KeyEvent.KEYCODE_DEL) {
 			if (pin4.hasFocus()) {
-				pin4.setText("");
+				// pin4.setText("");
 				pin3.requestFocus();
 			} else if (pin3.hasFocus()) {
-				pin3.setText("");
+				// pin3.setText("");
 				pin2.requestFocus();
 			} else if (pin2.hasFocus()) {
-				pin2.setText("");
+				// pin2.setText("");
 				pin1.requestFocus();
 
 			}
@@ -760,6 +792,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		}
 		return false;
 	}
+	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

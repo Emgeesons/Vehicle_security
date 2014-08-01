@@ -241,7 +241,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 										"time",
 										String.valueOf(System
 												.currentTimeMillis()
-												+ (10 * 60 * 1000))).commit();
+												+ (30 * 60 * 1000))).commit();
 						finish();
 
 					}

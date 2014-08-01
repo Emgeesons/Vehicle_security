@@ -1,33 +1,19 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Html;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -157,7 +143,6 @@ public class CarPark extends BaseActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				if (!notip.isEmpty()) {
 
 					Intent next = new Intent(getApplicationContext(),
@@ -166,6 +151,8 @@ public class CarPark extends BaseActivity {
 					next.putExtra("Rate", Rate);
 					next.putExtra("Address", Address);
 					next.putExtra("vid", vid);
+					next.putExtra("notip", notip);
+					
 
 					startActivity(next);
 
@@ -239,7 +226,6 @@ public class CarPark extends BaseActivity {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.activity_car_park;
 	}
 }

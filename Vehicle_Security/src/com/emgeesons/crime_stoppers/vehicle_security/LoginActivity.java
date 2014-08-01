@@ -111,6 +111,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		// mSimpleFacebook = SimpleFacebook.getInstance(LoginActivity.this);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(LoginActivity.this);
+
 		db = new DatabaseHandler(LoginActivity.this);
 		try {
 
@@ -203,7 +204,8 @@ public class LoginActivity extends Activity implements TextWatcher,
 		});
 		// set permission list, Don't foeget to add email
 
-		authButton.setReadPermissions(Arrays.asList("public_profile", "email"));
+		authButton.setReadPermissions(Arrays.asList("public_profile", "email",
+				"user_birthday"));
 
 		// authButton.setLoginBehavior(SessionLoginBehavior.SSO_WITH_FALLBACK);
 
@@ -702,7 +704,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(LoginActivity.this);
-			pDialog.setMessage("Sending Info");
+			pDialog.setMessage("Sending Info...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -842,12 +844,12 @@ public class LoginActivity extends Activity implements TextWatcher,
 		// vehicle
 		int vid;
 		String vtype, vmake, vmodel, reg, vstatus;
-
+		String fbdobs = "";
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(LoginActivity.this);
-			pDialog.setMessage("Logging in …..");
+			pDialog.setMessage("Logging in ...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -866,7 +868,18 @@ public class LoginActivity extends Activity implements TextWatcher,
 				json.put("firstName", fbfname);
 				json.put("lastName", fblname);
 				json.put("mobileNumber", "");
-				json.put("dob", fbdob);
+				
+				try {
+					String[] fbdatespilt = fbdob.split("\\/");
+					String y = fbdatespilt[2];
+					String m = fbdatespilt[1];
+					String d = fbdatespilt[0];
+					fbdobs = String.valueOf(y + "-" + m + "-" + d);
+					json.put("dob", fbdobs);
+				} catch (Exception e) {
+					// TODO: handle exception
+				}
+				
 				json.put("gender", fbgender);
 				json.put("fbId", fbid);
 				json.put("fbToken", fbtoken);
@@ -958,6 +971,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 						// "", "", "", fbid, fbtoken, "", "", pin, "", "",
 						// "");
 						// db.updateprofileData(data);
+						
 
 						SplashscreenActivity.fblogin = false;
 						if (mess.equalsIgnoreCase("New User")) {
@@ -966,7 +980,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 							db = new DatabaseHandler(LoginActivity.this);
 							PersonalData data = new PersonalData(user_id,
-									fbfname, fblname, fbemail, "", fbdob,
+									fbfname, fblname, fbemail, "", fbdobs,
 									fbgender, "", "", "", "", "", fbId,
 									fbToken, "", "", pin, "", "", "");
 
@@ -1075,7 +1089,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 									VehicleData datas = new VehicleData(vid,
 											vtype, vmake, vmodel, "", "", "",
 											"", "", reg, "", "", date[0],
-											vstatus, "");
+											vstatus, "", "","");
 									db.insertvehicleData(datas);
 
 									ParkingData datass = new ParkingData(
@@ -1152,7 +1166,8 @@ public class LoginActivity extends Activity implements TextWatcher,
 								finish();
 
 							} else {
-
+								atPrefs.edit().putBoolean(Data.coach, false)
+										.commit();
 								AirshipConfigOptions options = AirshipConfigOptions
 										.loadDefaultOptions(LoginActivity.this);
 								UAirship.takeOff(getApplication(), options);
@@ -1344,7 +1359,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-
+						atPrefs.edit().putBoolean(Data.coach, false).commit();
 						db = new DatabaseHandler(LoginActivity.this);
 						PersonalData data = new PersonalData(user_id, fName,
 								lName, email, mobileNumber, dob, gender,
@@ -1381,7 +1396,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 								db = new DatabaseHandler(LoginActivity.this);
 								VehicleData datas = new VehicleData(vid, vtype,
 										vmake, vmodel, "", "", "", "", "", reg,
-										"", "", date[0], vstatus, "");
+										"", "", date[0], vstatus, "", "","");
 								db.insertvehicleData(datas);
 
 								ParkingData datass = new ParkingData(

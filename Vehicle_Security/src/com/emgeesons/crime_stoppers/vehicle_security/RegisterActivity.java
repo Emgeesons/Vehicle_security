@@ -23,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -81,8 +82,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 	SharedPreferences atPrefs;
 	static int buffKey = 0;
 	static CharSequence[] secqus;
-	int tqus;
-	int qusvalue;
+	int tqus = -1;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -170,6 +170,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 				showDialog(DATE_DIALOG_ID);
 			}
 		});
+
 		// dob.setOnFocusChangeListener(new OnFocusChangeListener() {
 		//
 		// @Override
@@ -285,6 +286,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 								R.color.red));
 						bqus = false;
 					}
+
 					if (pin1.getText().toString().isEmpty()
 							|| pin2.getText().toString().isEmpty()
 							|| pin3.getText().toString().isEmpty()
@@ -353,28 +355,40 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 								} else {
 									otherqus.setVisibility(View.GONE);
 								}
+								qus.setText(secqus[buffKey]);
+								qus.setTextColor(getResources().getColor(
+										R.color.black));
+
+								tqus = buffKey;
+								if (qus.getText().toString()
+										.equalsIgnoreCase("Other")) {
+									otherqus.setVisibility(View.VISIBLE);
+								} else {
+									otherqus.setVisibility(View.GONE);
+								}
 								dialog.dismiss();
 
 							}
 						}).setCancelable(false)
 
-				.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						qus.setText(secqus[buffKey]);
-						qus.setTextColor(getResources().getColor(R.color.black));
-						int selectedPosition = ((AlertDialog) dialog)
-								.getListView().getCheckedItemPosition();
-
-						tqus = buffKey;
-						if (qus.getText().toString().equalsIgnoreCase("Other")) {
-							otherqus.setVisibility(View.VISIBLE);
-						} else {
-							otherqus.setVisibility(View.GONE);
-						}
-
-					}
-				});
+				// .setPositiveButton("Ok", new
+				// DialogInterface.OnClickListener() {
+				// @Override
+				// public void onClick(DialogInterface dialog, int which) {
+				// qus.setText(secqus[buffKey]);
+				// qus.setTextColor(getResources().getColor(R.color.black));
+				// int selectedPosition = ((AlertDialog) dialog)
+				// .getListView().getCheckedItemPosition();
+				//
+				// tqus = buffKey;
+				// if (qus.getText().toString().equalsIgnoreCase("Other")) {
+				// otherqus.setVisibility(View.VISIBLE);
+				// } else {
+				// otherqus.setVisibility(View.GONE);
+				// }
+				//
+				// }
+				;
 
 				AlertDialog alert = builder.create();
 				alert.show();
@@ -429,7 +443,12 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 			// set time picker as current date
 			DatePickerDialog dialog = new DatePickerDialog(this,
 					datePickerListener, years, months, date);
-			dialog.getDatePicker().setMaxDate(new Date().getTime());
+			//
+			Calendar calendars = Calendar.getInstance();
+			calendars.set(Calendar.YEAR, years - 13);
+			calendars.set(Calendar.MONTH, months);
+			calendars.set(Calendar.MINUTE, date);
+			dialog.getDatePicker().setMaxDate(calendars.getTimeInMillis());
 			return dialog;
 
 		}
@@ -457,34 +476,36 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 			// }
 			input_date = years + "-" + months + "-" + date;
 			System.out.println(input_date);
-			int AGE = getAge(years, months, date);
+			// int AGE = getAge(years, months, date);
 			// Log.d("My", "age is :" + AGE);
-			dob.setText(String.valueOf(AGE) + " " + "Yrs");
+			// dob.setText(String.valueOf(AGE) + " " + "Yrs");
+			String dates = date + "-" + months + "-" + years;
+			dob.setText(dates);
 
 		}
 
 	};
 
-	public int getAge(int years, int months, int day) {
-
-		GregorianCalendar cal = new GregorianCalendar();
-		int y, m, d, a;
-
-		y = cal.get(Calendar.YEAR);
-		m = cal.get(Calendar.MONTH);
-		d = cal.get(Calendar.DAY_OF_MONTH);
-		cal.set(years, months, day);
-		a = y - cal.get(Calendar.YEAR);
-		if ((m < cal.get(Calendar.MONTH) + 1)
-				|| ((m == cal.get(Calendar.MONTH) + 1) && (d < cal
-						.get(Calendar.DAY_OF_MONTH)))) {
-			--a;
-		}
-		if (a == -1) {
-			a = 0;
-		}
-		return a;
-	}
+	// public int getAge(int years, int months, int day) {
+	//
+	// GregorianCalendar cal = new GregorianCalendar();
+	// int y, m, d, a;
+	//
+	// y = cal.get(Calendar.YEAR);
+	// m = cal.get(Calendar.MONTH);
+	// d = cal.get(Calendar.DAY_OF_MONTH);
+	// cal.set(years, months, day);
+	// a = y - cal.get(Calendar.YEAR);
+	// if ((m < cal.get(Calendar.MONTH) + 1)
+	// || ((m == cal.get(Calendar.MONTH) + 1) && (d < cal
+	// .get(Calendar.DAY_OF_MONTH)))) {
+	// --a;
+	// }
+	// if (a == -1) {
+	// a = 0;
+	// }
+	// return a;
+	// }
 
 	private class regloginid extends AsyncTask<Void, Void, Void> {
 		String success, mess, response, id, pin, qus;
@@ -616,15 +637,14 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-						qusvalue = info.qusvalues(qus);
+						// qusvalue = info.qusvalues(qus);
 						db = new DatabaseHandler(RegisterActivity.this);
 						PersonalData data = new PersonalData(id, fname
 								.getText().toString(), lname.getText()
 								.toString(), email.getText().toString(), number
 								.getText().toString(), input_date, title, "",
-								"", "", "", "", "", "", "", "", pin,
-								String.valueOf(qusvalue), answer.getText()
-										.toString(), "0");
+								"", "", "", "", "", "", "", "", pin, qus,
+								answer.getText().toString(), "0");
 						db.updateprofileData(data);
 						atPrefs.edit().putBoolean(info.checkllogin, false)
 								.commit();
@@ -795,13 +815,13 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 
 		if (keyCode == KeyEvent.KEYCODE_DEL) {
 			if (pin4.hasFocus()) {
-				pin4.setText("");
+				// pin4.setText("");
 				pin3.requestFocus();
 			} else if (pin3.hasFocus()) {
-				pin3.setText("");
+				// pin3.setText("");
 				pin2.requestFocus();
 			} else if (pin2.hasFocus()) {
-				pin2.setText("");
+				// pin2.setText("");
 				pin1.requestFocus();
 
 			}

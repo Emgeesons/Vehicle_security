@@ -20,7 +20,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Vehicle type"
+            android:hint="  vehicle type"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
@@ -55,7 +55,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/box_gry"
                 android:ems="10"
-                android:hint="  Make"
+                android:hint="  make*"
                 android:nextFocusDown="@+id/model"
                 android:paddingLeft="10dp"
                 android:singleLine="true" >
@@ -70,7 +70,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/box_gry"
                 android:ems="10"
-                android:hint="  Model"
+                android:hint="  model*"
                 android:paddingLeft="10dp"
                 android:singleLine="true" >
             </EditText>
@@ -86,7 +86,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Body type"
+            android:hint="  body type"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
@@ -102,7 +102,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Registration / Serial No"
+            android:hint="  registration"
             android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
@@ -117,7 +117,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Engine No"
+            android:hint="  engine no "
             android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
@@ -132,7 +132,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Chassis No"
+            android:hint="  chassis no"
             android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
@@ -147,7 +147,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Colour"
+            android:hint="  colour*"
             android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
@@ -162,9 +162,22 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Accessories / Unique features"
+            android:hint="  accessories / unique features"
             android:paddingLeft="10dp"
             android:singleLine="true" >
+        </EditText>
+
+        <EditText
+            android:id="@+id/state"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/acc "
+            android:layout_alignRight="@+id/acc "
+            android:layout_below="@+id/acc "
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint="   state of registration " >
         </EditText>
     </RelativeLayout>
 

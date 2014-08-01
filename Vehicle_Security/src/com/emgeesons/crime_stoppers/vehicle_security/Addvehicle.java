@@ -35,15 +35,16 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.google.android.gms.drive.internal.e;
 
 public class Addvehicle extends BaseActivity implements TextWatcher {
 	TextView type, body;
-	EditText type_other, make, model, reg, engine, chassis, colour, acc;
-	boolean btype, bbody, btype_other, bmake, bmodel, breg, beng, bchassis,
-			bcolour, bacc;
+	EditText type_other, make, model, reg, engine, chassis, colour, acc, state;
+	boolean btype, bbody, btype_other, bmake, bmodel, bcolour, bacc, breg,
+			beng, bchassis, bstate;
 	static int buffKey = 0;
 	static CharSequence[] vechtype, bodytype;
-	int tvech, tbody;
+	int tvech = -1, tbody = -1;
 	Connection_Detector cd = new Connection_Detector(this);
 	Boolean IsInternetPresent;
 	String addVehicle_url = Data.url + "addVehicle.php";
@@ -54,6 +55,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 	SQLiteDatabase dbb;
 	int typevalue;
 	GPSTracker gps;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -74,8 +76,9 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		chassis = (EditText) findViewById(R.id.chassis);
 		colour = (EditText) findViewById(R.id.Colour);
 		acc = (EditText) findViewById(R.id.acc);
+		state = (EditText) findViewById(R.id.state);
 		info = new Data();
-		
+
 		db = new DatabaseHandler(getApplicationContext());
 		try {
 
@@ -112,10 +115,31 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								if (type.getText().toString()
 										.equalsIgnoreCase("Other")) {
 									type_other.setVisibility(View.VISIBLE);
+									make.setHint("make");
+									model.setHint("model*");
+									state.setVisibility(View.VISIBLE);
+									state.setHint("  state of registration");
+									reg.setHint("registration no");
 								} else {
 									type_other.setVisibility(View.GONE);
 								}
 
+								if (type.getText().toString()
+										.equalsIgnoreCase("Bicycle")) {
+									reg.setHint("serial no");
+									make.setHint("make");
+									model.setHint("model*");
+									state.setVisibility(View.GONE);
+								}
+
+								if (type.getText().toString()
+										.equalsIgnoreCase("Car")
+										|| type.getText().toString()
+												.equalsIgnoreCase("MotorCycle")) {
+									reg.setHint("registration no*(max 10 chars)");
+									state.setVisibility(View.VISIBLE);
+									state.setHint("  state of registration*(max 3 chars) ");
+								}
 								if (type.getText().toString()
 										.equalsIgnoreCase("Car")) {
 									body.setVisibility(View.VISIBLE);
@@ -173,6 +197,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		engine.addTextChangedListener(this);
 		colour.addTextChangedListener(this);
 		type_other.addTextChangedListener(this);
+		state.addTextChangedListener(this);
 
 	}
 
@@ -190,7 +215,10 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
-					if (make.getText().toString().length() < 2) {
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							&& make.getText().toString().length() < 2) {
 
 						make.setTextColor(getResources().getColor(R.color.red));
 						make.setHintTextColor(getResources().getColor(
@@ -204,13 +232,87 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bmodel = false;
 					}
-					if (!(reg.getText().toString().length() == 10)) {
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+
+							&& (reg.getText().toString().trim().length() > 10)) {
 
 						reg.setTextColor(getResources().getColor(R.color.red));
 						reg.setHintTextColor(getResources().getColor(
 								R.color.red));
 						breg = false;
 					}
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+
+							&& (reg.getText().toString().trim().isEmpty())) {
+
+						reg.setTextColor(getResources().getColor(R.color.red));
+						reg.setHintTextColor(getResources().getColor(
+								R.color.red));
+						breg = false;
+					}
+
+					if ((type.getText().toString().equalsIgnoreCase("Other") && !reg
+							.getText().toString().isEmpty())
+							&& (reg.getText().toString().length() > 13)) {
+
+						reg.setTextColor(getResources().getColor(R.color.red));
+						reg.setHintTextColor(getResources().getColor(
+								R.color.red));
+						breg = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Bicycle") && !reg
+							.getText().toString().isEmpty())
+							&& (reg.getText().toString().length() > 13)) {
+
+						reg.setTextColor(getResources().getColor(R.color.red));
+						reg.setHintTextColor(getResources().getColor(
+								R.color.red));
+						breg = false;
+					}
+
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							&& (state.getText().toString().length() > 4)) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							&& (state.getText().toString().isEmpty())) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Other"))
+							&& !state.getText().toString().trim().isEmpty()
+							&& (state.getText().toString().length() > 4)) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Other") && !state
+							.getText().toString().isEmpty())
+							&& (state.getText().toString().length() > 13)) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+
 					if (colour.getText().toString().length() < 3) {
 
 						colour.setTextColor(getResources()
@@ -219,7 +321,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bcolour = false;
 					}
-					if (type.getText().toString().equalsIgnoreCase("Car")
+					if (!engine.getText().toString().isEmpty()
 
 					&& engine.getText().toString().length() < 13) {
 
@@ -229,17 +331,8 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						beng = false;
 					}
-					if (type.getText().toString()
-							.equalsIgnoreCase("MotorCycle")
-							&& engine.getText().toString().length() < 13) {
 
-						engine.setTextColor(getResources()
-								.getColor(R.color.red));
-						engine.setHintTextColor(getResources().getColor(
-								R.color.red));
-						beng = false;
-					}
-					if (type.getText().toString().equalsIgnoreCase("Car")
+					if (!chassis.getText().toString().isEmpty()
 
 					&& chassis.getText().toString().length() < 17) {
 
@@ -249,16 +342,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bchassis = false;
 					}
-					if (type.getText().toString()
-							.equalsIgnoreCase("MotorCycle")
-							&& chassis.getText().toString().length() < 17) {
 
-						chassis.setTextColor(getResources().getColor(
-								R.color.red));
-						chassis.setHintTextColor(getResources().getColor(
-								R.color.red));
-						bchassis = false;
-					}
 					if (type_other.getVisibility() == View.VISIBLE
 							&& type_other.getText().toString().length() < 3) {
 
@@ -278,17 +362,16 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 					if (body.getText().toString().isEmpty()
 							&& body.getVisibility() == View.VISIBLE) {
 
-						type.setTextColor(getResources().getColor(R.color.red));
-						type.setHintTextColor(getResources().getColor(
+						body.setTextColor(getResources().getColor(R.color.red));
+						body.setHintTextColor(getResources().getColor(
 								R.color.red));
-						btype = false;
+						bbody = false;
 					}
 
 					if (btype == true && bbody == true && btype_other == true
 							&& bmake == true && bmodel == true && breg == true
-							&& bchassis == true && bcolour == true
-							&& beng == true) {
-						Log.i("right", "enter");
+							&& bcolour == true && beng == true
+							&& bchassis == true && bstate == true) {
 						addVehicle = new add().execute();
 
 					}
@@ -345,6 +428,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 				json.put("vinChassisNo", chassis.getText().toString());
 				json.put("colour", colour.getText().toString());
 				json.put("uniqueFeatures", acc.getText().toString());
+				json.put("state", state.getText().toString());
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
@@ -386,7 +470,9 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 										.toString(), chassis.getText()
 										.toString(), colour.getText()
 										.toString(), acc.getText().toString(),
-								reg.getText().toString(), "", "", "", "", "");
+								reg.getText().toString(), "", "", "", "", "",
+								"",state.getText()
+								.toString());
 
 						ParkingData datas = new ParkingData(vid, model
 								.getText().toString(), "", "", "", "",
@@ -481,6 +567,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		colour.setTextColor(getResources().getColor(R.color.black));
 		chassis.setTextColor(getResources().getColor(R.color.black));
 		type_other.setTextColor(getResources().getColor(R.color.black));
+		state.setTextColor(getResources().getColor(R.color.black));
 		bmake = true;
 		bmodel = true;
 		breg = true;
@@ -489,6 +576,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		bchassis = true;
 		btype_other = true;
 		bbody = true;
+		bstate = true;
 
 	}
 
@@ -522,7 +610,6 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.addvehicle;
 	}
 

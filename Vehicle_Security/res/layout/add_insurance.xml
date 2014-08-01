@@ -45,7 +45,7 @@
         android:background="@drawable/box_gry"
         android:ems="10"
         android:inputType="number"
-        android:hint="insurance company number"
+        android:hint="insurance company number*"
         android:padding="10dp" >
     </EditText>
 
@@ -59,7 +59,7 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/box_gry"
         android:ems="10"
-        android:hint="insurance policy no"
+        android:hint="insurance policy no*"
         android:padding="10dp"
         android:singleLine="true" >
     </EditText>
@@ -74,7 +74,7 @@
         android:layout_marginTop="10dp"
         android:background="@drawable/box_gry"
         android:ems="10"
-        android:hint="Expiry"
+        android:hint="expiry"
         android:padding="10dp"
         android:textSize="17dp" >
     </TextView>

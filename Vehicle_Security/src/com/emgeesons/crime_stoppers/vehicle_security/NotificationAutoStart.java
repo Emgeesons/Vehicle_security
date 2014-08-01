@@ -8,6 +8,6 @@ public class NotificationAutoStart extends BroadcastReceiver {
 
 	@Override
 	public void onReceive(Context context, Intent intent) {		
-//		NotificationAlarm.SetAlarm(context);
+		NotificationAlarm.SetAlarm(context);
 	}
 }

@@ -38,8 +38,8 @@ public class Reportsummary extends SherlockActivity {
 	String vehicle_type, make, model, body_type, engine_no, chassis, colour,
 			acc, reg, icom, ipno, iexp, insurance_company_number, location,
 			selected_date, selected_time, report_type, comments, spic1, spic2,
-			spic3;
-	TextView name, regs, type, date, time, locations, comment, rtype;
+			state, spic3;
+	TextView name, regs, type, date, time, locations, comment, rtype, vstate;
 	TextView ttype, tmake, tmodel, body, eng, vin, color, tacc, cname, policy,
 			expiry, status, num;
 	ImageView vtype;
@@ -74,9 +74,10 @@ public class Reportsummary extends SherlockActivity {
 				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
 		// Initialize ImageLoader with configuration.
 		ImageLoader.getInstance().init(config);
-		
+
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
+				.showImageOnLoading(R.drawable.add_photos_grey)
 				.displayer(new RoundedBitmapDisplayer(50)).build();
 		call = (Button) findViewById(R.id.call);
 		call.setOnClickListener(new OnClickListener() {
@@ -105,7 +106,6 @@ public class Reportsummary extends SherlockActivity {
 			File f3 = new File(sharedpreferences.getString(Data.p3, ""));
 			Uri imageUri3 = Uri.fromFile(f3);
 			spic3 = imageUri3.toString().replaceAll("%20", " ");
-
 			String date = sharedpreferences.getString(Data.time, "");
 			String[] datespilt = date.split("\\*");
 			selected_time = datespilt[1];
@@ -124,6 +124,8 @@ public class Reportsummary extends SherlockActivity {
 			icom = info.iname;
 			ipno = info.ipolicy;
 			iexp = info.exp;
+			insurance_company_number = info.inum;
+			state = info.state;
 
 		} else {
 
@@ -155,6 +157,7 @@ public class Reportsummary extends SherlockActivity {
 						"selected_time");
 				report_type = array.getJSONObject(0).getString("report_type");
 				comments = array.getJSONObject(0).getString("comments");
+				state = array.getJSONObject(0).getString("state");
 				// spic1 =
 				// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
 				// spic2 =
@@ -174,15 +177,16 @@ public class Reportsummary extends SherlockActivity {
 		pic1 = (ImageView) findViewById(R.id.pic1);
 		pic2 = (ImageView) findViewById(R.id.pic2);
 		pic3 = (ImageView) findViewById(R.id.pic3);
-
 		name = (TextView) findViewById(R.id.name);
 		regs = (TextView) findViewById(R.id.reg);
 		rtype = (TextView) findViewById(R.id.rtype);
 		date = (TextView) findViewById(R.id.date);
 		time = (TextView) findViewById(R.id.time);
+		vstate = (TextView) findViewById(R.id.vstate);
 		locations = (TextView) findViewById(R.id.location);
 		vtype = (ImageView) findViewById(R.id.vtypeimage);
 		adv = (RelativeLayout) findViewById(R.id.adv);
+
 		//
 		comment = (TextView) findViewById(R.id.comm);
 		//
@@ -198,7 +202,7 @@ public class Reportsummary extends SherlockActivity {
 		policy = (TextView) findViewById(R.id.vpolicy);
 		expiry = (TextView) findViewById(R.id.vexpiry);
 		ins = (RelativeLayout) findViewById(R.id.ins);
-
+		num = (TextView) findViewById(R.id.vnum);
 		name.setText(model);
 		regs.setText("Registration Number:" + " " + reg);
 		rtype.setText(report_type);
@@ -234,6 +238,7 @@ public class Reportsummary extends SherlockActivity {
 		vin.setText(chassis);
 		color.setText(colour);
 		tacc.setText(acc);
+		vstate.setText(state);
 
 		ImageView images[] = { pic1, pic2, pic3 };
 		String[] imageUrls = { spic1, spic2, spic3 };
@@ -246,7 +251,8 @@ public class Reportsummary extends SherlockActivity {
 		for (int j = 0; j < mStrings.size(); j++) {
 			imageLoader.displayImage(mStrings.get(j), images[j], options);
 			images[j].setVisibility(View.VISIBLE);
-			if (mStrings.get(j).isEmpty()||mStrings.get(j).equalsIgnoreCase("notcall")) {
+			if (mStrings.get(j).isEmpty() || mStrings.get(j).length() == 8
+					|| mStrings.get(j).equalsIgnoreCase("notcall")) {
 				images[j].setVisibility(View.GONE);
 
 			}
@@ -288,6 +294,11 @@ public class Reportsummary extends SherlockActivity {
 			policy.setText(ipno);
 			expiry.setText(iexp);
 			num.setText(insurance_company_number);
+		}
+		if (state.isEmpty()) {
+			TextView ee = (TextView) findViewById(R.id.state);
+			ee.setVisibility(View.GONE);
+			vstate.setVisibility(View.GONE);
 		}
 
 	}
@@ -354,9 +365,8 @@ public class Reportsummary extends SherlockActivity {
 
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		mStrings.clear();
-		
+
 		super.onBackPressed();
 	}
 }

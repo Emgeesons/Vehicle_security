@@ -121,6 +121,7 @@ public class Share extends BaseActivity {
 			public void onCheckedChanged(CompoundButton buttonView,
 					boolean isChecked) {
 				if (isChecked) {
+					atPrefs.edit().putString(callcheck, "True").commit();
 					publishStory();
 				}
 			}
@@ -132,6 +133,7 @@ public class Share extends BaseActivity {
 					boolean isChecked) {
 				// TODO Auto-generated method stub
 				if (isChecked) {
+					atPrefs.edit().putString(callcheck, "True").commit();
 					Thread thread = new Thread(new Runnable() {
 						@Override
 						public void run() {
@@ -182,6 +184,7 @@ public class Share extends BaseActivity {
 							postParams.putString("name", "My Wheel");
 							if (!fphoto.equalsIgnoreCase("fphoto")) {
 								postParams.putString("picture", fphoto);
+								postParams.putString("link", "https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security");
 							} else {
 
 							}
@@ -529,8 +532,8 @@ public class Share extends BaseActivity {
 						error.getErrorMessage(), Toast.LENGTH_SHORT).show();
 			} else {
 
-				Toast.makeText(getApplicationContext(), postId,
-						Toast.LENGTH_LONG).show();
+//				Toast.makeText(getApplicationContext(), postId,
+//						Toast.LENGTH_LONG).show();
 				gotonext();
 			}
 		}

@@ -2,16 +2,16 @@
 <resources>
 
     <string-array name="sec_qus">
-        <item>Passport Number</item>
-        <item>License Number</item>
-        <item>Mother\'s Maiden Name </item>
-        <item>First Pet\'s Name</item>
-        <item>First Childhood Friend</item>
-        <item>First Primary School </item>
-        <item>Colour of Your First Car </item>
-        <item>All Time Favourite Movie </item>
-        <item>First Paid Job</item>
-        <item>Other</item>
+        <item>passport number</item>
+        <item>license number</item>
+        <item>mother maiden name </item>
+        <item>first pet name</item>
+        <item>first childhood friend</item>
+        <item>first primary school </item>
+        <item>colour of your first car </item>
+        <item>all time favourite movie </item>
+        <item>first paid job</item>
+        <item>other</item>
     </string-array>
     <string-array name="vech_type">
         <item>Bicycle</item>

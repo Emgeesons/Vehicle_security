@@ -21,8 +21,10 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.location.Address;
@@ -71,13 +73,14 @@ public class Myupdates extends Fragment {
 	Data info;
 	GPSTracker gps;
 	private AsyncTask<Void, Void, Void> vinfo;
-	TextView name, reg, type, date, time, location;
+	TextView name, reg, type, date, time, location, rtype;
 	String pos;
 	ImageView vtype, rvtype;
 	RelativeLayout listHeaderView;
 	private ProgressBar pBar;
 	String vehicle_type, make, model, rno, inumber, locations, selected_date,
-			selected_time, report_type, comments, vehicle_id, report_id;
+			selected_time, report_type, comments, vehicle_id, report_id,
+			status, rsdate, rstime, rslocation;
 	JSONArray jsonarr, jsonMainArr;
 	Button recover;
 	View rootView;
@@ -85,7 +88,7 @@ public class Myupdates extends Fragment {
 	private AsyncTask<Void, Void, Void> recoverv;
 	View v;
 	DisplayImageOptions options;
-
+	SharedPreferences atPrefs;
 	String spic1, spic2, spic3;;
 	double LATITUDE, LONGITUDE;
 
@@ -104,6 +107,7 @@ public class Myupdates extends Fragment {
 
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
 				.cacheOnDisk(true).considerExifParams(true)
+				.showImageOnLoading(R.drawable.add_photos_grey)
 				.displayer(new RoundedBitmapDisplayer(50)).build();
 
 		addetails = (RelativeLayout) rootView.findViewById(R.id.adddetails);
@@ -113,6 +117,7 @@ public class Myupdates extends Fragment {
 		go = (Button) rootView.findViewById(R.id.go);
 		pBar = (ProgressBar) rootView.findViewById(R.id.progressBar1);
 
+		rtype = (TextView) rootView.findViewById(R.id.typess);
 		info = new Data();
 		db = new DatabaseHandler(getActivity());
 		try {
@@ -150,7 +155,7 @@ public class Myupdates extends Fragment {
 			} else {
 				LATITUDE = 0;
 				LONGITUDE = 0;
-				pos = "Not Found";
+				pos = "";
 			}
 			IsInternetPresent = cd.isConnectingToInternet();
 			if (IsInternetPresent == false) {
@@ -173,6 +178,11 @@ public class Myupdates extends Fragment {
 
 				@Override
 				public void onClick(View arg0) {
+					SharedPreferences sharedpreferences;
+					sharedpreferences = getActivity().getSharedPreferences(
+							Data.MyPREFERENCES, Context.MODE_PRIVATE);
+					sharedpreferences.edit().putString(Data.vid, "notcall")
+							.commit();
 					Intent next = new Intent(getActivity(), Reportsummary.class);
 					next.putExtra("data", jsonMainArr.toString());
 					startActivity(next);
@@ -229,12 +239,13 @@ public class Myupdates extends Fragment {
 	private class rec extends AsyncTask<Void, Void, Void> {
 		String success, mess, response;
 		String vid, typevalue;
+		String currentTime, currentDate;
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(getActivity());
-			pDialog.setMessage("Register");
+			pDialog.setMessage("updating..");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -260,8 +271,8 @@ public class Myupdates extends Fragment {
 				json.put("vehicleId", vehicle_id);
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				SimpleDateFormat sdfs = new SimpleDateFormat("HH:mm");
-				String currentTime = sdfs.format(new Date());
-				String currentDate = sdf.format(new Date());
+				currentTime = sdfs.format(new Date());
+				currentDate = sdf.format(new Date());
 				json.put("date", currentDate);
 				json.put("time", currentTime);
 				json.put("location", pos);
@@ -295,72 +306,13 @@ public class Myupdates extends Fragment {
 				getActivity().runOnUiThread(new Runnable() {
 
 					public void run() {
-
-						main.setVisibility(View.GONE);
-						Vrecover.setVisibility(View.VISIBLE);
-						TextView rname, rreg, rtype, rdate, rtime, rlocation;
-						Button done, ins, pol;
-						TextView update = (TextView) rootView
-								.findViewById(R.id.update);
-						rname = (TextView) rootView.findViewById(R.id.namess);
-						rreg = (TextView) rootView.findViewById(R.id.regss);
-						rtype = (TextView) rootView.findViewById(R.id.typess);
-						rdate = (TextView) rootView.findViewById(R.id.datess);
-						rtime = (TextView) rootView.findViewById(R.id.timess);
-						rlocation = (TextView) rootView
-								.findViewById(R.id.locationss);
-						done = (Button) rootView.findViewById(R.id.vrech);
-						ins = (Button) rootView.findViewById(R.id.ins);
-						pol = (Button) rootView.findViewById(R.id.pol);
-						rname.setText(model);
-						rreg.setText("Registration Number:" + " " + rno);
-						rtype.setText(report_type);
-						rdate.setText(dateformate(selected_date));
-						rtime.setText(selected_time);
-						rlocation.setText(locations);
-						// if (inumber.isEmpty()) {
-						// ins.setVisibility(View.GONE);
-						// } else {
-						// ins.setVisibility(View.VISIBLE);
-						// }
-						ins.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								Intent call = new Intent(Intent.ACTION_CALL);
-								call.setData(Uri.parse("tel:" + inumber));
-								startActivity(call);
-							}
-						});
-						pol.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								Intent call = new Intent(Intent.ACTION_CALL);
-								call.setData(Uri.parse("tel:" + "131444"));
-								startActivity(call);
-							}
-						});
-						update.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								main.setVisibility(View.VISIBLE);
-								Vrecover.setVisibility(View.GONE);
-							}
-						});
-						done.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View arg0) {
-								Intent next = new Intent(getActivity(),
-										MainActivity.class);
-								startActivity(next);
-								getActivity().finish();
-							}
-						});
+						rsdate = currentDate;
+						rstime = currentTime;
+						rslocation = pos;
+						recoverfun();
 
 					}
+
 				});
 			}
 
@@ -421,6 +373,92 @@ public class Myupdates extends Fragment {
 		}
 	}
 
+	private void recoverfun() {
+		// TODO Auto-generated method stub
+		main.setVisibility(View.GONE);
+		Vrecover.setVisibility(View.VISIBLE);
+		TextView rname, rreg, rdate, rtime, rlocation, rrdate, rrtime, rrloc;
+		Button done, ins, pol;
+		// TextView update = (TextView) rootView
+		// .findViewById(R.id.update);
+		rname = (TextView) rootView.findViewById(R.id.namess);
+		rreg = (TextView) rootView.findViewById(R.id.regss);
+		rdate = (TextView) rootView.findViewById(R.id.datess);
+		rtime = (TextView) rootView.findViewById(R.id.timess);
+		rlocation = (TextView) rootView.findViewById(R.id.locationss);
+		done = (Button) rootView.findViewById(R.id.vrech);
+		ins = (Button) rootView.findViewById(R.id.ins);
+		pol = (Button) rootView.findViewById(R.id.pol);
+		rrdate = (TextView) rootView.findViewById(R.id.rdate);
+		rrtime = (TextView) rootView.findViewById(R.id.rtime);
+		rrloc = (TextView) rootView.findViewById(R.id.rloc);
+		rname.setText(model);
+		rreg.setText("Registration Number:" + " " + rno);
+		rtype.setText(report_type);
+		rdate.setText(dateformate(selected_date));
+		rtime.setText(selected_time);
+		rlocation.setText(locations);
+
+		rrdate.setText(dateformate(rsdate));
+		if (rstime.equalsIgnoreCase("00:00:00")) {
+			rrtime.setVisibility(View.INVISIBLE);
+		} else {
+			String tim[] = rstime.split(":");
+			rrtime.setText(tim[0] + ":" + tim[1]);
+		}
+
+		rrloc.setText(rslocation);
+		if (rslocation.isEmpty()) {
+			ImageView s = (ImageView) rootView.findViewById(R.id.imageView4);
+			s.setVisibility(View.INVISIBLE);
+		}
+
+		if (rsdate.equalsIgnoreCase("0000-00-00")) {
+			rrdate.setVisibility(View.INVISIBLE);
+		}
+
+		// if (inumber.isEmpty()) {
+		// ins.setVisibility(View.GONE);
+		// } else {
+		// ins.setVisibility(View.VISIBLE);
+		// }
+		ins.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent call = new Intent(Intent.ACTION_CALL);
+				call.setData(Uri.parse("tel:" + inumber));
+				startActivity(call);
+			}
+		});
+		pol.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				Intent call = new Intent(Intent.ACTION_CALL);
+				call.setData(Uri.parse("tel:" + "131444"));
+				startActivity(call);
+			}
+		});
+		// update.setOnClickListener(new OnClickListener() {
+		//
+		// @Override
+		// public void onClick(View v) {
+		// main.setVisibility(View.VISIBLE);
+		// Vrecover.setVisibility(View.GONE);
+		// }
+		// });
+		done.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				Intent next = new Intent(getActivity(), MainActivity.class);
+				startActivity(next);
+				getActivity().finish();
+			}
+		});
+	}
+
 	String getaddress() {
 		Geocoder geocoder = new Geocoder(getActivity(), Locale.ENGLISH);
 
@@ -471,6 +509,10 @@ public class Myupdates extends Fragment {
 		}
 
 		location.setText(locations);
+		if (location.getText().toString().isEmpty()) {
+			ImageView ii = (ImageView) v.findViewById(R.id.imageView2);
+			ii.setVisibility(View.GONE);
+		}
 
 		if (vehicle_type.equalsIgnoreCase("Car")) {
 			vtype.setImageResource(R.drawable.ic_car);
@@ -510,17 +552,10 @@ public class Myupdates extends Fragment {
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
-				gps = new GPSTracker(getActivity());
-				if (gps.canGetLocation()) {
-					double LATITUDE = gps.getLatitude();
-					double LONGITUDE = gps.getLongitude();
-					json.put("latitude", LATITUDE);
-					json.put("longitude", LONGITUDE);
+				json.put("location", pos);
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
 
-				} else {
-					json.put("latitude", 0);
-					json.put("longitude", 0);
-				}
 				System.out.println("Element1-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()
@@ -576,6 +611,14 @@ public class Myupdates extends Fragment {
 										.getString("report_type");
 								comments = jsonMainArr.getJSONObject(0)
 										.getString("comments");
+								status = jsonMainArr.getJSONObject(0)
+										.getString("status");
+								rsdate = jsonMainArr.getJSONObject(0)
+										.getString("recovered_date");
+								rstime = jsonMainArr.getJSONObject(0)
+										.getString("recovered_time");
+								rslocation = jsonMainArr.getJSONObject(0)
+										.getString("recovered_location");
 								String[] datespilt = selected_time.split("\\:");
 								selected_time = datespilt[0] + ":"
 										+ datespilt[1];
@@ -594,11 +637,19 @@ public class Myupdates extends Fragment {
 
 						addetails.setVisibility(View.GONE);
 						main.setVisibility(View.VISIBLE);
-						if ((jsonarr.length() < 1)) {
-							noupdate.setVisibility(View.VISIBLE);
-							data.setAdapter(new ffAdapter());
+						if (status.equalsIgnoreCase("recovered")) {
+							report_type = "Recovered";
+							rtype.setTextColor(getResources().getColor(
+									R.color.green));
+							recoverfun();
 						} else {
-							data.setAdapter(new ffAdapter());
+							if ((jsonarr.length() < 1)) {
+								noupdate.setVisibility(View.VISIBLE);
+								data.setAdapter(new ffAdapter());
+							} else {
+								noupdate.setVisibility(View.INVISIBLE);
+								data.setAdapter(new ffAdapter());
+							}
 						}
 
 					}
@@ -717,6 +768,10 @@ public class Myupdates extends Fragment {
 				spic1 = jsonarr.getJSONObject(position).getString("photo1");
 				spic2 = jsonarr.getJSONObject(position).getString("photo2");
 				spic3 = jsonarr.getJSONObject(position).getString("photo3");
+				if (location.getText().toString().isEmpty()) {
+					ImageView i = (ImageView) vv.findViewById(R.id.simageView1);
+					i.setVisibility(View.GONE);
+				}
 				if (vehicle_type.equalsIgnoreCase("Car")) {
 					spot.setText("spotted your car");
 				} else if (vehicle_type.equalsIgnoreCase("Bicycle")) {

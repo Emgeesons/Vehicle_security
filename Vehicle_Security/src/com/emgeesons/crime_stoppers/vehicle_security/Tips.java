@@ -43,10 +43,10 @@ import android.widget.RatingBar;
 import android.widget.TextView;
 
 public class Tips extends BaseActivity {
-	TextView addresss, rates;
+	TextView addresss, rates, tip;
 	RatingBar ratebar;
 	double LATITUDE, LONGITUDE;
-	String rate, address, feedback, date, vid;
+	String rate, address, feedback, date, vid, tips;
 	List<TipData> tipdata;
 	List<TipData> labels = new ArrayList<TipData>();
 	ListView data;
@@ -82,6 +82,8 @@ public class Tips extends BaseActivity {
 		rate = intent.getStringExtra("Rate");
 		address = intent.getStringExtra("Address");
 		vid = intent.getStringExtra("vid");
+		tips = intent.getStringExtra("notip");
+		tip = (TextView) findViewById(R.id.tip);
 		addresss = (TextView) findViewById(R.id.address);
 		rates = (TextView) findViewById(R.id.rate);
 		ratebar = (RatingBar) findViewById(R.id.ratebar);
@@ -93,7 +95,7 @@ public class Tips extends BaseActivity {
 		}
 		addresss.setText(address);
 		rates.setText(rate);
-
+		tip.setText(tips + " " + "tips for this location");
 		ratebar.setRating(Float.valueOf(rate));
 		data = (ListView) findViewById(R.id.data);
 		gps = new GPSTracker(Tips.this);

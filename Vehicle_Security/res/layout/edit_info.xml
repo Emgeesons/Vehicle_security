@@ -25,7 +25,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/box_gry"
                 android:ems="10"
-                android:hint="First name"
+                android:hint=" first name*"
                 android:inputType="textPersonName"
                 android:nextFocusDown="@+id/lname"
                 android:paddingLeft="5dp"
@@ -40,7 +40,7 @@
                 android:layout_weight="1"
                 android:background="@drawable/box_gry"
                 android:ems="10"
-                android:hint="Last name"
+                android:hint=" last name*"
                 android:inputType="textPersonName"
                 android:paddingLeft="5dp"
                 android:textSize="@dimen/big_text" >
@@ -57,7 +57,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="Email id"
+            android:hint=" email id*"
             android:inputType="textEmailAddress"
             android:paddingLeft="5dp"
             android:textSize="@dimen/big_text" >
@@ -73,7 +73,7 @@
             android:layout_toLeftOf="@+id/male_female"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  Age"
+            android:hint="  dob*"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
@@ -116,7 +116,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="Mobile number"
+            android:hint="  mobile number*"
             android:inputType="phone"
             android:paddingLeft="5dp"
             android:textSize="@dimen/big_text" />
@@ -246,7 +246,7 @@
             android:layout_below="@+id/sec_other_qus"
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
-            android:hint="answer"
+            android:hint="answer*"
             android:paddingLeft="10dp"
             android:paddingTop="5dp"
             android:singleLine="true"
@@ -290,7 +290,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="Licence number"
+            android:hint=" licence number"
             android:paddingLeft="10dp"
             android:singleLine="true"
             android:textSize="@dimen/big_text" >
@@ -306,7 +306,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="Address"
+            android:hint=" address*(min 6 chars)"
             android:paddingLeft="10dp"
             android:singleLine="true"
             android:textSize="@dimen/big_text" />
@@ -321,8 +321,9 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="postcode"
+            android:hint=" postcode*(4 chars)"
             android:inputType="number"
+            android:maxLength="4"
             android:paddingLeft="10dp"
             android:textSize="@dimen/big_text" >
         </EditText>

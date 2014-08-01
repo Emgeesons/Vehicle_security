@@ -64,7 +64,7 @@ public abstract class BaseActivity extends SherlockActivity {
 		// TODO Auto-generated method stub
 		super.onResume();
 		// pin check 
-		// time @10min
+		// time @30min
 		String time = atPrefs.getString("time", "");
 		String times = String.valueOf(System.currentTimeMillis());
 		double t = Double.valueOf(time);
@@ -82,7 +82,7 @@ public abstract class BaseActivity extends SherlockActivity {
 				return;
 			} else {
 
-				if (!atPrefs.getBoolean(info.checkllogin, true) && tw >= t) {
+				if (!atPrefs.getBoolean(info.checkllogin, true) && tw > t) {
 					Intent ne = new Intent(getApplicationContext(),
 							PinLock.class);
 					startActivity(ne);

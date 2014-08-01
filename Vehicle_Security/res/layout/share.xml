@@ -55,25 +55,6 @@
         android:layout_marginTop="16dp"
         android:text="Share on Twitter" />
 
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/fb"
-        android:layout_marginBottom="13dp"
-        android:layout_marginLeft="12dp"
-        android:layout_toRightOf="@+id/fb"
-        android:src="@drawable/facebook" />
-
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tw"
-        android:layout_marginBottom="13dp"
-        android:layout_toLeftOf="@+id/imageView1"
-        android:src="@drawable/twitter" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -107,5 +88,25 @@
             android:text="post"
             android:textColor="@color/white" />
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/fb"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="10dp"
+        android:layout_toRightOf="@+id/fb"
+        android:src="@drawable/facebook" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/tw"
+        android:layout_marginLeft="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_toLeftOf="@+id/imageView1"
+        android:src="@drawable/twitter" />
 
 </RelativeLayout>

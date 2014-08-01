@@ -33,7 +33,7 @@
         android:background="@drawable/box_gry"
         android:ems="10"
         android:gravity="top|left"
-        android:hint="Give us your feedback"
+        android:hint="give us your feedback"
         android:inputType="textMultiLine"
         android:lines="5"
         android:padding="10dp"

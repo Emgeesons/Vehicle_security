@@ -20,7 +20,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
@@ -37,7 +36,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -442,7 +440,7 @@ public class VehicleInfo extends BaseActivity {
 	private class detail extends AsyncTask<Void, Void, Void> {
 		String success, mess, response;
 		String vtype, vmake, vmodel, reg, vstatus, vbody, vexp, vpol, vins,
-				vacc, vcol, veng, vch, pic1, pic2, pic3;
+				vacc, vcol, veng, vch, pic1, pic2, pic3, vinsnum, state;
 		int vid;
 
 		@Override
@@ -514,9 +512,12 @@ public class VehicleInfo extends BaseActivity {
 						"insurance_policy_no");
 				vexp = jsonMainArr.getJSONObject(0).getString(
 						"insurance_expiry_date");
+				vinsnum = jsonMainArr.getJSONObject(0).getString(
+						"insurance_company_number");
 				pic1 = jsonMainArr.getJSONObject(0).getString("photo_1");
 				pic2 = jsonMainArr.getJSONObject(0).getString("photo_2");
 				pic3 = jsonMainArr.getJSONObject(0).getString("photo_3");
+				state = jsonMainArr.getJSONObject(0).getString("state");
 
 			} catch (JSONException e) {
 				System.out.println("JSONException");
@@ -548,6 +549,8 @@ public class VehicleInfo extends BaseActivity {
 								+ "',vehicle_insno = '" + vpol
 								+ "',vehicle_insexp = '" + date[0]
 								+ "',vehicle_status = '" + vstatus
+								+ "',vehicle_insnum = '" + vinsnum
+								+ "',vehicle_state = '" + state
 								+ "' WHERE vehicle_id='" + id + "'");
 
 						Thread thread = new Thread(new Runnable() {

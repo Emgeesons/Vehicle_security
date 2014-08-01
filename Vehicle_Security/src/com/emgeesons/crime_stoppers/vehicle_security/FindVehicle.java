@@ -91,7 +91,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		super.onCreate(savedInstanceState);
 		// setContentView(R.layout.find_vehicle);
 		getSupportActionBar().setTitle(
-				Html.fromHtml("<font color='#FFFFFF'>Find My Vehicle</font>"));
+				Html.fromHtml("<font color='#FFFFFF'>Find My Car</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));

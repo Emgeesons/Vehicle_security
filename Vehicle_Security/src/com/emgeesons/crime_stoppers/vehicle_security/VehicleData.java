@@ -4,13 +4,15 @@ public class VehicleData {
 	int vehicle_id;
 	private String vehicle_make, vehicle_type, vehicle_body, vehicle_model,
 			vehicle_eng, vehicle_ch, vehicle_colour, vehicle_acc, vehicle_reg,
-			vehicle_insname, vehicle_insno, vehicle_insexp, status,expmi;
+			vehicle_insname, vehicle_insno, vehicle_insexp, status, expmi,
+			inumber, state;
 
 	public VehicleData(int vehicle_id, String vehicle_type,
 			String vehicle_make, String vehicle_model, String vehicle_body,
 			String vehicle_eng, String vehicle_ch, String vehicle_colour,
 			String vehicle_acc, String vehicle_reg, String vehicle_insname,
-			String vehicle_insno, String vehicle_insexp, String status,String expmi) {
+			String vehicle_insno, String vehicle_insexp, String status,
+			String expmi, String inumber, String state) {
 		this.vehicle_id = vehicle_id;
 		this.vehicle_type = vehicle_type;
 		this.vehicle_make = vehicle_make;
@@ -26,8 +28,17 @@ public class VehicleData {
 		this.vehicle_insexp = vehicle_insexp;
 		this.status = status;
 		this.expmi = expmi;
-		
+		this.inumber = inumber;
+		this.state = state;
 
+	}
+
+	public String getstate() {
+		return this.state;
+	}
+
+	public String getinumber() {
+		return this.inumber;
 	}
 
 	public int getvehicle_id() {

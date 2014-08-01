@@ -43,7 +43,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 	String details_url = Data.url + "profileAddDetails.php";
 	Data info;
 	ProgressDialog pDialog;
-	boolean blnumber, baddress, bpostcode;
+	boolean baddress, bpostcode;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	SharedPreferences atPrefs;
@@ -87,7 +87,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(AddDetails.this);
-			pDialog.setMessage("Adding Details");
+			pDialog.setMessage("Adding Details...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -241,14 +241,14 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
-					if (lnumber.getText().toString().length() < 6) {
-						lnumber.setHintTextColor(getResources().getColor(
-								R.color.red));
-						lnumber.setTextColor(getResources().getColor(
-								R.color.red));
-						blnumber = false;
-
-					}
+					// if (lnumber.getText().toString().length() < 6) {
+					// lnumber.setHintTextColor(getResources().getColor(
+					// R.color.red));
+					// lnumber.setTextColor(getResources().getColor(
+					// R.color.red));
+					// blnumber = false;
+					//
+					// }
 					if (address.getText().toString().length() < 6) {
 						address.setHintTextColor(getResources().getColor(
 								R.color.red));
@@ -264,8 +264,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 						bpostcode = false;
 					}
 
-					if (blnumber == true && baddress == true
-							&& bpostcode == true) {
+					if (baddress == true && bpostcode == true) {
 						details = new detail().execute();
 					}
 
@@ -285,11 +284,11 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 	@Override
 	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
 			int arg3) {
-		lnumber.setTextColor(getResources().getColor(R.color.black));
+		// lnumber.setTextColor(getResources().getColor(R.color.black));
 		address.setTextColor(getResources().getColor(R.color.black));
 		postcode.setTextColor(getResources().getColor(R.color.black));
 
-		blnumber = true;
+		// blnumber = true;
 		baddress = true;
 		bpostcode = true;
 
@@ -316,7 +315,6 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 
 	@Override
 	public void onBackPressed() {
-		// TODO Auto-generated method stub
 		Intent back = new Intent(getApplicationContext(), ProfileScreen.class);
 		startActivity(back);
 		finish();
@@ -325,7 +323,6 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.add_details;
 	}
 }

@@ -228,7 +228,7 @@
                 android:layout_alignLeft="@+id/textView1"
                 android:layout_below="@+id/textView1"
                 android:layout_marginTop="5sp"
-                android:text="Crime stoppers South Australia"
+                android:text="Crime Stoppers, South Australia"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/smaller_text" />
 
@@ -271,8 +271,8 @@
 
             <RelativeLayout
                 android:id="@+id/updatesc"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="35dp"
+                android:layout_height="35dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="16dp" 

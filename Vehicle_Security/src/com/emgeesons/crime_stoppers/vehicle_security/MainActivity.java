@@ -66,7 +66,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 		dbb = db.openDataBase();
 		dbb = db.getReadableDatabase();
-		itemname = new String[] { "Home", "Emergency Numbers", "", "Feedback",
+		itemname = new String[] { "Home", "Helpful Numbers", "", "Feedback",
 				"Share App", "Rate Us", "", "Logout" };
 		info = new Data();
 		photo = new int[] { R.drawable.ic_nav_home,
@@ -165,7 +165,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					new ColorDrawable(Color.parseColor("#060606")));
 			getSupportActionBar()
 					.setTitle(
-							Html.fromHtml("<font color='#ffffff'>Emergency Numbers</font>"));
+							Html.fromHtml("<font color='#ffffff'>Helpful Numbers</font>"));
 			// hide dropdown from action bar
 			getSupportActionBar()
 					.setNavigationMode(
@@ -193,6 +193,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				Intent next = new Intent(getApplicationContext(),
 						LoginActivity.class);
 				startActivity(next);
+				finish();
 			}
 
 			break;
@@ -204,12 +205,16 @@ public class MainActivity extends SherlockFragmentActivity implements
 			share.setType("text/plain");
 			share.putExtra(Intent.EXTRA_TEXT, message);
 			startActivity(Intent.createChooser(share, "Share My Wheels"));
+			atPrefs.edit().putString(callcheck, "True").commit();
+			// selectItem(0);
 			break;
 		case 5:
 			startActivity(new Intent(
 					Intent.ACTION_VIEW,
 					Uri.parse("https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security")));
+			atPrefs.edit().putString(callcheck, "True").commit();
 			// selectItem(0);
+
 			break;
 
 		case 7:
@@ -251,6 +256,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 											.putString(
 													SplashscreenActivity.profile_pic,
 													"").commit();
+									atPrefs.edit().putInt("selected", 0)
+											.commit();
+									atPrefs.edit().putInt("updates", 0)
+											.commit();
 									Session session = Session
 											.getActiveSession();
 									if (session != null) {
@@ -288,14 +297,17 @@ public class MainActivity extends SherlockFragmentActivity implements
 		// ft.addToBackStack(null);
 		ft.commit();
 		listview.setItemChecked(position, true);
+
 		selectedPosition = position;
+
 		drawlayout.closeDrawer(listview);
 	}
 
 	@Override
 	public void onBackPressed() {
 		// to go back to 1st frg
-		if (selectedPosition != 0) {
+		if (selectedPosition != 0 && selectedPosition != 4
+				&& selectedPosition != 5) {
 			selectItem(0);
 		} else {
 			super.onBackPressed();
@@ -342,7 +354,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 				atPrefs.edit().putString(callcheck, "false").commit();
 				return;
 			} else {
-				if (!atPrefs.getBoolean(info.checkllogin, true) && tw >= t) {
+				if (!atPrefs.getBoolean(info.checkllogin, true) && tw > t) {
 					Intent ne = new Intent(getApplicationContext(),
 							PinLock.class);
 					startActivity(ne);

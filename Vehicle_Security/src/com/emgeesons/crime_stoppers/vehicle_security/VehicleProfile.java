@@ -63,7 +63,7 @@ import com.google.android.gms.internal.el;
 
 public class VehicleProfile extends BaseActivity {
 	TextView title, reg, type, make, model, body, eng, vin, color, acc, cname,
-			policy, expiry, status;
+			policy, expiry, status, number, state;
 	ImageView vpic, addpic;
 	String id;
 	Data info;
@@ -115,11 +115,13 @@ public class VehicleProfile extends BaseActivity {
 		cname = (TextView) findViewById(R.id.vname);
 		policy = (TextView) findViewById(R.id.vpolicy);
 		expiry = (TextView) findViewById(R.id.vexpiry);
+		state = (TextView) findViewById(R.id.vstate);
 		vpic = (ImageView) findViewById(R.id.imagetype);
 		ins = (RelativeLayout) findViewById(R.id.ins);
 		addins = (Button) findViewById(R.id.addins);
 		edit = (Button) findViewById(R.id.edit);
 		status = (TextView) findViewById(R.id.status);
+		number = (TextView) findViewById(R.id.vnumber);
 		imagesre = (RelativeLayout) findViewById(R.id.pic);
 		addpic = (ImageView) findViewById(R.id.addpic);
 		pic1 = (CircularImageView) findViewById(R.id.pic1);
@@ -139,6 +141,8 @@ public class VehicleProfile extends BaseActivity {
 		vin.setText(info.vin);
 		color.setText(info.color);
 		acc.setText(info.acc);
+		number.setText(info.inum);
+		state.setText(info.state);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(VehicleProfile.this);
 		db = new DatabaseHandler(getApplicationContext());
@@ -206,38 +210,35 @@ public class VehicleProfile extends BaseActivity {
 			status.setVisibility(View.GONE);
 		}
 
-		if (info.body.isEmpty()) {
+		if (info.body.isEmpty()
+				&& type.getText().toString().equalsIgnoreCase("Car")) {
+			TextView b = (TextView) findViewById(R.id.body);
+			b.setVisibility(View.VISIBLE);
+			body.setVisibility(View.VISIBLE);
+
+		} else {
 			TextView b = (TextView) findViewById(R.id.body);
 			b.setVisibility(View.GONE);
 			body.setVisibility(View.GONE);
-
 		}
-		if (info.eng.isEmpty()) {
-			TextView e = (TextView) findViewById(R.id.engine);
-			e.setVisibility(View.GONE);
-			eng.setVisibility(View.GONE);
-		}
-		if (info.acc.isEmpty()) {
-			TextView accc = (TextView) findViewById(R.id.accessories);
-			accc.setVisibility(View.GONE);
-			acc.setVisibility(View.GONE);
-		}
-		if (info.vin.isEmpty()) {
-			TextView v = (TextView) findViewById(R.id.vin);
-			v.setVisibility(View.GONE);
-			vin.setVisibility(View.GONE);
-		}
-
-		if (info.exp.contains("0000-00-00") || info.exp.isEmpty()) {
-			TextView ex = (TextView) findViewById(R.id.expiry);
-			ex.setVisibility(View.GONE);
-			expiry.setVisibility(View.GONE);
-		} else {
-			expiry.setText(getdateformate(info.exp));
-		}
+		// if (info.eng.isEmpty()) {
+		// TextView e = (TextView) findViewById(R.id.engine);
+		// e.setVisibility(View.GONE);
+		// eng.setVisibility(View.GONE);
+		// }
+		// if (info.acc.isEmpty()) {
+		// TextView accc = (TextView) findViewById(R.id.accessories);
+		// accc.setVisibility(View.GONE);
+		// acc.setVisibility(View.GONE);
+		// }
+		// if (info.vin.isEmpty()) {
+		// TextView v = (TextView) findViewById(R.id.vin);
+		// v.setVisibility(View.GONE);
+		// vin.setVisibility(View.GONE);
+		// }
 
 		if (info.iname.isEmpty()) {
-			ins.setVisibility(View.GONE);
+			// ins.setVisibility(View.GONE);
 			addins.setBackgroundResource(R.drawable.blue_button);
 			call = "first";
 			addins.setTextColor(getResources().getColor(R.color.white));
@@ -254,15 +255,28 @@ public class VehicleProfile extends BaseActivity {
 			addins.setTextColor(getResources().getColor(R.color.black));
 			cname.setText(info.iname);
 			policy.setText(info.ipolicy);
-			expiry.setText(getdateformate(info.exp));
+			if (info.exp.contains("0000-00-00") || info.exp.isEmpty()) {
+				// TextView ex = (TextView) findViewById(R.id.expiry);
+				// ex.setVisibility(View.GONE);
+				// expiry.setVisibility(View.GONE);
+				expiry.setVisibility(View.GONE);
+			} else {
+				expiry.setText(getdateformate(info.exp));
+			}
 
 		}
 
 		// check image
+
 		ImageView[] IMGS = { pic1, pic2, pic3 };
 		if (folder.exists()) {
 
 			no = folder.listFiles();
+			if (no.length == 3) {
+
+				addpic.setVisibility(View.GONE);
+
+			}
 			for (int i = 0; i < no.length; i++) {
 				if (no[i].isFile()) {
 					System.out.println("File " + no[i]);
@@ -372,7 +386,7 @@ public class VehicleProfile extends BaseActivity {
 						Editvehicle.class);
 				next.putExtra("id", id);
 				startActivity(next);
-				
+
 				finish();
 
 			}
@@ -626,6 +640,7 @@ public class VehicleProfile extends BaseActivity {
 
 	private class delete extends AsyncTask<Void, Void, Void> {
 		String success, mess, response;
+		int pts;
 
 		@Override
 		protected void onPreExecute() {
@@ -646,7 +661,7 @@ public class VehicleProfile extends BaseActivity {
 			System.out.println(del_url);
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
-			SharedPreferences atPrefs;
+			final SharedPreferences atPrefs;
 			atPrefs = PreferenceManager
 					.getDefaultSharedPreferences(VehicleProfile.this);
 
@@ -693,7 +708,8 @@ public class VehicleProfile extends BaseActivity {
 				jsonMainArr = profile.getJSONArray("response");
 				success = profile.getString("status");
 				mess = profile.getString("message");
-
+				pts = jsonMainArr.getJSONObject(0).getInt(
+						"profile_completeness");
 			} catch (JSONException e) {
 				System.out.println("JSONException");
 			} catch (ClientProtocolException e) {
@@ -709,6 +725,7 @@ public class VehicleProfile extends BaseActivity {
 				runOnUiThread(new Runnable() {
 
 					public void run() {
+
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						dbbb.execSQL("delete from Vehicle_info WHERE Vehicle_id ='"
 								+ id + "'");
@@ -717,6 +734,9 @@ public class VehicleProfile extends BaseActivity {
 						NotificationAlarm.CancelAlarm(getApplicationContext());
 						NotificationAlarm.SetAlarm(getApplicationContext());
 						deleteDirectory(folder);
+						atPrefs.edit()
+								.putInt(SplashscreenActivity.progress, pts)
+								.commit();
 						if (vehicles.size() == 1) {
 							Intent next = new Intent(getApplicationContext(),
 									ProfileScreen.class);
@@ -1116,7 +1136,6 @@ public class VehicleProfile extends BaseActivity {
 										+ "' WHERE vehicle_id= '" + vid + "'");
 
 							} catch (JSONException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 
@@ -1187,15 +1206,13 @@ public class VehicleProfile extends BaseActivity {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.vehicle_profile;
 	}
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
-//		db.close();
-//		dbb.close();
+		// db.close();
+		// dbb.close();
 		super.onPause();
 	}
 }

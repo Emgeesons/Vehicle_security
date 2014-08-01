@@ -163,6 +163,7 @@
         android:layout_alignLeft="@+id/textView5"
         android:layout_below="@+id/textView5"
         android:divider="@color/white"
+        android:layout_marginBottom="10dp"
         android:dividerHeight="0.2dp" >
     </ListView>
 
@@ -175,7 +176,8 @@
         android:layout_alignRight="@+id/relativeLayout4"
         android:layout_marginBottom="30dp"
         android:ems="10"
-        android:hint="eg: parking level 2,A7"
+        android:drawableLeft="@drawable/edit_white"
+        android:hint=" eg: parking level 2,A7"
         android:singleLine="true"
         android:textColor="@color/white" >
 

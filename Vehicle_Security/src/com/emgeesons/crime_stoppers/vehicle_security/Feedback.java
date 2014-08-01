@@ -70,7 +70,6 @@ public class Feedback extends SherlockFragment {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				IsInternetPresent = cd.isConnectingToInternet();
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
@@ -162,6 +161,7 @@ public class Feedback extends SherlockFragment {
 										Intent next = new Intent(getActivity(),
 												MainActivity.class);
 										startActivity(next);
+										getActivity().finish();
 									}
 								});
 						Dialog.setCancelable(false);

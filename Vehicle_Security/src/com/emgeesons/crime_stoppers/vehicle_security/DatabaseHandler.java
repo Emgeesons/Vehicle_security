@@ -73,6 +73,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	private static final String vehicle_insexp = "vehicle_insexp";
 	private static final String vehicle_status = "vehicle_status";
 	private static final String vehicle_expmil = "vehicle_expmil";
+	private static final String vehicle_insnum = "vehicle_insnum";
+	private static final String vehicle_state = "vehicle_state";
 
 	// // Vehicle_park
 	private static final String vehicle_ID = "id";
@@ -308,6 +310,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(vehicle_insexp, data.getvehicle_insexp());
 		values.put(vehicle_status, data.getstatus());
 		values.put(vehicle_expmil, data.getexpmil());
+		values.put(vehicle_insnum, data.getinumber());
+		values.put(vehicle_state, data.getstate());
 
 		// Inserting Row
 
@@ -361,7 +365,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 						cursor.getString(8), cursor.getString(9),
 						cursor.getString(10), cursor.getString(11),
 						cursor.getString(12), cursor.getString(13),
-						cursor.getString(14), cursor.getString(15));
+						cursor.getString(14), cursor.getString(15),
+						cursor.getString(16), cursor.getString(17));
 				con.add(data);
 			} while (cursor.moveToNext());
 		}

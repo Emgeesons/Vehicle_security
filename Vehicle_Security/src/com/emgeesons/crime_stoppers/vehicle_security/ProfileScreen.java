@@ -130,20 +130,20 @@ public class ProfileScreen extends BaseActivity {
 		height = getWindowManager().getDefaultDisplay().getHeight();
 		int image_h = height * 30 / 100;
 		RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-				LayoutParams.WRAP_CONTENT, image_h);
+				LayoutParams.MATCH_PARENT, image_h);
 		relbg.setLayoutParams(parms);
 		info = new Data();
 		info.showInfo(getApplicationContext());
-		name.setText(info.fName + "" + info.lName);
+		name.setText(info.fName + " " + info.lName);
 		number.setText(info.mobileNumber);
 		email.setText(info.email);
 		pts.setText(info.spoints);
-		if (info.year == 0 || info.month == 0 || info.date == 0) {
-			age.setVisibility(View.GONE);
-		} else {
-			int AGe = info.getAge(info.year, info.month, info.date);
-			age.setText("," + AGe + " " + "Yrs");
-		}
+//		if (info.year == 0 || info.month == 0 || info.date == 0) {
+//			age.setVisibility(View.GONE);
+//		} else {
+//			int AGe = info.getAge(info.year, info.month, info.date);
+//			age.setText("," + AGe + " " + "Yrs");
+//		}
 
 		if (info.gender.equalsIgnoreCase("male")) {
 			gender.setImageResource(R.drawable.ic_male);
@@ -206,7 +206,7 @@ public class ProfileScreen extends BaseActivity {
 		}
 		vehicles = db.getVehicleData();
 		if (!(vehicles.size() == 0)) {
-			addvehicle.setText("My Vehicle");
+			addvehicle.setText("My Vehicles");
 		}
 
 		addvehicle.setOnClickListener(new OnClickListener() {
@@ -306,7 +306,11 @@ public class ProfileScreen extends BaseActivity {
 				public void run() {
 					Drawable d = (Drawable) Drawable.createFromPath(f
 							.get(count));
-
+					int image_hs = height * 30 / 100;
+					// RelativeLayout.LayoutParams parmss = new
+					// RelativeLayout.LayoutParams(
+					// LayoutParams.MATCH_PARENT, image_hs);
+					// bg.setLayoutParams(parmss);
 					bg.setImageDrawable(d);
 					count++;
 
@@ -315,7 +319,7 @@ public class ProfileScreen extends BaseActivity {
 						count = 0;
 					}
 
-					handlers.postDelayed(this, 1000); // for interval...
+					handlers.postDelayed(this, 3000); // for interval...
 				}
 			};
 			handlers.post(runnable);
@@ -372,7 +376,18 @@ public class ProfileScreen extends BaseActivity {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.middlebar));
 			status.setText("Add vehicles to your profile");
-			profile_comp.setText("Your profile is 50% complete");
+			profile_comp
+					.setText("Your profile is " + newprogress + " complete");
+			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
+					newprogress);
+			anim.setDuration(1000);
+			progress.setAnimation(anim);
+		} else if (newprogress == 60) {
+			progress.setProgressDrawable(getResources().getDrawable(
+					R.drawable.middlebar));
+			status.setText("Add license details and Add photo/insurance of vehicle");
+			profile_comp
+					.setText("Your profile is " + newprogress + " complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
@@ -380,17 +395,32 @@ public class ProfileScreen extends BaseActivity {
 		} else if (newprogress <= 80) {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.fourbar));
+			if (info.licenseNo.isEmpty()) {
+				status.setText("Add license details to your profile");
+			} else {
+				status.setText("Add photo/insurance of vehicle");
+			}
+
+			profile_comp.setText("Your profile is " + newprogress + " complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
 			progress.setAnimation(anim);
-
+		} else if (newprogress == 90) {
+			progress.setProgressDrawable(getResources().getDrawable(
+					R.drawable.fourbar));
+			status.setText("Add photo/insurance of vehicle");
+			profile_comp
+					.setText("Your profile is " + newprogress + " complete");
+			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
+					newprogress);
+			anim.setDuration(1000);
+			progress.setAnimation(anim);
 		} else {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.endbar));
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
-
 			anim.setDuration(1000);
 			progress.setAnimation(anim);
 		}
@@ -401,19 +431,19 @@ public class ProfileScreen extends BaseActivity {
 			profile_comp.setVisibility(View.GONE);
 
 		}
-		if (newprogress > 50) {
-			if (info.licenseNo.isEmpty()) {
-				profile_comp.setText("Your profile is  " + newprogress + " % "
-						+ "Complete");
-				status.setText("Complete your profile and add information about your vehicle now");
-
-			} else {
-				profile_comp.setText("Your profile is  " + newprogress + " % "
-						+ "Complete");
-				status.setText("Add information about your vehicle now");
-			}
-
-		}
+		// if (newprogress > 50) {
+		// if (info.licenseNo.isEmpty()) {
+		// profile_comp.setText("Your profile is  " + newprogress + " % "
+		// + "Complete");
+		// status.setText("Complete your profile and add information about your vehicle now");
+		//
+		// } else {
+		// profile_comp.setText("Your profile is  " + newprogress + " % "
+		// + "Complete");
+		// status.setText("Add information about your vehicle now");
+		// }
+		//
+		// }
 
 	}
 

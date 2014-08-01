@@ -30,17 +30,17 @@ import android.view.View.OnClickListener;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 import com.actionbarsherlock.view.MenuItem.OnMenuItemClickListener;
+import com.google.android.gms.internal.el;
 
 public class Editvehicle extends BaseActivity implements TextWatcher {
 	TextView type, body;
-	EditText type_other, make, model, reg, engine, chassis, colour, acc;
+	EditText type_other, make, model, reg, engine, chassis, colour, acc, state;
 	boolean btype, bbody, btype_other, bmake, bmodel, breg, beng, bchassis,
-			bcolour, bacc;
+			bcolour, bacc, bstate;
 	static int buffKey = 0;
 	static CharSequence[] vechtype, bodytype;
 	int tvech, tbody;
@@ -54,11 +54,12 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 	SQLiteDatabase dbb;
 	String id;
 	GPSTracker gps;
+	double LATITUDE, LONGITUDE;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-//		setContentView(R.layout.addvehicle);
+		// setContentView(R.layout.addvehicle);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'> Edit Details</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -75,8 +76,18 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		chassis = (EditText) findViewById(R.id.chassis);
 		colour = (EditText) findViewById(R.id.Colour);
 		acc = (EditText) findViewById(R.id.acc);
+		state = (EditText) findViewById(R.id.state);
 		info = new Data();
 		db = new DatabaseHandler(getApplicationContext());
+		gps = new GPSTracker(Editvehicle.this);
+		if (gps.canGetLocation()) {
+			LATITUDE = gps.getLatitude();
+			LONGITUDE = gps.getLongitude();
+
+		} else {
+			LATITUDE = 0.0;
+			LONGITUDE = 0.0;
+		}
 		try {
 
 			db.createDataBase();
@@ -102,6 +113,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		colour.setText(info.color);
 		acc.setText(info.acc);
 		reg.setText(info.reg);
+		state.setText(info.state);
 		bmake = true;
 		bmodel = true;
 		breg = true;
@@ -110,6 +122,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		bchassis = true;
 		btype_other = true;
 		bbody = true;
+		bstate = true;
 		vechtype = getResources().getStringArray(R.array.vech_type);
 		bodytype = getResources().getStringArray(R.array.body_type);
 		if (info.type.equalsIgnoreCase("Bicycle")) {
@@ -195,10 +208,31 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								if (type.getText().toString()
 										.equalsIgnoreCase("Other")) {
 									type_other.setVisibility(View.VISIBLE);
+									make.setHint("make");
+									model.setHint("model");
+									state.setVisibility(View.VISIBLE);
+									state.setHint("  state of registration");
+									reg.setHint("registration no");
 								} else {
 									type_other.setVisibility(View.GONE);
 								}
 
+								if (type.getText().toString()
+										.equalsIgnoreCase("Bicycle")) {
+									reg.setHint("serial no");
+									make.setHint("make");
+									model.setHint("model");
+									state.setVisibility(View.GONE);
+								}
+
+								if (type.getText().toString()
+										.equalsIgnoreCase("Car")
+										|| type.getText().toString()
+												.equalsIgnoreCase("MotorCycle")) {
+									reg.setHint("registration no*(max 10 chars)");
+									state.setVisibility(View.VISIBLE);
+									state.setHint("  state of registration*(max 3 chars) ");
+								}
 								if (type.getText().toString()
 										.equalsIgnoreCase("Car")) {
 									body.setVisibility(View.VISIBLE);
@@ -207,6 +241,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 									body.setVisibility(View.GONE);
 								}
 								btype = true;
+
 								dialog.dismiss();
 							}
 						}).setCancelable(false);
@@ -255,6 +290,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		engine.addTextChangedListener(this);
 		colour.addTextChangedListener(this);
 		type_other.addTextChangedListener(this);
+		state.addTextChangedListener(this);
 
 	}
 
@@ -272,7 +308,10 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
-					if (make.getText().toString().length() < 2) {
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							&& make.getText().toString().length() < 2) {
 
 						make.setTextColor(getResources().getColor(R.color.red));
 						make.setHintTextColor(getResources().getColor(
@@ -286,13 +325,87 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bmodel = false;
 					}
-					if (!(reg.getText().toString().length() == 10)) {
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+
+							&& (reg.getText().toString().trim().length() > 10)) {
 
 						reg.setTextColor(getResources().getColor(R.color.red));
 						reg.setHintTextColor(getResources().getColor(
 								R.color.red));
 						breg = false;
 					}
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+
+							&& (reg.getText().toString().trim().isEmpty())) {
+
+						reg.setTextColor(getResources().getColor(R.color.red));
+						reg.setHintTextColor(getResources().getColor(
+								R.color.red));
+						breg = false;
+					}
+
+					if ((type.getText().toString().equalsIgnoreCase("Other") && !reg
+							.getText().toString().isEmpty())
+							&& (reg.getText().toString().length() > 13)) {
+
+						reg.setTextColor(getResources().getColor(R.color.red));
+						reg.setHintTextColor(getResources().getColor(
+								R.color.red));
+						breg = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Bicycle") && !reg
+							.getText().toString().isEmpty())
+							&& (reg.getText().toString().length() > 13)) {
+
+						reg.setTextColor(getResources().getColor(R.color.red));
+						reg.setHintTextColor(getResources().getColor(
+								R.color.red));
+						breg = false;
+					}
+
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							&& (state.getText().toString().length() > 4)) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							&& (state.getText().toString().isEmpty())) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Other"))
+							&& !state.getText().toString().trim().isEmpty()
+							&& (state.getText().toString().length() > 4)) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Other") && !state
+							.getText().toString().isEmpty())
+							&& (state.getText().toString().length() > 13)) {
+
+						state.setTextColor(getResources().getColor(R.color.red));
+						state.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bstate = false;
+					}
+
 					if (colour.getText().toString().length() < 3) {
 
 						colour.setTextColor(getResources()
@@ -301,7 +414,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bcolour = false;
 					}
-					if (type.getText().toString().equalsIgnoreCase("Car")
+					if (!engine.getText().toString().isEmpty()
 
 					&& engine.getText().toString().length() < 13) {
 
@@ -311,17 +424,8 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						beng = false;
 					}
-					if (type.getText().toString()
-							.equalsIgnoreCase("MotorCycle")
-							&& engine.getText().toString().length() < 13) {
 
-						engine.setTextColor(getResources()
-								.getColor(R.color.red));
-						engine.setHintTextColor(getResources().getColor(
-								R.color.red));
-						beng = false;
-					}
-					if (type.getText().toString().equalsIgnoreCase("Car")
+					if (!chassis.getText().toString().isEmpty()
 
 					&& chassis.getText().toString().length() < 17) {
 
@@ -331,16 +435,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bchassis = false;
 					}
-					if (type.getText().toString()
-							.equalsIgnoreCase("MotorCycle")
-							&& chassis.getText().toString().length() < 17) {
 
-						chassis.setTextColor(getResources().getColor(
-								R.color.red));
-						chassis.setHintTextColor(getResources().getColor(
-								R.color.red));
-						bchassis = false;
-					}
 					if (type_other.getVisibility() == View.VISIBLE
 							&& type_other.getText().toString().length() < 3) {
 
@@ -360,17 +455,16 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 					if (body.getText().toString().isEmpty()
 							&& body.getVisibility() == View.VISIBLE) {
 
-						type.setTextColor(getResources().getColor(R.color.red));
-						type.setHintTextColor(getResources().getColor(
+						body.setTextColor(getResources().getColor(R.color.red));
+						body.setHintTextColor(getResources().getColor(
 								R.color.red));
-						btype = false;
+						bbody = false;
 					}
 
 					if (btype == true && bbody == true && btype_other == true
 							&& bmake == true && bmodel == true && breg == true
-							&& bchassis == true && bcolour == true
-							&& beng == true) {
-						Log.i("right", "enter");
+							&& bcolour == true && beng == true
+							&& bchassis == true && bstate == true) {
 						editVehicle = new edit().execute();
 
 					}
@@ -390,7 +484,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(Editvehicle.this);
-			pDialog.setMessage("Updating Vehicle Info");
+			pDialog.setMessage("Updating Vehicle Info...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -406,7 +500,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 			JSONArray jsonMainArr;
 			JSONObject json = new JSONObject();
 			try {
-				gps = new GPSTracker(Editvehicle.this);
+
 				info.device();
 				info.showInfo(getApplicationContext());
 				json.put("userId", info.user_id);
@@ -427,21 +521,16 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 				json.put("registrationSerialNo", reg.getText().toString());
 				json.put("engineNo", engine.getText().toString());
 				json.put("vinChassisNo", chassis.getText().toString());
+				json.put("state", state.getText().toString());
 				json.put("colour", colour.getText().toString());
 				json.put("uniqueFeatures", acc.getText().toString());
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
-				if (gps.canGetLocation()) {
-					double LATITUDE = gps.getLatitude();
-					double LONGITUDE = gps.getLongitude();
-					json.put("latitude", LATITUDE);
-					json.put("longitude", LONGITUDE);
 
-				} else {
-					json.put("latitude", 0);
-					json.put("longitude", 0);
-				}
+				json.put("latitude", LATITUDE);
+				json.put("longitude", LONGITUDE);
+
 				System.out.println("Elements-->" + json);
 				postMethod.setHeader("Content-Type", "application/json");
 				postMethod.setEntity(new ByteArrayEntity(json.toString()
@@ -489,6 +578,8 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								+ acc.getText().toString()
 								+ "',vehicle_reg = '"
 								+ reg.getText().toString()
+								+ "',vehicle_state = '"
+								+ state.getText().toString()
 								+ "'WHERE vehicle_id='" + id + "'");
 
 						dbbb.execSQL("UPDATE Vehicle_park SET type = '" + types
@@ -576,6 +667,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		colour.setTextColor(getResources().getColor(R.color.black));
 		chassis.setTextColor(getResources().getColor(R.color.black));
 		type_other.setTextColor(getResources().getColor(R.color.black));
+		state.setTextColor(getResources().getColor(R.color.black));
 		bmake = true;
 		bmodel = true;
 		breg = true;
@@ -584,6 +676,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		bchassis = true;
 		btype_other = true;
 		bbody = true;
+		bstate = true;
 
 	}
 
@@ -617,7 +710,6 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.addvehicle;
 	}
 

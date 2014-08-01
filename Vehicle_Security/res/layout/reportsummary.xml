@@ -378,11 +378,32 @@
                         android:text="TextView"
                         android:textSize="@dimen/medium_text" />
 
+                    <TextView
+                        android:id="@+id/state"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignLeft="@+id/accessories"
+                        android:layout_below="@+id/accessories"
+                        android:layout_marginTop="5dp"
+                        android:text="State Of Registration: "
+                        android:textColor="@color/light_black"
+                        android:textSize="@dimen/medium_text" />
+
+                    <TextView
+                        android:id="@+id/vstate"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBaseline="@+id/state"
+                        android:layout_alignBottom="@+id/state"
+                        android:layout_toRightOf="@+id/state"
+                        android:text="TextView"
+                        android:textSize="@dimen/medium_text" />
+
                     <RelativeLayout
                         android:id="@+id/ins"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/vacc"
+                        android:layout_below="@+id/state"
                         android:layout_marginTop="5dp" >
 
                         <RelativeLayout

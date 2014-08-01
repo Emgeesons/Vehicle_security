@@ -69,8 +69,7 @@ public class NotificationAlarm extends BroadcastReceiver {
 				// if (gc.getTimeInMillis() < times) {
 				System.out.println(String.valueOf(times) + ""
 						+ data.getvehicle_model());
-				NotificationSpawn.SetAlarm(context, times,
-						data.getvehicle_model());
+				NotificationSpawn.SetAlarm(context, times);
 			}
 			co++;
 			// }
