@@ -181,7 +181,9 @@ public class HomescreenActivity extends SherlockFragment implements
 		if (!(vehicles.size() == 0)) {
 
 			for (int i = 0; i < vehicles.size(); i++) {
-				name.add(vehicles.get(i).getvehicle_model());
+				// check = make
+				name.add(vehicles.get(i).getcheck() + " "
+						+ vehicles.get(i).getvehicle_model());
 				no.add(vehicles.get(i).getvehicle_id());
 				type.add(vehicles.get(i).gettype());
 			}
@@ -221,8 +223,8 @@ public class HomescreenActivity extends SherlockFragment implements
 		getSherlockActivity().getSupportActionBar().setListNavigationCallbacks(
 				adapter, navigationListener);
 		adapter.setDropDownViewResource(R.layout.nav_item);
-		//Get selected pos for spinner
-		if (!atPrefs.getBoolean(info.checkllogin, true) && type.size()>1 ) {
+		// Get selected pos for spinner
+		if (!atPrefs.getBoolean(info.checkllogin, true) && type.size() > 1) {
 			getSherlockActivity().getSupportActionBar()
 					.setSelectedNavigationItem(atPrefs.getInt("selected", 0));
 		}
@@ -404,7 +406,6 @@ public class HomescreenActivity extends SherlockFragment implements
 	}
 
 	static void checkupdate() {
-		// TODO Auto-generated method stub
 		RelativeLayout updates;
 		updates = (RelativeLayout) view.findViewById(R.id.updatesc);
 		int no = atPrefs.getInt("updates", 0);
@@ -625,7 +626,6 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	@Override
 	public void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 	}
 
@@ -1102,7 +1102,6 @@ public class HomescreenActivity extends SherlockFragment implements
 				alert = builder.create();
 				alert.show();
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 
 		}

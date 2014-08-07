@@ -108,7 +108,7 @@
         </EditText>
 
         <EditText
-            android:id="@+id/engine"
+            android:id="@+id/state"
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_alignLeft="@+id/registration"
@@ -117,7 +117,20 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  engine no "
+            android:hint="   state of registration " >
+        </EditText>
+
+        <EditText
+            android:id="@+id/engine"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignLeft="@+id/state"
+            android:layout_alignRight="@+id/state"
+            android:layout_below="@+id/state"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/box_gry"
+            android:ems="10"
+            android:hint=" VIN/engine no "
             android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
@@ -165,19 +178,6 @@
             android:hint="  accessories / unique features"
             android:paddingLeft="10dp"
             android:singleLine="true" >
-        </EditText>
-
-        <EditText
-            android:id="@+id/state"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:layout_alignLeft="@+id/acc "
-            android:layout_alignRight="@+id/acc "
-            android:layout_below="@+id/acc "
-            android:layout_marginTop="10dp"
-            android:background="@drawable/box_gry"
-            android:ems="10"
-            android:hint="   state of registration " >
         </EditText>
     </RelativeLayout>
 

@@ -127,7 +127,7 @@
         android:layout_below="@+id/relativeLayout3"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"
-        android:text="Be Security Smart right from the Start"
+        android:text="Be Security Smart right from the start"
         android:textColor="#c7c8c7" />
 
     <RelativeLayout
@@ -174,10 +174,10 @@
         android:layout_above="@+id/relativeLayout5"
         android:layout_alignLeft="@+id/listView1"
         android:layout_alignRight="@+id/relativeLayout4"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="15dp"
         android:ems="10"
         android:drawableLeft="@drawable/edit_white"
-        android:hint=" eg: parking level 2,A7"
+        android:hint=" Add comment(eg: parking level 2,A7)"
         android:singleLine="true"
         android:textColor="@color/white" >
 

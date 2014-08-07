@@ -33,8 +33,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -58,7 +60,6 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.view.MenuItem;
-import com.google.android.gms.internal.el;
 
 public class ProfileScreen extends BaseActivity {
 	TextView name, age, number, email, profile_comp, pts, samaritan, status;
@@ -138,12 +139,12 @@ public class ProfileScreen extends BaseActivity {
 		number.setText(info.mobileNumber);
 		email.setText(info.email);
 		pts.setText(info.spoints);
-//		if (info.year == 0 || info.month == 0 || info.date == 0) {
-//			age.setVisibility(View.GONE);
-//		} else {
-//			int AGe = info.getAge(info.year, info.month, info.date);
-//			age.setText("," + AGe + " " + "Yrs");
-//		}
+		// if (info.year == 0 || info.month == 0 || info.date == 0) {
+		// age.setVisibility(View.GONE);
+		// } else {
+		// int AGe = info.getAge(info.year, info.month, info.date);
+		// age.setText("," + AGe + " " + "Yrs");
+		// }
 
 		if (info.gender.equalsIgnoreCase("male")) {
 			gender.setImageResource(R.drawable.ic_male);
@@ -306,10 +307,10 @@ public class ProfileScreen extends BaseActivity {
 				public void run() {
 					Drawable d = (Drawable) Drawable.createFromPath(f
 							.get(count));
-					int image_hs = height * 30 / 100;
+					// int image_hs = height * 30 / 100;
 					// RelativeLayout.LayoutParams parmss = new
 					// RelativeLayout.LayoutParams(
-					// LayoutParams.MATCH_PARENT, image_hs);
+					// LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 					// bg.setLayoutParams(parmss);
 					bg.setImageDrawable(d);
 					count++;
@@ -376,8 +377,8 @@ public class ProfileScreen extends BaseActivity {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.middlebar));
 			status.setText("Add vehicles to your profile");
-			profile_comp
-					.setText("Your profile is " + newprogress + " complete");
+			profile_comp.setText("Your profile is " + newprogress + "%"
+					+ " complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
@@ -386,8 +387,8 @@ public class ProfileScreen extends BaseActivity {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.middlebar));
 			status.setText("Add license details and Add photo/insurance of vehicle");
-			profile_comp
-					.setText("Your profile is " + newprogress + " complete");
+			profile_comp.setText("Your profile is " + newprogress + "%"
+					+ " complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
@@ -401,7 +402,8 @@ public class ProfileScreen extends BaseActivity {
 				status.setText("Add photo/insurance of vehicle");
 			}
 
-			profile_comp.setText("Your profile is " + newprogress + " complete");
+			profile_comp.setText("Your profile is " + newprogress + "%"
+					+ " complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
@@ -410,8 +412,8 @@ public class ProfileScreen extends BaseActivity {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.fourbar));
 			status.setText("Add photo/insurance of vehicle");
-			profile_comp
-					.setText("Your profile is " + newprogress + " complete");
+			profile_comp.setText("Your profile is " + newprogress + "%"
+					+ " complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
 					newprogress);
 			anim.setDuration(1000);
@@ -470,7 +472,7 @@ public class ProfileScreen extends BaseActivity {
 		File f = new File(sdRoot, dir + names);
 
 		if (names.isEmpty()) {
-			profilepic.setImageResource(R.drawable.default_profile);
+			profilepic.setImageResource(R.drawable.add_photo_profile);
 		} else {
 
 			if (f.exists()) {
@@ -478,7 +480,7 @@ public class ProfileScreen extends BaseActivity {
 				Bitmap photo = (Bitmap) decodeFile(imagepath);
 				profilepic.setImageBitmap(photo);
 			} else {
-				profilepic.setImageResource(R.drawable.default_profile);
+				profilepic.setImageResource(R.drawable.add_photo_profile);
 			}
 		}
 	}
@@ -524,10 +526,37 @@ public class ProfileScreen extends BaseActivity {
 
 				imagepath = getImagePath();
 				Bitmap photo = (Bitmap) decodeFile(imagepath);
+				int rotate = 0;
+				try {
+					File imageFile = new File(imagepath);
+					ExifInterface exif = new ExifInterface(
+							imageFile.getAbsolutePath());
+					int orientation = exif.getAttributeInt(
+							ExifInterface.TAG_ORIENTATION,
+							ExifInterface.ORIENTATION_NORMAL);
+
+					switch (orientation) {
+					case ExifInterface.ORIENTATION_ROTATE_270:
+						rotate = 270;
+						break;
+					case ExifInterface.ORIENTATION_ROTATE_180:
+						rotate = 180;
+						break;
+					case ExifInterface.ORIENTATION_ROTATE_90:
+						rotate = 90;
+						break;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Matrix matrix = new Matrix();
+				matrix.postRotate(rotate);
+				photo = Bitmap.createBitmap(photo, 0, 0, photo.getWidth(),
+						photo.getHeight(), matrix, true);
 				photo = Bitmap.createScaledBitmap(photo, 200, 200, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-				File f = new File(sdRoot, dir + "profilePic.png");
+				File f = new File(sdRoot, dir + "profile.png");
 				try {
 
 					f.createNewFile();
@@ -537,7 +566,6 @@ public class ProfileScreen extends BaseActivity {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
-
 				imagepath = f.getAbsolutePath();
 				photo = (Bitmap) decodeFile(imagepath);
 				profilepic.setImageBitmap(photo);
@@ -605,7 +633,7 @@ public class ProfileScreen extends BaseActivity {
 	public Uri setImageUri() {
 		File file = new File(Environment.getExternalStorageDirectory()
 				+ File.separator + "profile.jpg");
-
+		// File file = new File(sdRoot, dir + "profilePic.jpg");
 		Uri imgUri = Uri.fromFile(file);
 		imgPath = file.getAbsolutePath();
 		return imgUri;
@@ -667,9 +695,9 @@ public class ProfileScreen extends BaseActivity {
 			} catch (Exception e) {
 			}
 
-			String photoName = "profilePic.png";
+			String photoName = "profile.png";
 			// change image name
-			File photo = new File(sdRoot, dir + "profilePic.png");
+			File photo = new File(sdRoot, dir + "profile.png");
 			while (photo.exists()) {
 				photoName = names;
 				photo.renameTo(new File(sdRoot, dir + photoName));
@@ -757,7 +785,6 @@ public class ProfileScreen extends BaseActivity {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.profilescreen;
 	}
 }

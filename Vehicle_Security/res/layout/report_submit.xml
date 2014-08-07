@@ -43,7 +43,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="62dp"
         android:gravity="center"
-        android:text="The community will now try their best to help you get your vehile back"
+        android:text="The community will now try their best to help you get your vehicle back"
         android:textColor="@color/light_black"
         android:textSize="@dimen/regular_text" />
 

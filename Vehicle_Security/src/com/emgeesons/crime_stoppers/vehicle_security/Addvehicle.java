@@ -128,7 +128,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 										.equalsIgnoreCase("Bicycle")) {
 									reg.setHint("serial no");
 									make.setHint("make");
-									model.setHint("model*");
+									model.setHint("model");
 									state.setVisibility(View.GONE);
 								}
 
@@ -225,13 +225,31 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bmake = false;
 					}
-					if (model.getText().toString().length() < 2) {
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							&& model.getText().toString().length() < 2) {
 
 						model.setTextColor(getResources().getColor(R.color.red));
 						model.setHintTextColor(getResources().getColor(
 								R.color.red));
+
 						bmodel = false;
 					}
+					if ((type.getText().toString().equalsIgnoreCase("Bicycle"))
+							&& (model.getText().toString().trim().isEmpty() && make
+									.getText().toString().trim().isEmpty())) {
+
+						model.setTextColor(getResources().getColor(R.color.red));
+						model.setHintTextColor(getResources().getColor(
+								R.color.red));
+						make.setTextColor(getResources().getColor(R.color.red));
+						make.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bmake = false;
+						bmodel = false;
+					}
+
 					if ((type.getText().toString().equalsIgnoreCase("Car") || type
 							.getText().toString()
 							.equalsIgnoreCase("MotorCycle"))
@@ -471,12 +489,11 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 										.toString(), colour.getText()
 										.toString(), acc.getText().toString(),
 								reg.getText().toString(), "", "", "", "", "",
-								"",state.getText()
-								.toString());
-
+								"", state.getText().toString());
+						// check = make
 						ParkingData datas = new ParkingData(vid, model
-								.getText().toString(), "", "", "", "",
-								typevalue);
+								.getText().toString(), "", "", "", make
+								.getText().toString(), typevalue);
 						db.inserparkData(datas);
 						db.insertvehicleData(data);
 						// SQLiteDatabase dbbb = db.getReadableDatabase();
@@ -600,7 +617,6 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 			// app icon @ action bar clicked; go home
 			Intent next = new Intent(getApplicationContext(),
 					ProfileScreen.class);
-
 			startActivity(next);
 			finish();
 			break;

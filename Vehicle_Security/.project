@@ -30,4 +30,11 @@
 		<nature>com.android.ide.eclipse.adt.AndroidNature</nature>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>res/drawable-xxxhdpi/ic_coachmark.png</name>
+			<type>1</type>
+			<location>C:/Documents and Settings/Gaurav/My Documents/Google Drive/Crime Stoppers/05 - b Coach Mark/UI Elements/icons@4x/ic_coachmark.png</location>
+		</link>
+	</linkedResources>
 </projectDescription>

@@ -200,7 +200,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		case 4:
 
 			String message;
-			message = "Check out My Wheels by Crime Stoppers, South Australia. Download it from - https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
+			message = "Check out My Wheel by Crime Stoppers, South Australia. Download it from - https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
 			Intent share = new Intent(Intent.ACTION_SEND);
 			share.setType("text/plain");
 			share.putExtra(Intent.EXTRA_TEXT, message);
@@ -223,7 +223,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 			builder.setMessage("Are you sure you want to Logout?")
 					.setCancelable(false)
 					.setMessage(
-							"Logging out of the App will erase all User data.")
+							"Are you sure you want to logout")
 					.setNegativeButton("Cancel",
 							new DialogInterface.OnClickListener() {
 
@@ -239,6 +239,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 								public void onClick(DialogInterface dialog,
 										int id) {
 									PushManager.disablePush();
+
 									SplashscreenActivity.fblogin = true;
 									atPrefs.edit()
 											.putBoolean(info.checkllogin, true)
@@ -256,6 +257,8 @@ public class MainActivity extends SherlockFragmentActivity implements
 											.putString(
 													SplashscreenActivity.profile_pic,
 													"").commit();
+									atPrefs.edit().putBoolean(Data.coach, true)
+											.commit();
 									atPrefs.edit().putInt("selected", 0)
 											.commit();
 									atPrefs.edit().putInt("updates", 0)

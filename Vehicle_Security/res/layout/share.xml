@@ -85,7 +85,7 @@
             android:layout_marginRight="5dp"
             android:layout_weight="1"
             android:background="@drawable/blue_button"
-            android:text="post"
+            android:text="Share"
             android:textColor="@color/white" />
     </LinearLayout>
 

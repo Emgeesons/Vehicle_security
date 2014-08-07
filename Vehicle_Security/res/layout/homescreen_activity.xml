@@ -92,7 +92,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_weight="1"
                         android:gravity="center"
-                        android:text="Find my car"
+                        android:text="Find my vehicle"
                         android:textColor="@color/blue_text"
                         android:textSize="@dimen/medium_text" />
                 </RelativeLayout>
@@ -175,7 +175,7 @@
                 android:layout_alignLeft="@+id/textView1"
                 android:layout_below="@+id/textView1"
                 android:layout_marginTop="5dp"
-                android:text="theft and vandalism"
+                android:text="theft or vandalism"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/smaller_text" />
 

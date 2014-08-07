@@ -154,7 +154,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 						SQLiteDatabase dbbb = db.getReadableDatabase();
 						dbbb.execSQL("UPDATE profile SET licenseNo = '"
 								+ lnumber.getText().toString()
-								+ "',address = '"
+								+ "',street = '"
 								+ address.getText().toString()
 								+ "',postcode = '"
 								+ postcode.getText().toString() + "'");

@@ -45,14 +45,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.FailReason;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
@@ -374,7 +368,6 @@ public class Myupdates extends Fragment {
 	}
 
 	private void recoverfun() {
-		// TODO Auto-generated method stub
 		main.setVisibility(View.GONE);
 		Vrecover.setVisibility(View.VISIBLE);
 		TextView rname, rreg, rdate, rtime, rlocation, rrdate, rrtime, rrloc;
@@ -624,7 +617,6 @@ public class Myupdates extends Fragment {
 										+ datespilt[1];
 								onchange();
 							} catch (JSONException e) {
-								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
 
@@ -637,19 +629,25 @@ public class Myupdates extends Fragment {
 
 						addetails.setVisibility(View.GONE);
 						main.setVisibility(View.VISIBLE);
-						if (status.equalsIgnoreCase("recovered")) {
-							report_type = "Recovered";
-							rtype.setTextColor(getResources().getColor(
-									R.color.green));
-							recoverfun();
-						} else {
-							if ((jsonarr.length() < 1)) {
-								noupdate.setVisibility(View.VISIBLE);
-								data.setAdapter(new ffAdapter());
-							} else {
-								noupdate.setVisibility(View.INVISIBLE);
-								data.setAdapter(new ffAdapter());
+
+						if ((jsonarr.length() < 1)) {
+							if (status.equalsIgnoreCase("recovered")) {
+								report_type = "Recovered";
+								rtype.setTextColor(getResources().getColor(
+										R.color.green));
+								recoverfun();
 							}
+							noupdate.setVisibility(View.VISIBLE);
+							data.setAdapter(new ffAdapter());
+						} else {
+							if (status.equalsIgnoreCase("recovered")) {
+								report_type = "Recovered";
+								rtype.setTextColor(getResources().getColor(
+										R.color.green));
+								recoverfun();
+							}
+							noupdate.setVisibility(View.INVISIBLE);
+							data.setAdapter(new ffAdapter());
 						}
 
 					}

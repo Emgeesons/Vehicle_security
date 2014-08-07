@@ -67,7 +67,8 @@ public class Otherupdates extends Fragment {
 	private AsyncTask<Void, Void, Void> vinfo;
 	String otherUpdates_url = Data.url + "otherUpdates.php";
 	String DetailsUpdates_url = Data.url + "otherUpdatesDetails.php", vid,
-			vmake, vmodel, vreg, vdate, vtime, vcomm, vloc, rtype, vtypes;
+			vmake, vmodel, vreg, vdate, vtime, vcomm, vloc, rtype, vtypes,
+			spic1, spic2, spic3;
 	private ProgressBar pBar;
 	Data info;
 	GPSTracker gps;
@@ -101,7 +102,8 @@ public class Otherupdates extends Fragment {
 		cd = new Connection_Detector(getActivity());
 		Updates.imageLoader = ImageLoader.getInstance();
 		options = new DisplayImageOptions.Builder().cacheInMemory(true)
-				.cacheOnDisk(true).considerExifParams(true).showImageOnLoading(R.drawable.add_photos_grey)
+				.cacheOnDisk(true).considerExifParams(true)
+				.showImageOnLoading(R.drawable.add_photos_grey)
 				.displayer(new RoundedBitmapDisplayer(50)).build();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 		pBar = (ProgressBar) rootView.findViewById(R.id.progressBar1);
@@ -204,7 +206,7 @@ public class Otherupdates extends Fragment {
 				json.put("make", info.manufacturer);
 				json.put("os", "Android" + " " + info.Version);
 				json.put("model", info.model);
-				
+
 				json.put("latitude", LATITUDE);
 				json.put("longitude", LONGITUDE);
 				json.put("countReports", rsize);
@@ -477,6 +479,9 @@ public class Otherupdates extends Fragment {
 						vloc = testimonialData.get(position).getsloc();
 						vtypes = testimonialData.get(position).getVtype();
 						rtype = testimonialData.get(position).getRtype();
+						spic1 = testimonialData.get(position).getp1();
+						spic2 = testimonialData.get(position).getp2();
+						spic3 = testimonialData.get(position).getp3();
 						IsInternetPresent = cd.isConnectingToInternet();
 						if (IsInternetPresent == false) {
 							cd.showNoInternetPopup();
@@ -563,9 +568,9 @@ public class Otherupdates extends Fragment {
 				getActivity().runOnUiThread(new Runnable() {
 
 					public void run() {
-
-						TextView name, reg, type, date, time, location;
-						ImageView vtype, locicon;
+						ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+						TextView name, reg, type, date, time, location, comm;
+						ImageView vtype, locicon, pic1, pic2, pic3;
 						Button report;
 						pBar.setVisibility(View.GONE);
 						// String[] datespilt = selected_time.split("\\:");
@@ -583,8 +588,12 @@ public class Otherupdates extends Fragment {
 						date = (TextView) v.findViewById(R.id.date);
 						time = (TextView) v.findViewById(R.id.time);
 						location = (TextView) v.findViewById(R.id.location);
+						comm = (TextView) v.findViewById(R.id.comm);
 						vtype = (ImageView) v.findViewById(R.id.vtype);
 						locicon = (ImageView) v.findViewById(R.id.imageView2);
+						pic1 = (ImageView) v.findViewById(R.id.pic1);
+						pic3 = (ImageView) v.findViewById(R.id.pic3);
+						pic2 = (ImageView) v.findViewById(R.id.pic2);
 						data1.setVisibility(View.VISIBLE);
 						data1.addHeaderView(v);
 						if (jsonarr.length() == 0) {
@@ -628,12 +637,55 @@ public class Otherupdates extends Fragment {
 						date.setText(dateformate(vdate));
 						time.setText(selected_time);
 						location.setText(vloc);
+						comm.setText(vcomm);
+
+						String s[] = { spic1, spic2, spic3 };
+						ImageView arr[] = { pic1, pic2, pic3 };
+						for (int i = 0; i < s.length; i++) {
+							Updates.imageLoader.displayImage(s[i], arr[i],
+									options, animateFirstListener);
+							arr[i].setVisibility(View.VISIBLE);
+							if (s[i].isEmpty()) {
+								arr[i].setVisibility(View.GONE);
+							}
+						}
 
 						if (location.getText().toString().isEmpty()) {
 							location.setVisibility(View.GONE);
 							locicon.setVisibility(View.GONE);
 						}
+						pic1.setOnClickListener(new OnClickListener() {
 
+							@Override
+							public void onClick(View v) {
+								Intent intent = new Intent(getActivity(),
+										Fullimage.class);
+								intent.putExtra("IMAGES", spic1);
+								startActivity(intent);
+							}
+						});
+						pic2.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								Intent intent = new Intent(getActivity(),
+										Fullimage.class);
+								intent.putExtra("IMAGES", spic2);
+								startActivity(intent);
+
+							}
+						});
+						pic3.setOnClickListener(new OnClickListener() {
+
+							@Override
+							public void onClick(View v) {
+								Intent intent = new Intent(getActivity(),
+										Fullimage.class);
+								intent.putExtra("IMAGES", spic3);
+								startActivity(intent);
+
+							}
+						});
 						if (vtypes.equalsIgnoreCase("Car")) {
 							vtype.setImageResource(R.drawable.ic_car);
 						} else if (vtypes.equalsIgnoreCase("Bicycle")) {

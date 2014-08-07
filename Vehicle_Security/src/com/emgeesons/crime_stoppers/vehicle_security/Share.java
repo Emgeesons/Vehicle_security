@@ -14,9 +14,11 @@ import twitter4j.TwitterException;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -24,6 +26,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -70,6 +73,7 @@ public class Share extends BaseActivity {
 	String fphoto, tphoto;
 	public static final String Shares = "Shares";
 	ProgressDialog pDialog;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -157,60 +161,85 @@ public class Share extends BaseActivity {
 			@Override
 			public void onClick(View arg0) {
 				// twitter post
-				Editor editor = sharepreferences.edit();
 
-				editor.remove("facebook").commit();
-				editor.remove("twitter").commit();
-				editor.remove("fb").commit();
-				editor.remove("tw").commit();
-//				Thread thread = new Thread() {
-//					@Override
-//					public void run() {
+				if (!tw.isChecked() && !fb.isChecked()) {
 
-						if (tw.isChecked()) {
+					AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+							Share.this);
 
-							new TwitterUpdateStatusTask().execute(twtext
-									.getText().toString());
-						}
-						// fb post
-						if (fb.isChecked()) {
+					// alertDialog.setTitle("Location Access Required");
+					alertDialog
+							.setMessage("Please select facebook or twitter to share");
 
-							Session session = Session.getActiveSession();
-							session = Session
-									.openActiveSessionFromCache(Share.this);
-							Bundle postParams = new Bundle();
-							postParams.putString("message", fbtext.getText()
-									.toString() + " " + "#MyWheels");
-							postParams.putString("name", "My Wheel");
-							if (!fphoto.equalsIgnoreCase("fphoto")) {
-								postParams.putString("picture", fphoto);
-								postParams.putString("link", "https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security");
-							} else {
-
-							}
-
-							final Request request = new Request(session,
-									"me/feed", postParams, HttpMethod.POST,
-									callback);
-							runOnUiThread(new Runnable() {
-								public void run() {
-
-									RequestAsyncTask task = new RequestAsyncTask(
-											request);
-									task.execute();
+					alertDialog.setPositiveButton("Ok",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									dialog.dismiss();
 								}
 							});
+
+					// Showing Alert Message
+					alertDialog.show();
+
+				} else {
+					Editor editor = sharepreferences.edit();
+
+					editor.remove("facebook").commit();
+					editor.remove("twitter").commit();
+					editor.remove("fb").commit();
+					editor.remove("tw").commit();
+					// Thread thread = new Thread() {
+					// @Override
+					// public void run() {
+
+					if (tw.isChecked()) {
+
+						new TwitterUpdateStatusTask().execute(twtext.getText()
+								.toString());
+					}
+					// fb post
+					if (fb.isChecked()) {
+
+						Session session = Session.getActiveSession();
+						session = Session
+								.openActiveSessionFromCache(Share.this);
+						Bundle postParams = new Bundle();
+						postParams.putString("message", fbtext.getText()
+								.toString() + " " + "#MyWheels");
+						postParams.putString("name", "My Wheel");
+						if (!fphoto.equalsIgnoreCase("fphoto")) {
+							postParams.putString("picture", fphoto);
+							postParams
+									.putString(
+											"link",
+											"https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security");
+						} else {
+
 						}
-//					}
-//				};
-//
-//				thread.start();
-				pDialog = new ProgressDialog(Share.this);
-				pDialog.setMessage("Sharing...");
-				pDialog.setIndeterminate(false);
-				pDialog.setCancelable(false);
-				pDialog.show();
-				
+
+						final Request request = new Request(session, "me/feed",
+								postParams, HttpMethod.POST, callback);
+						runOnUiThread(new Runnable() {
+							public void run() {
+
+								RequestAsyncTask task = new RequestAsyncTask(
+										request);
+								task.execute();
+							}
+						});
+					}
+					// }
+					// };
+					//
+					// thread.start();
+					pDialog = new ProgressDialog(Share.this);
+					pDialog.setMessage("Sharing...");
+					pDialog.setIndeterminate(false);
+					pDialog.setCancelable(true);
+					pDialog.show();
+				}
+
 			}
 		});
 		initControl();
@@ -504,8 +533,8 @@ public class Share extends BaseActivity {
 					// requestToken.getAuthenticationURL());
 					// startActivity(intent);
 					// finish();
-//					Toast.makeText(getApplicationContext(), "enter",
-//							Toast.LENGTH_LONG).show();
+					// Toast.makeText(getApplicationContext(), "enter",
+					// Toast.LENGTH_LONG).show();
 				}
 			}
 		}
@@ -532,8 +561,8 @@ public class Share extends BaseActivity {
 						error.getErrorMessage(), Toast.LENGTH_SHORT).show();
 			} else {
 
-//				Toast.makeText(getApplicationContext(), postId,
-//						Toast.LENGTH_LONG).show();
+				// Toast.makeText(getApplicationContext(), postId,
+				// Toast.LENGTH_LONG).show();
 				gotonext();
 			}
 		}

@@ -300,6 +300,21 @@ public class Reportsummary extends SherlockActivity {
 			ee.setVisibility(View.GONE);
 			vstate.setVisibility(View.GONE);
 		}
+		Button in = (Button) findViewById(R.id.inscall);
+		if (!insurance_company_number.isEmpty()) {
+			in.setOnClickListener(new OnClickListener() {
+
+				@Override
+				public void onClick(View arg0) {
+					// TODO Auto-generated method stub
+					Intent call = new Intent(Intent.ACTION_CALL);
+					call.setData(Uri.parse("tel:" + insurance_company_number));
+					startActivity(call);
+				}
+			});
+		} else {
+			in.setVisibility(View.GONE);
+		}
 
 	}
 

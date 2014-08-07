@@ -42,11 +42,13 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -431,9 +433,9 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 					}
 					if ((reg.getText().toString().isEmpty())) {
 
-						reg.setTextColor(getResources().getColor(R.color.red));
-						reg.setHintTextColor(getResources().getColor(
-								R.color.red));
+						// reg.setTextColor(getResources().getColor(R.color.red));
+						// reg.setHintTextColor(getResources().getColor(
+						// R.color.red));
 						breg = false;
 					}
 					if (color.getText().toString().length() < 3) {
@@ -449,6 +451,28 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 						type.setHintTextColor(getResources().getColor(
 								R.color.red));
 						btype = false;
+					}
+					if (!type.getText().toString().isEmpty()
+							&& (breg == false && bcolor == false
+									&& bmake == false && bmodel == false)) {
+						AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+								ReportSighting.this);
+
+						// alertDialog.setTitle("Location Access Required");
+						alertDialog
+								.setMessage("Please fill in at least one more field");
+
+						alertDialog.setPositiveButton("Ok",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int which) {
+										dialog.dismiss();
+									}
+								});
+
+						// Showing Alert Message
+						alertDialog.show();
+
 					}
 					if (btype == true) {
 						if (breg == true || bcolor == true || bmake == true
@@ -773,6 +797,33 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 
 				imagepath = getImagePath();
 				photo = (Bitmap) decodeFile(imagepath);
+				int rotate = 0;
+				try {
+					File imageFile = new File(imagepath);
+					ExifInterface exif = new ExifInterface(
+							imageFile.getAbsolutePath());
+					int orientation = exif.getAttributeInt(
+							ExifInterface.TAG_ORIENTATION,
+							ExifInterface.ORIENTATION_NORMAL);
+
+					switch (orientation) {
+					case ExifInterface.ORIENTATION_ROTATE_270:
+						rotate = 270;
+						break;
+					case ExifInterface.ORIENTATION_ROTATE_180:
+						rotate = 180;
+						break;
+					case ExifInterface.ORIENTATION_ROTATE_90:
+						rotate = 90;
+						break;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Matrix matrix = new Matrix();
+				matrix.postRotate(rotate);
+				photo = Bitmap.createBitmap(photo, 0, 0, photo.getWidth(),
+						photo.getHeight(), matrix, true);
 				// photo = Bitmap.createScaledBitmap(photo, 74, 74, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);

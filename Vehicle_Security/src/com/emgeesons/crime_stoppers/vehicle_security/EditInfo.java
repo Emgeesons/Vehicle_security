@@ -399,14 +399,14 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
-					if (fname.getText().toString().trim().length() < 3) {
+					if (fname.getText().toString().trim().length() < 2) {
 
 						fname.setTextColor(getResources().getColor(R.color.red));
 						fname.setHintTextColor(getResources().getColor(
 								R.color.red));
 						bfname = false;
 					}
-					if (lname.getText().toString().trim().length() < 3) {
+					if (lname.getText().toString().trim().length() < 2) {
 						lname.setTextColor(getResources().getColor(R.color.red));
 						lname.setHintTextColor(getResources().getColor(
 								R.color.red));

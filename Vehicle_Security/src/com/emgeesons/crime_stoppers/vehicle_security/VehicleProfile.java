@@ -40,7 +40,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.drawable.ColorDrawable;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorManager;
+import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -52,14 +57,13 @@ import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.RotateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
-import com.google.android.gms.internal.el;
 
 public class VehicleProfile extends BaseActivity {
 	TextView title, reg, type, make, model, body, eng, vin, color, acc, cname,
@@ -128,6 +132,7 @@ public class VehicleProfile extends BaseActivity {
 		pic2 = (CircularImageView) findViewById(R.id.pic2);
 		pic3 = (CircularImageView) findViewById(R.id.pic3);
 		Delete = (Button) findViewById(R.id.Delete);
+
 		Intent intent = getIntent();
 		id = intent.getStringExtra("id");
 		info = new Data();
@@ -566,6 +571,34 @@ public class VehicleProfile extends BaseActivity {
 
 				imagepath = getImagePath();
 				photo = (Bitmap) decodeFile(imagepath);
+				int rotate = 0;
+				try {
+					File imageFile = new File(imagepath);
+					ExifInterface exif = new ExifInterface(
+							imageFile.getAbsolutePath());
+					int orientation = exif.getAttributeInt(
+							ExifInterface.TAG_ORIENTATION,
+							ExifInterface.ORIENTATION_NORMAL);
+
+					switch (orientation) {
+					case ExifInterface.ORIENTATION_ROTATE_270:
+						rotate = 270;
+						break;
+					case ExifInterface.ORIENTATION_ROTATE_180:
+						rotate = 180;
+						break;
+					case ExifInterface.ORIENTATION_ROTATE_90:
+						rotate = 90;
+						break;
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				Matrix matrix = new Matrix();
+				matrix.postRotate(rotate);
+				photo = Bitmap.createBitmap(photo, 0, 0, photo.getWidth(),
+						photo.getHeight(), matrix, true);
+
 				// photo = Bitmap.createScaledBitmap(photo, 100, 100, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
@@ -581,6 +614,7 @@ public class VehicleProfile extends BaseActivity {
 				}
 
 				imagepath = f.getAbsolutePath();
+
 				setpic();
 
 			}
@@ -877,6 +911,7 @@ public class VehicleProfile extends BaseActivity {
 				photo.renameTo(new File(sdRoot, dir + photoName));
 
 			}
+
 			checkpic();
 
 		}
@@ -938,7 +973,7 @@ public class VehicleProfile extends BaseActivity {
 			o.inJustDecodeBounds = true;
 			BitmapFactory.decodeFile(path, o);
 			// The new size we want to scale to
-			final int REQUIRED_SIZE = 400;
+			final int REQUIRED_SIZE = 600;
 
 			// Find the correct scale value. It should be the power of 2.
 			int scale = 1;
@@ -1215,4 +1250,5 @@ public class VehicleProfile extends BaseActivity {
 		// dbb.close();
 		super.onPause();
 	}
+
 }

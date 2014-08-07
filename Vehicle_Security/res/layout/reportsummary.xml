@@ -6,13 +6,13 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/call"
+        android:layout_above="@+id/s"
         android:fillViewport="true"
         android:scrollbars="none" >
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
+            android:layout_height="match_parent" >
 
             <RelativeLayout
                 android:id="@+id/basic"
@@ -510,15 +510,39 @@
         </RelativeLayout>
     </ScrollView>
 
-    <Button
-        android:id="@+id/call"
+    <LinearLayout
+        android:id="@+id/s"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/blue_button"
-        android:text="Call Police"
-        android:textColor="@color/white" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:gravity="center"
+        android:weightSum="2" >
+
+        <Button
+            android:id="@+id/call"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/blue_button"
+            android:gravity="center"
+            android:text="Call Police"
+            android:textColor="@color/white" />
+
+        <Button
+            android:id="@+id/inscall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/blue_button"
+            android:gravity="center"
+            android:text="Call Insurer"
+            android:textColor="@color/white" />
+    </LinearLayout>
 
 </RelativeLayout>

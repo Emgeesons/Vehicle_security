@@ -56,7 +56,7 @@
                 android:layout_alignLeft="@+id/imagetype"
                 android:layout_below="@+id/relativeLayout1"
                 android:layout_marginTop="14dp"
-                android:text="Vehicle Type:"
+                android:text="Vehicle Type: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -78,7 +78,7 @@
                 android:layout_alignLeft="@+id/type"
                 android:layout_below="@+id/type"
                 android:layout_marginTop="5dp"
-                android:text="Make:"
+                android:text="Make: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -99,7 +99,7 @@
                 android:layout_alignLeft="@+id/make"
                 android:layout_below="@+id/make"
                 android:layout_marginTop="5dp"
-                android:text="Model:"
+                android:text="Model: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -120,7 +120,7 @@
                 android:layout_alignLeft="@+id/Model"
                 android:layout_below="@+id/Model"
                 android:layout_marginTop="5dp"
-                android:text="Body Type:"
+                android:text="Body Type: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -141,7 +141,7 @@
                 android:layout_alignLeft="@+id/body"
                 android:layout_below="@+id/body"
                 android:layout_marginTop="5dp"
-                android:text="Engine No:"
+                android:text="Engine No: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -162,7 +162,7 @@
                 android:layout_alignLeft="@+id/engine"
                 android:layout_below="@+id/engine"
                 android:layout_marginTop="5dp"
-                android:text="VIN:"
+                android:text="VIN: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -183,7 +183,7 @@
                 android:layout_alignLeft="@+id/vin"
                 android:layout_below="@+id/vin"
                 android:layout_marginTop="5dp"
-                android:text="Color :"
+                android:text="Color: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -204,7 +204,7 @@
                 android:layout_alignLeft="@+id/color"
                 android:layout_below="@+id/color"
                 android:layout_marginTop="5dp"
-                android:text="Accessories:"
+                android:text="Accessories: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 
@@ -241,7 +241,7 @@
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Insurance Company Name :"
+                    android:text="Insurance Company Name: "
                     android:textColor="@color/light_black"
                     android:textSize="@dimen/medium_text" />
 
@@ -261,7 +261,7 @@
                     android:layout_height="wrap_content"
                     android:layout_below="@+id/name"
                     android:layout_marginTop="5dp"
-                    android:text="Insurance Company Number :"
+                    android:text="Insurance Company Number: "
                     android:textColor="@color/light_black"
                     android:textSize="@dimen/medium_text" />
 
@@ -282,7 +282,7 @@
                     android:layout_alignParentLeft="true"
                     android:layout_below="@+id/number"
                     android:layout_marginTop="5dp"
-                    android:text="Insurance Policy No:"
+                    android:text="Insurance Policy No: "
                     android:textColor="@color/light_black"
                     android:textSize="@dimen/medium_text" />
 

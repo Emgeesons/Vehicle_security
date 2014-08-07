@@ -5,6 +5,8 @@ import java.io.IOException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -191,6 +193,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 		protected Void doInBackground(Void... params) {
 
 			DefaultHttpClient httpClient = new DefaultHttpClient();
+
 			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
 			HttpPost postMethod = new HttpPost(pass_url);
 			System.out.println(pass_url);

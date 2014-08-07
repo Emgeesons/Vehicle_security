@@ -4,9 +4,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.text.Html;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -25,6 +28,12 @@ public class ReportSubmit extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// setContentView(R.layout.report_submit);
+		getSupportActionBar().setTitle(
+				Html.fromHtml("<font color='#FFFFFF'>Report Submitted</font>"));
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setBackgroundDrawable(
+				new ColorDrawable(Color.parseColor("#060606")));
+		getSupportActionBar().setIcon(R.drawable.app_icon);
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(ReportSubmit.this);
 		sharedpreferences = getSharedPreferences(Data.MyPREFERENCES,
@@ -104,5 +113,6 @@ public class ReportSubmit extends BaseActivity {
 	protected int getLayoutResourceId() {
 		return R.layout.report_submit;
 	}
+	
 
 }

@@ -2,17 +2,33 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
+import org.apache.http.HttpConnection;
+import org.apache.http.HttpVersion;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.params.HttpProtocolParams;
+import org.apache.http.protocol.HTTP;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -845,6 +861,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		int vid;
 		String vtype, vmake, vmodel, reg, vstatus;
 		String fbdobs = "";
+
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
@@ -859,6 +876,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		protected Void doInBackground(Void... params) {
 
 			DefaultHttpClient httpClient = new DefaultHttpClient();
+
 			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
 			HttpPost postMethod = new HttpPost(fb_url);
 
@@ -868,7 +886,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 				json.put("firstName", fbfname);
 				json.put("lastName", fblname);
 				json.put("mobileNumber", "");
-				
+
 				try {
 					String[] fbdatespilt = fbdob.split("\\/");
 					String y = fbdatespilt[2];
@@ -879,7 +897,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
-				
+
 				json.put("gender", fbgender);
 				json.put("fbId", fbid);
 				json.put("fbToken", fbtoken);
@@ -971,7 +989,6 @@ public class LoginActivity extends Activity implements TextWatcher,
 						// "", "", "", fbid, fbtoken, "", "", pin, "", "",
 						// "");
 						// db.updateprofileData(data);
-						
 
 						SplashscreenActivity.fblogin = false;
 						if (mess.equalsIgnoreCase("New User")) {
@@ -1089,12 +1106,12 @@ public class LoginActivity extends Activity implements TextWatcher,
 									VehicleData datas = new VehicleData(vid,
 											vtype, vmake, vmodel, "", "", "",
 											"", "", reg, "", "", date[0],
-											vstatus, "", "","");
+											vstatus, "", "", "");
 									db.insertvehicleData(datas);
 
 									ParkingData datass = new ParkingData(
 											String.valueOf(vid), vmodel, "",
-											"", "", "", vtype);
+											"", "", vmake, vtype);
 									db.inserparkData(datass);
 
 									if (date[0].equalsIgnoreCase("0000-00-00")) {
@@ -1396,12 +1413,12 @@ public class LoginActivity extends Activity implements TextWatcher,
 								db = new DatabaseHandler(LoginActivity.this);
 								VehicleData datas = new VehicleData(vid, vtype,
 										vmake, vmodel, "", "", "", "", "", reg,
-										"", "", date[0], vstatus, "", "","");
+										"", "", date[0], vstatus, "", "", "");
 								db.insertvehicleData(datas);
 
 								ParkingData datass = new ParkingData(
 										String.valueOf(vid), vmodel, "", "",
-										"", "", vtype);
+										"", vmake, vtype);
 								db.inserparkData(datass);
 
 								if (date[0].equalsIgnoreCase("0000-00-00")) {
