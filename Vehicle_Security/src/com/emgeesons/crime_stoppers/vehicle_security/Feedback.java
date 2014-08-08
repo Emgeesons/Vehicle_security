@@ -1,18 +1,29 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
+import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -29,7 +40,6 @@ import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockFragment;
 
@@ -47,6 +57,7 @@ public class Feedback extends SherlockFragment {
 	String feedback_url = Data.url + "feedback.php";
 	TextView ratetext;
 	Data info;
+	String reponse;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -101,120 +112,196 @@ public class Feedback extends SherlockFragment {
 			pDialog.show();
 		}
 
+		@SuppressWarnings({ "deprecation", "deprecation", "deprecation" })
 		@Override
 		protected Void doInBackground(Void... params) {
-
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(feedback_url);
-			System.out.println(feedback_url);
+			HttpEntity resEntity = null;
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			HttpParams httpParameters = new BasicHttpParams();
+			// Set the timeout in milliseconds until a connection is
+			// established.
+			// The default value is zero, that means the timeout is not used.
+			int timeoutConnection = 3000;
+			HttpConnectionParams.setConnectionTimeout(httpParameters,
+					timeoutConnection);
+			// Set the default socket timeout (SO_TIMEOUT)
+			// in milliseconds which is the timeout for waiting for data.
+			int timeoutSocket = 5000;
+			HttpConnectionParams.setSoTimeout(httpParameters, timeoutSocket);
+			HttpClient httpclient = new DefaultHttpClient(httpParameters);
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(feedback_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
+
 				info.device();
 				info.showInfo(getActivity());
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
 
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
-				json.put("rating", rates);
-				json.put("feedback", feedback.getText().toString());
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("rating",
+						new StringBody(String.valueOf(rates)));
+				mpEntity.addPart("feedback", new StringBody(feedback.getText()
+						.toString()));
 
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
 				getActivity().runOnUiThread(new Runnable() {
 
 					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Thank You");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
+						AlertDialog.Builder alertDialog = new AlertDialog.Builder(
+								getActivity());
+
+						alertDialog
+								.setMessage("Please make sure you are connected to the internet and try again.");
+
+						alertDialog.setPositiveButton("Ok",
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int which) {
-										pDialog.dismiss();
-										Intent next = new Intent(getActivity(),
-												MainActivity.class);
-										startActivity(next);
-										getActivity().finish();
+
 									}
 								});
-						Dialog.setCancelable(false);
-						Dialog.show();
+
+						alertDialog.show();
 					}
 				});
-			}
-			// response failure
-			else if (success.equals("failure")) {
-
-				getActivity().runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-
-			} else if (success.equals("error")) {
-
-				getActivity().runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+				return null;
 			}
 
+			StatusLine status = response.getStatusLine();
+			System.out.println(response.getStatusLine());
+			if (status.getStatusCode() == HttpStatus.SC_OK) {
+
+				if (resEntity != null) {
+					try {
+						reponse = EntityUtils.toString(resEntity);
+						System.out.println(reponse);
+						JSONObject profile = new JSONObject(reponse);
+
+						jsonMainArr = profile.getJSONArray("response");
+
+						success = profile.getString("status");
+						mess = profile.getString("message");
+					} catch (JSONException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (ParseException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				if (success.equals("success")) {
+
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Thank You");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+											Intent next = new Intent(
+													getActivity(),
+													MainActivity.class);
+											startActivity(next);
+											getActivity().finish();
+										}
+									});
+							Dialog.setCancelable(false);
+							Dialog.show();
+						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
+
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
+			} else {
+				cd.showNoInternetPopup();
+			}
 			return null;
 
 		}

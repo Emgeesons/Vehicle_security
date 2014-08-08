@@ -203,8 +203,13 @@ public class Reportsummary extends SherlockActivity {
 		expiry = (TextView) findViewById(R.id.vexpiry);
 		ins = (RelativeLayout) findViewById(R.id.ins);
 		num = (TextView) findViewById(R.id.vnum);
-		name.setText(model);
-		regs.setText("Registration Number:" + " " + reg);
+		name.setText(make + " " + model);
+		if (vehicle_type.equalsIgnoreCase("Bicycle")) {
+			regs.setText("Serial Number:" + " " + reg);
+		}else {
+			regs.setText("Registration Number:" + " " + reg);
+		}
+		
 		rtype.setText(report_type);
 		date.setText(dateformate(selected_date));
 		time.setText(selected_time);

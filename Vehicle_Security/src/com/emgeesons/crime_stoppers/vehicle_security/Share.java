@@ -207,7 +207,7 @@ public class Share extends BaseActivity {
 						Bundle postParams = new Bundle();
 						postParams.putString("message", fbtext.getText()
 								.toString() + " " + "#MyWheels");
-						postParams.putString("name", "My Wheel");
+						postParams.putString("name", "My Wheels");
 						if (!fphoto.equalsIgnoreCase("fphoto")) {
 							postParams.putString("picture", fphoto);
 							postParams

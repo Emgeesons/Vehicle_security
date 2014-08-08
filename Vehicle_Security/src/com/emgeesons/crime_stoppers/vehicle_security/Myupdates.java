@@ -1,6 +1,7 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -9,12 +10,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -68,7 +77,7 @@ public class Myupdates extends Fragment {
 	GPSTracker gps;
 	private AsyncTask<Void, Void, Void> vinfo;
 	TextView name, reg, type, date, time, location, rtype;
-	String pos;
+	String pos="";
 	ImageView vtype, rvtype;
 	RelativeLayout listHeaderView;
 	private ProgressBar pBar;
@@ -83,7 +92,7 @@ public class Myupdates extends Fragment {
 	View v;
 	DisplayImageOptions options;
 	SharedPreferences atPrefs;
-	String spic1, spic2, spic3;;
+	String spic1, spic2, spic3, reponse;
 	double LATITUDE, LONGITUDE;
 
 	public static Myupdates newInstance() {
@@ -245,115 +254,150 @@ public class Myupdates extends Fragment {
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(recover_url);
-			System.out.println(recover_url);
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			HttpPost httppost = new HttpPost(recover_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 
-			JSONObject json = new JSONObject();
 			try {
 				info.device();
 				info.showInfo(getActivity());
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
-				json.put("reportId", report_id);
-				json.put("vehicleId", vehicle_id);
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
+
+				mpEntity.addPart("reportId",
+						new StringBody(String.valueOf(report_id)));
+				mpEntity.addPart("vehicleId",
+						new StringBody(String.valueOf(vehicle_id)));
 				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 				SimpleDateFormat sdfs = new SimpleDateFormat("HH:mm");
 				currentTime = sdfs.format(new Date());
 				currentDate = sdf.format(new Date());
-				json.put("date", currentDate);
-				json.put("time", currentTime);
-				json.put("location", pos);
-				// json.put("make", info.manufacturer);
-				// json.put("os", "Android" + " " + info.Version);
-				// json.put("model", info.model);
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
+				mpEntity.addPart("date",
+						new StringBody(String.valueOf(currentDate)));
+				mpEntity.addPart("time",
+						new StringBody(String.valueOf(currentTime)));
+				mpEntity.addPart("location",
+						new StringBody(String.valueOf(pos)));
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				getActivity().runOnUiThread(new Runnable() {
-
-					public void run() {
-						rsdate = currentDate;
-						rstime = currentTime;
-						rslocation = pos;
-						recoverfun();
-
-					}
-
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
 
-			// response failure
-			else if (success.equals("failure")) {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
 
-				getActivity().runOnUiThread(new Runnable() {
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+				if (success.equals("success")) {
 
-			} else if (success.equals("error")) {
+					getActivity().runOnUiThread(new Runnable() {
 
-				getActivity().runOnUiThread(new Runnable() {
+						public void run() {
+							rsdate = currentDate;
+							rstime = currentTime;
+							rslocation = pos;
+							recoverfun();
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						}
+
+					});
+				}
+
+				// response failure
+				else if (success.equals("failure")) {
+
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											Dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
+			}else {
+				cd.showNoInternetPopup();
 			}
 
 			return null;
@@ -385,7 +429,7 @@ public class Myupdates extends Fragment {
 		rrdate = (TextView) rootView.findViewById(R.id.rdate);
 		rrtime = (TextView) rootView.findViewById(R.id.rtime);
 		rrloc = (TextView) rootView.findViewById(R.id.rloc);
-		rname.setText(model);
+		rname.setText(make + " " + model);
 		rreg.setText("Registration Number:" + " " + rno);
 		rtype.setText(report_type);
 		rdate.setText(dateformate(selected_date));
@@ -491,7 +535,7 @@ public class Myupdates extends Fragment {
 
 	public void onchange() {
 
-		name.setText(model);
+		name.setText(make + " " + model);
 		reg.setText("Registration Number:" + " " + rno);
 		type.setText(report_type);
 		if (!selected_date.isEmpty()) {
@@ -511,10 +555,14 @@ public class Myupdates extends Fragment {
 			vtype.setImageResource(R.drawable.ic_car);
 		} else if (vehicle_type.equalsIgnoreCase("Bicycle")) {
 			vtype.setImageResource(R.drawable.ic_cycle);
+			reg.setText("Serial Number:" + " " + rno);
 		} else if (vehicle_type.equalsIgnoreCase("MotorCycle")) {
 			vtype.setImageResource(R.drawable.ic_bike);
 		} else {
 			vtype.setImageResource(R.drawable.ic_other);
+		}
+		if (rno.isEmpty()) {
+			reg.setVisibility(View.GONE);
 		}
 
 	}
@@ -529,173 +577,215 @@ public class Myupdates extends Fragment {
 
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(myUpdates_url);
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			HttpPost httppost = new HttpPost(myUpdates_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 
-			JSONObject json = new JSONObject();
 			try {
 				info.device();
 				info.showInfo(getActivity());
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				json.put("location", pos);
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
 
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				jsonarr = profile.getJSONArray("sightings");
-				success = profile.getString("status");
-				mess = profile.getString("message");
+				mpEntity.addPart("location", new StringBody(pos));
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				getActivity().runOnUiThread(new Runnable() {
-
-					public void run() {
-						pBar.setVisibility(View.GONE);
-						if (!(jsonMainArr.length() == 0)) {
-							try {
-								vehicle_id = jsonMainArr.getJSONObject(0)
-										.getString("vehicle_id");
-								vehicle_type = jsonMainArr.getJSONObject(0)
-										.getString("vehicle_type");
-								report_id = jsonMainArr.getJSONObject(0)
-										.getString("report_id");
-								make = jsonMainArr.getJSONObject(0).getString(
-										"make");
-								model = jsonMainArr.getJSONObject(0).getString(
-										"model");
-								rno = jsonMainArr.getJSONObject(0).getString(
-										"registration_serial_no");
-								inumber = jsonMainArr.getJSONObject(0)
-										.getString("insurance_company_number");
-								locations = jsonMainArr.getJSONObject(0)
-										.getString("location");
-								selected_date = jsonMainArr.getJSONObject(0)
-										.getString("selected_date");
-								selected_time = jsonMainArr.getJSONObject(0)
-										.getString("selected_time");
-								report_type = jsonMainArr.getJSONObject(0)
-										.getString("report_type");
-								comments = jsonMainArr.getJSONObject(0)
-										.getString("comments");
-								status = jsonMainArr.getJSONObject(0)
-										.getString("status");
-								rsdate = jsonMainArr.getJSONObject(0)
-										.getString("recovered_date");
-								rstime = jsonMainArr.getJSONObject(0)
-										.getString("recovered_time");
-								rslocation = jsonMainArr.getJSONObject(0)
-										.getString("recovered_location");
-								String[] datespilt = selected_time.split("\\:");
-								selected_time = datespilt[0] + ":"
-										+ datespilt[1];
-								onchange();
-							} catch (JSONException e) {
-								e.printStackTrace();
-							}
-
-						} else {
-							data.removeHeaderView(v);
-							recover.setVisibility(View.GONE);
-							selected_time = "";
-							selected_date = "";
-						}
-
-						addetails.setVisibility(View.GONE);
-						main.setVisibility(View.VISIBLE);
-
-						if ((jsonarr.length() < 1)) {
-							if (status.equalsIgnoreCase("recovered")) {
-								report_type = "Recovered";
-								rtype.setTextColor(getResources().getColor(
-										R.color.green));
-								recoverfun();
-							}
-							noupdate.setVisibility(View.VISIBLE);
-							data.setAdapter(new ffAdapter());
-						} else {
-							if (status.equalsIgnoreCase("recovered")) {
-								report_type = "Recovered";
-								rtype.setTextColor(getResources().getColor(
-										R.color.green));
-								recoverfun();
-							}
-							noupdate.setVisibility(View.INVISIBLE);
-							data.setAdapter(new ffAdapter());
-						}
-
-					}
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			// response failure
-			else if (success.equals("failure")) {
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
 
-				getActivity().runOnUiThread(new Runnable() {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					jsonarr = profile.getJSONArray("sightings");
+					success = profile.getString("status");
+					mess = profile.getString("message");
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-			} else if (success.equals("error")) {
-				getActivity().runOnUiThread(new Runnable() {
+				if (success.equals("success")) {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+					getActivity().runOnUiThread(new Runnable() {
 
+						public void run() {
+							pBar.setVisibility(View.GONE);
+							if (!(jsonMainArr.length() == 0)) {
+								try {
+									vehicle_id = jsonMainArr.getJSONObject(0)
+											.getString("vehicle_id");
+									vehicle_type = jsonMainArr.getJSONObject(0)
+											.getString("vehicle_type");
+									report_id = jsonMainArr.getJSONObject(0)
+											.getString("report_id");
+									make = jsonMainArr.getJSONObject(0)
+											.getString("make");
+									model = jsonMainArr.getJSONObject(0)
+											.getString("model");
+									rno = jsonMainArr
+											.getJSONObject(0)
+											.getString("registration_serial_no");
+									inumber = jsonMainArr.getJSONObject(0)
+											.getString(
+													"insurance_company_number");
+									locations = jsonMainArr.getJSONObject(0)
+											.getString("location");
+									selected_date = jsonMainArr
+											.getJSONObject(0).getString(
+													"selected_date");
+									selected_time = jsonMainArr
+											.getJSONObject(0).getString(
+													"selected_time");
+									report_type = jsonMainArr.getJSONObject(0)
+											.getString("report_type");
+									comments = jsonMainArr.getJSONObject(0)
+											.getString("comments");
+									status = jsonMainArr.getJSONObject(0)
+											.getString("status");
+									rsdate = jsonMainArr.getJSONObject(0)
+											.getString("recovered_date");
+									rstime = jsonMainArr.getJSONObject(0)
+											.getString("recovered_time");
+									rslocation = jsonMainArr.getJSONObject(0)
+											.getString("recovered_location");
+									String[] datespilt = selected_time
+											.split("\\:");
+									selected_time = datespilt[0] + ":"
+											+ datespilt[1];
+									onchange();
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+
+							} else {
+								data.removeHeaderView(v);
+								recover.setVisibility(View.GONE);
+								selected_time = "";
+								selected_date = "";
+							}
+
+							addetails.setVisibility(View.GONE);
+							main.setVisibility(View.VISIBLE);
+							if (jsonMainArr.length() == 1) {
+								if (status.equalsIgnoreCase("recovered")) {
+									report_type = "Recovered";
+									rtype.setTextColor(getResources().getColor(
+											R.color.green));
+									recoverfun();
+								}
+							}
+
+							if ((jsonarr.length() < 1)) {
+//								if (status.equalsIgnoreCase("recovered")) {
+//									report_type = "Recovered";
+//									rtype.setTextColor(getResources().getColor(
+//											R.color.green));
+//									recoverfun();
+//								}
+								noupdate.setVisibility(View.VISIBLE);
+								data.setAdapter(new ffAdapter());
+							} else {
+								if (status.equalsIgnoreCase("recovered")) {
+									report_type = "Recovered";
+									rtype.setTextColor(getResources().getColor(
+											R.color.green));
+									recoverfun();
+								}
+								noupdate.setVisibility(View.INVISIBLE);
+								data.setAdapter(new ffAdapter());
+							}
+
+						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
+
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				}
+			}else {
+				cd.showNoInternetPopup();
 			}
 
 			return null;

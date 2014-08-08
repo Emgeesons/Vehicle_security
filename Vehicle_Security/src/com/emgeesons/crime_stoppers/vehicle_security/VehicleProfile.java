@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -75,7 +76,7 @@ public class VehicleProfile extends BaseActivity {
 	Button addins, edit, Delete;
 	GPSTracker gps;
 	int ttype;
-	String dir, imgPath;
+	String dir, imgPath, reponse;
 	private String imagepath = null;
 	File sdRoot;
 	String call;
@@ -178,8 +179,8 @@ public class VehicleProfile extends BaseActivity {
 		dir = "My Wheel/" + id + "/";
 
 		getSupportActionBar().setTitle(
-				Html.fromHtml("<font color='#FFFFFF'>" + info.vmodel
-						+ "</font>"));
+				Html.fromHtml("<font color='#FFFFFF'>" + info.make + " "
+						+ info.vmodel + "</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
@@ -686,152 +687,182 @@ public class VehicleProfile extends BaseActivity {
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(del_url);
-			System.out.println(del_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
 			final SharedPreferences atPrefs;
 			atPrefs = PreferenceManager
 					.getDefaultSharedPreferences(VehicleProfile.this);
-
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			HttpPost httppost = new HttpPost(del_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
+			info.device();
+			info.showInfo(getApplicationContext());
+			info.vehicleInfo(getApplicationContext(), id);
 			try {
-				info.device();
-				info.showInfo(getApplicationContext());
-				info.vehicleInfo(getApplicationContext(), id);
-
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
-				json.put("vehicleId", id);
+				mpEntity.addPart("vehicleId", new StringBody(id));
 				if (no.length == 0) {
-					json.put("photosExist", 0);
+					mpEntity.addPart("photosExist", new StringBody("0"));
 				} else {
-					json.put("photosExist", 1);
+					mpEntity.addPart("photosExist", new StringBody("1"));
 				}
-
 				if (info.iname.isEmpty()) {
-					json.put("insuranceDetailsExist", 0);
+					mpEntity.addPart("insuranceDetailsExist", new StringBody(
+							"0"));
 				} else {
-					json.put("insuranceDetailsExist", 1);
+					mpEntity.addPart("insuranceDetailsExist", new StringBody(
+							"1"));
 				}
 				if (info.licenseNo.isEmpty()) {
-					json.put("additionalDetailsExist", 0);
+					mpEntity.addPart("additionalDetailsExist", new StringBody(
+							"0"));
 				} else {
-					json.put("additionalDetailsExist", 1);
+					mpEntity.addPart("additionalDetailsExist", new StringBody(
+							"1"));
 				}
-
-				json.put("noVehicles", vehicles.size());
+				mpEntity.addPart("noVehicles",
+						new StringBody(String.valueOf(vehicles.size())));
 				int newprogress = atPrefs.getInt(SplashscreenActivity.progress,
 						0);
-				json.put("profileCompleteness", newprogress);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				pts = jsonMainArr.getJSONObject(0).getInt(
-						"profile_completeness");
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+				mpEntity.addPart("profileCompleteness",
+						new StringBody(String.valueOf(newprogress)));
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
 
-				runOnUiThread(new Runnable() {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
 
-					public void run() {
+					pts = jsonMainArr.getJSONObject(0).getInt(
+							"profile_completeness");
 
-						SQLiteDatabase dbbb = db.getReadableDatabase();
-						dbbb.execSQL("delete from Vehicle_info WHERE Vehicle_id ='"
-								+ id + "'");
-						dbbb.execSQL("delete from Vehicle_park WHERE vid ='"
-								+ id + "'");
-						NotificationAlarm.CancelAlarm(getApplicationContext());
-						NotificationAlarm.SetAlarm(getApplicationContext());
-						deleteDirectory(folder);
-						atPrefs.edit()
-								.putInt(SplashscreenActivity.progress, pts)
-								.commit();
-						if (vehicles.size() == 1) {
-							Intent next = new Intent(getApplicationContext(),
-									ProfileScreen.class);
-							startActivity(next);
-							finish();
-						} else {
-							Intent next = new Intent(getApplicationContext(),
-									VehicleInfo.class);
-							startActivity(next);
-							finish();
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+				if (success.equals("success")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("delete from Vehicle_info WHERE Vehicle_id ='"
+									+ id + "'");
+							dbbb.execSQL("delete from Vehicle_park WHERE vid ='"
+									+ id + "'");
+							NotificationAlarm
+									.CancelAlarm(getApplicationContext());
+							NotificationAlarm.SetAlarm(getApplicationContext());
+							deleteDirectory(folder);
+							atPrefs.edit()
+									.putInt(SplashscreenActivity.progress, pts)
+									.commit();
+							if (vehicles.size() == 1) {
+								Intent next = new Intent(
+										getApplicationContext(),
+										ProfileScreen.class);
+								startActivity(next);
+								finish();
+							} else {
+								Intent next = new Intent(
+										getApplicationContext(),
+										VehicleInfo.class);
+								startActivity(next);
+								finish();
+							}
+
 						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
 
-					}
-				});
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									VehicleProfile.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											Dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									VehicleProfile.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
-			// response failure
-			else if (success.equals("failure")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								VehicleProfile.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-
-			} else if (success.equals("error")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								VehicleProfile.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-			}
-
 			return null;
 
 		}
@@ -896,23 +927,48 @@ public class VehicleProfile extends BaseActivity {
 
 			try {
 				JSONObject profile = new JSONObject(names);
-				String res = profile.getString("response");
-				int pos = res.lastIndexOf("/");
-				names = res.substring(pos + 1);
-				Log.i("name", names);
+				success = profile.getString("status");
+				if (success.equalsIgnoreCase("success")) {
+					String res = profile.getString("response");
+					int pos = res.lastIndexOf("/");
+					names = res.substring(pos + 1);
+					Log.i("name", names);
+					String photoName = "VehiclePic" + nopic + ".png";
+					// change image name
+					File photo = new File(sdRoot, dir + "VehiclePic" + nopic
+							+ ".png");
+					while (photo.exists()) {
+						photoName = names;
+						photo.renameTo(new File(sdRoot, dir + photoName));
+
+					}
+
+					checkpic();
+				} else if (!success.equalsIgnoreCase("success")) {
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									VehicleProfile.this).create();
+							Dialog.setTitle(success);
+							// Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
+
 			} catch (Exception e) {
 			}
-
-			String photoName = "VehiclePic" + nopic + ".png";
-			// change image name
-			File photo = new File(sdRoot, dir + "VehiclePic" + nopic + ".png");
-			while (photo.exists()) {
-				photoName = names;
-				photo.renameTo(new File(sdRoot, dir + photoName));
-
-			}
-
-			checkpic();
 
 		}
 
@@ -1039,193 +1095,222 @@ public class VehicleProfile extends BaseActivity {
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(profile_url);
 			JSONArray jsonMainArr;
 			atPrefs = PreferenceManager
 					.getDefaultSharedPreferences(VehicleProfile.this);
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 
-			JSONObject json = new JSONObject();
+			HttpPost httppost = new HttpPost(profile_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
-
 				info.device();
 				info.showInfo(VehicleProfile.this);
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
 
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
 
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				jsonVehicleArr = profile.getJSONArray("vehicles");
-				success = profile.getString("status");
-
-				mess = profile.getString("message");
-				user_id = jsonMainArr.getJSONObject(0).getString("user_id");
-				fName = jsonMainArr.getJSONObject(0).getString("first_name");
-				lName = jsonMainArr.getJSONObject(0).getString("last_name");
-				email = jsonMainArr.getJSONObject(0).getString("email");
-				mobileNumber = jsonMainArr.getJSONObject(0).getString(
-						"mobile_number");
-				String[] datespilt = jsonMainArr.getJSONObject(0)
-						.getString("dob").split("\\s+");
-				dob = String.valueOf(datespilt[0]);
-				gender = jsonMainArr.getJSONObject(0).getString("gender");
-				licenseNo = jsonMainArr.getJSONObject(0)
-						.getString("license_no");
-				address = jsonMainArr.getJSONObject(0).getString("address");
-				// street = jsonMainArr.getJSONObject(0).getString("street");
-				// suburb = jsonMainArr.getJSONObject(0).getString("suburb");
-				postcode = jsonMainArr.getJSONObject(0).getString("postcode");
-				dtModified = jsonMainArr.getJSONObject(0).getString(
-						"modified_at");
-				fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
-				fbToken = jsonMainArr.getJSONObject(0).getString("fb_token");
-				// cname = jsonMainArr.getJSONObject(0).getString(
-				// "emergency_contact");
-				// cnumber = jsonMainArr.getJSONObject(0).getString(
-				// "emergency_contact_number");
-				sques = jsonMainArr.getJSONObject(0).getString(
-						"security_question");
-				sans = jsonMainArr.getJSONObject(0)
-						.getString("security_answer");
-				profilecom = jsonMainArr.getJSONObject(0).getInt(
-						"profile_completed");
-				pin = jsonMainArr.getJSONObject(0).getString("pin");
-				points = jsonMainArr.getJSONObject(0).getString(
-						"samaritan_points");
-				photourl = jsonMainArr.getJSONObject(0).getString("photo_url");
-				int pos = photourl.lastIndexOf("/");
-				photoname = photourl.substring(pos + 1);
-
-				// vehicle info
-
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
-			} catch (JSONException e) {
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					jsonVehicleArr = profile.getJSONArray("vehicles");
+					success = profile.getString("status");
 
-				runOnUiThread(new Runnable() {
+					mess = profile.getString("message");
+					user_id = jsonMainArr.getJSONObject(0).getString("user_id");
+					fName = jsonMainArr.getJSONObject(0)
+							.getString("first_name");
+					lName = jsonMainArr.getJSONObject(0).getString("last_name");
+					email = jsonMainArr.getJSONObject(0).getString("email");
+					mobileNumber = jsonMainArr.getJSONObject(0).getString(
+							"mobile_number");
+					String[] datespilt = jsonMainArr.getJSONObject(0)
+							.getString("dob").split("\\s+");
+					dob = String.valueOf(datespilt[0]);
+					gender = jsonMainArr.getJSONObject(0).getString("gender");
+					licenseNo = jsonMainArr.getJSONObject(0).getString(
+							"license_no");
+					address = jsonMainArr.getJSONObject(0).getString("address");
+					// street =
+					// jsonMainArr.getJSONObject(0).getString("street");
+					// suburb =
+					// jsonMainArr.getJSONObject(0).getString("suburb");
+					postcode = jsonMainArr.getJSONObject(0).getString(
+							"postcode");
+					dtModified = jsonMainArr.getJSONObject(0).getString(
+							"modified_at");
+					fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
+					fbToken = jsonMainArr.getJSONObject(0)
+							.getString("fb_token");
+					// cname = jsonMainArr.getJSONObject(0).getString(
+					// "emergency_contact");
+					// cnumber = jsonMainArr.getJSONObject(0).getString(
+					// "emergency_contact_number");
+					sques = jsonMainArr.getJSONObject(0).getString(
+							"security_question");
+					sans = jsonMainArr.getJSONObject(0).getString(
+							"security_answer");
+					profilecom = jsonMainArr.getJSONObject(0).getInt(
+							"profile_completed");
+					pin = jsonMainArr.getJSONObject(0).getString("pin");
+					points = jsonMainArr.getJSONObject(0).getString(
+							"samaritan_points");
+					photourl = jsonMainArr.getJSONObject(0).getString(
+							"photo_url");
+					int pos = photourl.lastIndexOf("/");
+					photoname = photourl.substring(pos + 1);
 
-					public void run() {
-						db = new DatabaseHandler(VehicleProfile.this);
-						PersonalData data = new PersonalData(user_id, fName,
-								lName, email, mobileNumber, dob, gender,
-								licenseNo, street, suburb, postcode,
-								dtModified, fbId, fbToken, cname, cnumber, pin,
-								sques, sans, points);
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-						db.updateprofileData(data);
-						atPrefs.edit()
-								.putInt(SplashscreenActivity.progress,
-										profilecom).commit();
-						for (int i = 0; i < jsonVehicleArr.length(); i++) {
+				if (success.equals("success")) {
 
-							try {
-								vid = jsonVehicleArr.getJSONObject(i).getInt(
-										"vehicle_id");
-								vtype = jsonVehicleArr.getJSONObject(i)
-										.getString("vehicle_type");
-								vmake = jsonVehicleArr.getJSONObject(i)
-										.getString("vehicle_make");
-								vmodel = jsonVehicleArr.getJSONObject(i)
-										.getString("vehicle_model");
-								reg = jsonVehicleArr.getJSONObject(i)
-										.getString("registration_serial_no");
-								vstatus = jsonVehicleArr.getJSONObject(i)
-										.getString("vehicle_status");
+					runOnUiThread(new Runnable() {
 
-								db = new DatabaseHandler(VehicleProfile.this);
+						public void run() {
+							db = new DatabaseHandler(VehicleProfile.this);
+							PersonalData data = new PersonalData(user_id,
+									fName, lName, email, mobileNumber, dob,
+									gender, licenseNo, street, suburb,
+									postcode, dtModified, fbId, fbToken, cname,
+									cnumber, pin, sques, sans, points);
 
-								SQLiteDatabase dbbb = db.getReadableDatabase();
-								dbbb.execSQL("UPDATE Vehicle_info SET vehicle_type = '"
-										+ vtype
-										+ "',vehicle_make = '"
-										+ vmake
-										+ "',vehicle_model = '"
-										+ vmodel
-										+ "',vehicle_reg = '"
-										+ reg
-										+ "',vehicle_status = '"
-										+ vstatus
-										+ "' WHERE vehicle_id= '" + vid + "'");
+							db.updateprofileData(data);
+							atPrefs.edit()
+									.putInt(SplashscreenActivity.progress,
+											profilecom).commit();
+							for (int i = 0; i < jsonVehicleArr.length(); i++) {
 
-							} catch (JSONException e) {
-								e.printStackTrace();
+								try {
+									vid = jsonVehicleArr.getJSONObject(i)
+											.getInt("vehicle_id");
+									vtype = jsonVehicleArr.getJSONObject(i)
+											.getString("vehicle_type");
+									vmake = jsonVehicleArr.getJSONObject(i)
+											.getString("vehicle_make");
+									vmodel = jsonVehicleArr.getJSONObject(i)
+											.getString("vehicle_model");
+									reg = jsonVehicleArr
+											.getJSONObject(i)
+											.getString("registration_serial_no");
+									vstatus = jsonVehicleArr.getJSONObject(i)
+											.getString("vehicle_status");
+
+									db = new DatabaseHandler(
+											VehicleProfile.this);
+
+									SQLiteDatabase dbbb = db
+											.getReadableDatabase();
+									dbbb.execSQL("UPDATE Vehicle_info SET vehicle_type = '"
+											+ vtype
+											+ "',vehicle_make = '"
+											+ vmake
+											+ "',vehicle_model = '"
+											+ vmodel
+											+ "',vehicle_reg = '"
+											+ reg
+											+ "',vehicle_status = '"
+											+ vstatus
+											+ "' WHERE vehicle_id= '"
+											+ vid + "'");
+
+								} catch (JSONException e) {
+									e.printStackTrace();
+								}
+
 							}
 
+							Intent nextscreen = new Intent(VehicleProfile.this,
+									VehicleInfo.class);
+							startActivity(nextscreen);
+							finish();
+
 						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
 
-						Intent nextscreen = new Intent(VehicleProfile.this,
-								VehicleInfo.class);
-						startActivity(nextscreen);
-						finish();
+					runOnUiThread(new Runnable() {
 
-					}
-				});
-			}
-			// response failure
-			else if (success.equals("failure")) {
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									VehicleProfile.this).create();
+							Dialog.setTitle("Incorrect Email");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
 
-				runOnUiThread(new Runnable() {
+				} else if (success.equals("error")) {
+					runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								VehicleProfile.this).create();
-						Dialog.setTitle("Incorrect Email");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-
-			} else if (success.equals("error")) {
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								VehicleProfile.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									VehicleProfile.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;

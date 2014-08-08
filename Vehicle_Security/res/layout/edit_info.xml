@@ -122,6 +122,25 @@
             android:textSize="@dimen/big_text" />
 
         <EditText
+            android:id="@+id/pin1"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/box_gry"
+            android:digits="0123456789"
+            android:ems="10"
+            android:layout_below="@+id/number"
+            android:gravity="center"
+            android:layout_toRightOf="@+id/textView1"
+            android:inputType="numberPassword"
+            android:maxLength="1"
+            android:singleLine="true" >
+
+           
+        </EditText>
+
+        <EditText
             android:id="@+id/pin2"
             android:layout_width="30dp"
             android:layout_height="40dp"
@@ -161,7 +180,7 @@
             android:layout_toRightOf="@+id/pin3"
             android:background="@drawable/box_gry"
             android:digits="0123456789"
-            android:gravity="center"
+            android:gravity="center"            
             android:inputType="numberPassword"
             android:maxLength="1"
             android:singleLine="true" />
@@ -253,23 +272,6 @@
             android:textColor="@color/black"
             android:textSize="@dimen/big_text" />
 
-        <EditText
-            android:id="@+id/pin1"
-            android:layout_width="30dp"
-            android:layout_height="40dp"
-            android:layout_below="@+id/number"
-            android:layout_marginLeft="18dp"
-            android:layout_marginTop="14dp"
-            android:layout_toRightOf="@+id/textView1"
-            android:background="@drawable/box_gry"
-            android:digits="0123456789"
-            android:ems="10"
-            android:gravity="center"
-            android:inputType="numberPassword"
-            android:maxLength="1"
-            android:singleLine="true" >
-        </EditText>
-
         <RelativeLayout
             android:id="@+id/relativeLayout3"
             android:layout_width="match_parent"
@@ -327,6 +329,7 @@
             android:paddingLeft="10dp"
             android:textSize="@dimen/big_text" >
         </EditText>
+
     </RelativeLayout>
 
 </ScrollView>

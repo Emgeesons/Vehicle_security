@@ -1,18 +1,27 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,6 +73,7 @@ public class Tips extends BaseActivity {
 	int size = 0;
 	SharedPreferences atPrefs;
 	JSONArray jsonMainArr;
+	String reponse;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -130,56 +140,77 @@ public class Tips extends BaseActivity {
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(tip_url);
-			System.out.println(tip_url);
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 
-			JSONObject json = new JSONObject();
+			HttpPost httppost = new HttpPost(tip_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
+
 				info.device();
 				info.showInfo(Tips.this);
 
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
-					json.put("userId", info.user_id);
-					json.put("vehicleId", vid);
-					json.put("pin", info.pin);
+					mpEntity.addPart("userId", new StringBody(info.user_id));
+					mpEntity.addPart("vehicleId", new StringBody(vid));
+					mpEntity.addPart("pin", new StringBody(info.pin));
+
 				} else {
-
-					json.put("userId", 0);
-					json.put("vehicleId", 0);
-					//
-					json.put("pin", "0" + "0" + "0" + "0");
+					mpEntity.addPart("userId", new StringBody("0"));
+					mpEntity.addPart("vehicleId", new StringBody("0"));
+					mpEntity.addPart("pin", new StringBody("0" + "0" + "0"
+							+ "0"));
 				}
-				json.put("noTips", size);
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("noTips", new StringBody(String.valueOf(size)));
 
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
 
-				// json.put("vehicleId", vid);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				tipdata = getContactData();
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+
+					tipdata = getContactData();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 			if (success.equals("success")) {

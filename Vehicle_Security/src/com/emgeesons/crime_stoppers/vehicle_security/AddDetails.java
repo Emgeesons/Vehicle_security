@@ -1,13 +1,23 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +51,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 	Boolean IsInternetPresent;
 	private AsyncTask<Void, Void, Void> details;
 	String details_url = Data.url + "profileAddDetails.php";
+	String reponse;
 	Data info;
 	ProgressDialog pDialog;
 	boolean baddress, bpostcode;
@@ -48,6 +59,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 	SQLiteDatabase dbb;
 	SharedPreferences atPrefs;
 	GPSTracker gps;
+	int p;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,130 +105,167 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(details_url);
-			System.out.println(details_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(details_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 				gps = new GPSTracker(AddDetails.this);
 				info.device();
 				info.showInfo(getApplicationContext());
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
-				json.put("licenceNo", lnumber.getText().toString());
-				json.put("address", address.getText().toString());
-				json.put("pincode", postcode.getText().toString());
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("licenceNo", new StringBody(lnumber.getText()
+						.toString()));
+
+				mpEntity.addPart("address", new StringBody(address.getText()
+						.toString()));
+				mpEntity.addPart("pincode", new StringBody(postcode.getText()
+						.toString()));
+
 				if (gps.canGetLocation()) {
 					double LATITUDE = gps.getLatitude();
 					double LONGITUDE = gps.getLongitude();
-					json.put("latitude", LATITUDE);
-					json.put("longitude", LONGITUDE);
+					mpEntity.addPart("latitude",
+							new StringBody(String.valueOf(LATITUDE)));
+					mpEntity.addPart("longitude",
+							new StringBody(String.valueOf(LONGITUDE)));
 
 				} else {
-					json.put("latitude", 0);
-					json.put("longitude", 0);
+					mpEntity.addPart("latitude",
+							new StringBody(String.valueOf(0)));
+					mpEntity.addPart("longitude",
+							new StringBody(String.valueOf(0)));
 				}
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						SQLiteDatabase dbbb = db.getReadableDatabase();
-						dbbb.execSQL("UPDATE profile SET licenseNo = '"
-								+ lnumber.getText().toString()
-								+ "',street = '"
-								+ address.getText().toString()
-								+ "',postcode = '"
-								+ postcode.getText().toString() + "'");
-						ProfileScreen.newprogress = 50;
-						atPrefs.edit()
-								.putInt(SplashscreenActivity.progress,
-										ProfileScreen.newprogress).commit();
-						Intent next = new Intent(getApplicationContext(),
-								ProfileScreen.class);
-						startActivity(next);
-						finish();
-					}
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			// response failure
-			else if (success.equals("failure")) {
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+					p = jsonMainArr.getJSONObject(0)
+							.getInt("profile_completed");
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				runOnUiThread(new Runnable() {
+				if (success.equals("success")) {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								AddDetails.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+					runOnUiThread(new Runnable() {
 
-			} else if (success.equals("error")) {
+						public void run() {
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("UPDATE profile SET licenseNo = '"
+									+ lnumber.getText().toString()
+									+ "',street = '"
+									+ address.getText().toString()
+									+ "',postcode = '"
+									+ postcode.getText().toString() + "'");
+							atPrefs.edit()
+									.putInt(SplashscreenActivity.progress, p)
+									.commit();
+							Intent next = new Intent(getApplicationContext(),
+									ProfileScreen.class);
+							startActivity(next);
+							finish();
+						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
 
-				runOnUiThread(new Runnable() {
+					runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								AddDetails.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									AddDetails.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									AddDetails.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
+
 			}
-
 			return null;
-
 		}
 
 		@Override

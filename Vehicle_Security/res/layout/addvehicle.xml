@@ -117,6 +117,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
+            android:singleLine="true"
             android:hint="   state of registration " >
         </EditText>
 
@@ -130,7 +131,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint=" VIN/engine no "
+            android:hint=" VIN/engine no (min 13 chars) "
             android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
@@ -145,7 +146,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  chassis no"
+            android:hint="  chassis no (min 17 chars)"
             android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>

@@ -2,16 +2,26 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -104,12 +114,13 @@ public class HomescreenActivity extends SherlockFragment implements
 	Boolean IsInternetPresent;
 	private AsyncTask<Void, Void, Void> details;
 	String details_url = Data.url + "parkingHere.php";
-	String vid, typename;
+	String vid = "0", typename;
 	String lat, lon, comm;
 	CircularImageView profilepic;
 	String names;
 	private String imagepath = null;
 	AlertDialog alert;
+	String reponse;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -459,58 +470,97 @@ public class HomescreenActivity extends SherlockFragment implements
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(details_url);
-			System.out.println(details_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			HttpEntity resEntity;
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(details_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
+
 				info.device();
 				info.showInfo(getActivity());
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
-					json.put("userId", info.user_id);
-					json.put("vehicleId", vid);
-					json.put("pin", info.pin);
-				} else {
+					mpEntity.addPart("userId", new StringBody(info.user_id));
+					mpEntity.addPart("vehicleId", new StringBody(vid));
+					mpEntity.addPart("pin", new StringBody(info.pin));
 
-					json.put("userId", 0);
-					json.put("vehicleId", 0);
-					//
-					json.put("pin", "0" + "0" + "0" + "0");
+				} else {
+					mpEntity.addPart("userId", new StringBody("0"));
+					mpEntity.addPart("vehicleId", new StringBody("0"));
+					mpEntity.addPart("pin", new StringBody("0" + "0" + "0"
+							+ "0"));
 				}
 
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
 
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				rate = jsonMainArr.getJSONObject(0).getString("rating");
-				notip = jsonMainArr.getJSONObject(0).getString("noTips");
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			try {
+				 resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				getActivity().runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+
+					jsonMainArr = profile.getJSONArray("response");
+
+					success = profile.getString("status");
+					mess = profile.getString("message");
+					rate = jsonMainArr.getJSONObject(0).getString("rating");
+					notip = jsonMainArr.getJSONObject(0).getString("noTips");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 
 			if (success.equals("success")) {

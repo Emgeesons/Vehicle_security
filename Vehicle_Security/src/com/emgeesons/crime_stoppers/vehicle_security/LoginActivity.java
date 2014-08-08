@@ -2,14 +2,17 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.security.KeyStore;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
 
-import org.apache.http.HttpConnection;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
@@ -22,13 +25,17 @@ import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
 import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.params.HttpParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -100,7 +107,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 	String fbemail, fbfname, fblname, fbdob, fbgender, fbid, fbtoken;
 	SharedPreferences atPrefs;
 	IntentFilter apidUpdateFilter;
-	String userid;
+	String userid, reponse;
 	EditText ans;
 
 	downlaod d;
@@ -545,161 +552,194 @@ public class LoginActivity extends Activity implements TextWatcher,
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
-
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(forgot_url);
+			String reponse;
+			// DefaultHttpClient httpClient = new DefaultHttpClient();
+			// ResponseHandler<String> resonseHandler = new
+			// BasicResponseHandler();
+			// HttpPost postMethod = new HttpPost(forgot_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			// JSONObject json = new JSONObject();
+
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(forgot_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 				info.device();
-				json.put("email", forgot_id.getText().toString());
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("email", new StringBody(forgot_id.getText()
+						.toString()));
 
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				qus = jsonMainArr.getJSONObject(0).getString(
-						"security_question");
-				userid = jsonMainArr.getJSONObject(0).getString("userId");
-
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+					qus = jsonMainArr.getJSONObject(0).getString(
+							"security_question");
+					userid = jsonMainArr.getJSONObject(0).getString("userId");
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				runOnUiThread(new Runnable() {
+				if (success.equals("success")) {
 
-					public void run() {
+					runOnUiThread(new Runnable() {
 
-						forgot_main.setVisibility(View.GONE);
-						forgot_main.startAnimation(slide_out_left);
-						forgot_qus.setVisibility(View.VISIBLE);
-						forgot_qus.startAnimation(slide_in_right);
-						final TextView qustion = (TextView) findViewById(R.id.qus);
-						Button submit = (Button) findViewById(R.id.Submit);
-						TextView cancel = (TextView) findViewById(R.id.forgotqus_cancel);
-						ans = (EditText) findViewById(R.id.answer);
-						qustion.setText(qus.toString());
-						cancel.setOnClickListener(new OnClickListener() {
+						public void run() {
 
-							@Override
-							public void onClick(View arg0) {
-								forgot_main.setVisibility(View.VISIBLE);
-								forgot_main.startAnimation(slide_in_left);
-								forgot_qus.setVisibility(View.GONE);
-								forgot_qus.startAnimation(slide_out_right);
-							}
-						});
-						ans.addTextChangedListener(new TextWatcher() {
+							forgot_main.setVisibility(View.GONE);
+							forgot_main.startAnimation(slide_out_left);
+							forgot_qus.setVisibility(View.VISIBLE);
+							forgot_qus.startAnimation(slide_in_right);
+							final TextView qustion = (TextView) findViewById(R.id.qus);
+							Button submit = (Button) findViewById(R.id.Submit);
+							TextView cancel = (TextView) findViewById(R.id.forgotqus_cancel);
+							ans = (EditText) findViewById(R.id.answer);
+							qustion.setText(qus.toString());
+							cancel.setOnClickListener(new OnClickListener() {
 
-							@Override
-							public void onTextChanged(CharSequence arg0,
-									int arg1, int arg2, int arg3) {
+								@Override
+								public void onClick(View arg0) {
+									forgot_main.setVisibility(View.VISIBLE);
+									forgot_main.startAnimation(slide_in_left);
+									forgot_qus.setVisibility(View.GONE);
+									forgot_qus.startAnimation(slide_out_right);
+								}
+							});
+							ans.addTextChangedListener(new TextWatcher() {
 
-							}
+								@Override
+								public void onTextChanged(CharSequence arg0,
+										int arg1, int arg2, int arg3) {
 
-							@Override
-							public void beforeTextChanged(CharSequence arg0,
-									int arg1, int arg2, int arg3) {
-								ans.setTextColor(getResources().getColor(
-										R.color.black));
-							}
+								}
 
-							@Override
-							public void afterTextChanged(Editable arg0) {
-
-							}
-						});
-						submit.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								if (ans.getText().toString().length() <= 2) {
+								@Override
+								public void beforeTextChanged(
+										CharSequence arg0, int arg1, int arg2,
+										int arg3) {
 									ans.setTextColor(getResources().getColor(
-											R.color.red));
-									ans.setHintTextColor(getResources()
-											.getColor(R.color.red));
+											R.color.black));
+								}
 
-								} else {
+								@Override
+								public void afterTextChanged(Editable arg0) {
 
-									IsInternetPresent = cd
-											.isConnectingToInternet();
-									if (IsInternetPresent == false) {
-										cd.showNoInternetPopup();
+								}
+							});
+							submit.setOnClickListener(new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									if (ans.getText().toString().length() <= 2) {
+										ans.setTextColor(getResources()
+												.getColor(R.color.red));
+										ans.setHintTextColor(getResources()
+												.getColor(R.color.red));
+
 									} else {
-										check = new qusans().execute();
+
+										IsInternetPresent = cd
+												.isConnectingToInternet();
+										if (IsInternetPresent == false) {
+											cd.showNoInternetPopup();
+										} else {
+											check = new qusans().execute();
+										}
 									}
 								}
-							}
-						});
+							});
 
-					}
+						}
 
-				});
-			}
-			// response failure
-			else if (success.equals("failure")) {
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
 
-				runOnUiThread(new Runnable() {
+					runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								LoginActivity.this).create();
-						Dialog.setTitle("Incorrect Email");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									LoginActivity.this).create();
+							Dialog.setTitle("Incorrect Email");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
 
-			} else if (success.equals("error")) {
-				runOnUiThread(new Runnable() {
+				} else if (success.equals("error")) {
+					runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								LoginActivity.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									LoginActivity.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;
@@ -726,115 +766,147 @@ public class LoginActivity extends Activity implements TextWatcher,
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
-
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(forgot_qusurl);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(forgot_qusurl);
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 				info.device();
-				json.put("userId", userid);
-				json.put("securityAnswer", ans.getText().toString());
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+				mpEntity.addPart("userId", new StringBody(userid));
+				mpEntity.addPart("securityAnswer", new StringBody(ans.getText()
+						.toString()));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								LoginActivity.this).create();
-						Dialog.setTitle("Email Sent");
-						Dialog.setIcon(R.drawable.ic_action_done);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										login_main.setVisibility(View.VISIBLE);
-										login_main
-												.startAnimation(slide_in_right);
-										forgot_qus.setVisibility(View.GONE);
-										forgot_qus
-												.startAnimation(slide_out_left);
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			// response failure
-			else if (success.equals("failure")) {
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				runOnUiThread(new Runnable() {
+				if (success.equals("success")) {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								LoginActivity.this).create();
-						Dialog.setTitle("Incorrect Answer");
+					runOnUiThread(new Runnable() {
 
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									LoginActivity.this).create();
+							Dialog.setTitle("Email Sent");
+							Dialog.setIcon(R.drawable.ic_action_done);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											login_main
+													.setVisibility(View.VISIBLE);
+											login_main
+													.startAnimation(slide_in_right);
+											forgot_qus.setVisibility(View.GONE);
+											forgot_qus
+													.startAnimation(slide_out_left);
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
 
-			} else if (success.equals("invalid")) {
-				runOnUiThread(new Runnable() {
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								LoginActivity.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+					runOnUiThread(new Runnable() {
 
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									LoginActivity.this).create();
+							Dialog.setTitle("Incorrect Answer");
+
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("invalid")) {
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									LoginActivity.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;
@@ -872,108 +944,93 @@ public class LoginActivity extends Activity implements TextWatcher,
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(fb_url);
-
-			JSONObject json = new JSONObject();
+			HttpPost httppost = new HttpPost(fb_url);
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 				info.device();
-				json.put("firstName", fbfname);
-				json.put("lastName", fblname);
-				json.put("mobileNumber", "");
-
+				mpEntity.addPart("firstName", new StringBody(fbfname));
+				mpEntity.addPart("lastName", new StringBody(fblname));
+				mpEntity.addPart("mobileNumber", new StringBody(""));
+				mpEntity.addPart("email", new StringBody(fbemail));
 				try {
 					String[] fbdatespilt = fbdob.split("\\/");
 					String y = fbdatespilt[2];
 					String m = fbdatespilt[1];
 					String d = fbdatespilt[0];
 					fbdobs = String.valueOf(y + "-" + m + "-" + d);
-					json.put("dob", fbdobs);
+					mpEntity.addPart("dob", new StringBody(fbdobs));
 				} catch (Exception e) {
 					// TODO: handle exception
 				}
 
-				json.put("gender", fbgender);
-				json.put("fbId", fbid);
-				json.put("fbToken", fbtoken);
-				json.put("email", fbemail);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				mpEntity.addPart("gender", new StringBody(fbgender));
+				mpEntity.addPart("fbId", new StringBody(fbid));
+				mpEntity.addPart("fbToken", new StringBody(fbtoken));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
 
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				jsonVehicleArr = profile.getJSONArray("vehicles");
-				success = profile.getString("status");
-				mess = profile.getString("message");
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+
 				try {
-					user_id = jsonMainArr.getJSONObject(0).getString("user_id");
-					// fName = jsonMainArr.getJSONObject(0)
-					// .getString("first_name");
-					// lName =
-					// jsonMainArr.getJSONObject(0).getString("last_name");
-					// email = jsonMainArr.getJSONObject(0).getString("email");
-					// mobileNumber = jsonMainArr.getJSONObject(0).getString(
-					// "mobile_number");
-					// String[] datespilt = jsonMainArr.getJSONObject(0)
-					// .getString("dob").split("\\s+");
-					// dob = String.valueOf(datespilt[0]);
-					// gender =
-					// jsonMainArr.getJSONObject(0).getString("gender");
-					// licenseNo = jsonMainArr.getJSONObject(0).getString(
-					// "license_no");
-					// street =
-					// jsonMainArr.getJSONObject(0).getString("street");
-					// suburb =
-					// jsonMainArr.getJSONObject(0).getString("suburb");
-					// postcode = jsonMainArr.getJSONObject(0).getString(
-					// "postcode");
-					// dtModified = jsonMainArr.getJSONObject(0).getString(
-					// "modified_at");
-					// fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
-					// fbToken = jsonMainArr.getJSONObject(0)
-					// .getString("fb_token");
-					// // cname = jsonMainArr.getJSONObject(0).getString(
-					// // "emergency_contact");
-					// // cnumber = jsonMainArr.getJSONObject(0).getString(
-					// // "emergency_contact_number");
-					// sques = jsonMainArr.getJSONObject(0).getString(
-					// "security_question");
-					// sans = jsonMainArr.getJSONObject(0).getString(
-					// "security_answer");
-					// profilecom = jsonMainArr.getJSONObject(0).getInt(
-					// "profile_completed");
-					pin = jsonMainArr.getJSONObject(0).getString("pin");
-					// points = jsonMainArr.getJSONObject(0).getString(
-					// "samaritan_points");
-					// photourl = jsonMainArr.getJSONObject(0).getString(
-					// "photo_url");
-					// int pos = photourl.lastIndexOf("/");
-					// photoname = photourl.substring(pos + 1);
+					reponse = EntityUtils.toString(resEntity);
+
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+
+					jsonVehicleArr = profile.getJSONArray("vehicles");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+					try {
+						user_id = jsonMainArr.getJSONObject(0).getString(
+								"user_id");
+
+						pin = jsonMainArr.getJSONObject(0).getString("pin");
+
+					} catch (JSONException e) {
+						e.printStackTrace();
+					}
+
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				} catch (JSONException e) {
+					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
 			}
 
 			if (success.equals("success")) {
@@ -1056,6 +1113,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 								photourl = jsonMainArr.getJSONObject(0)
 										.getString("photo_url");
 								int pos = photourl.lastIndexOf("/");
+
 								photoname = photourl.substring(pos + 1);
 							} catch (JSONException e1) {
 								// TODO Auto-generated catch block
@@ -1294,82 +1352,142 @@ public class LoginActivity extends Activity implements TextWatcher,
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(login_url);
+			// DefaultHttpClient httpClient = new DefaultHttpClient();
+			// ResponseHandler<String> resonseHandler = new
+			// BasicResponseHandler();
+			// HttpPost postMethod = new HttpPost(login_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			// JSONObject json = new JSONObject();
+
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(login_url);
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 				info.device();
-				json.put("email", id.getText().toString());
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("email", new StringBody(id.getText()
+						.toString()));
 				pin = pin1.getText().toString() + pin2.getText().toString()
 						+ pin3.getText().toString() + pin4.getText().toString();
-				json.put("pin", pin);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				mpEntity.addPart("pin", new StringBody(pin));
 
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				jsonVehicleArr = profile.getJSONArray("vehicles");
-				success = profile.getString("status");
-
-				mess = profile.getString("message");
-				user_id = jsonMainArr.getJSONObject(0).getString("user_id");
-				fName = jsonMainArr.getJSONObject(0).getString("first_name");
-				lName = jsonMainArr.getJSONObject(0).getString("last_name");
-				email = jsonMainArr.getJSONObject(0).getString("email");
-				mobileNumber = jsonMainArr.getJSONObject(0).getString(
-						"mobile_number");
-				String[] datespilt = jsonMainArr.getJSONObject(0)
-						.getString("dob").split("\\s+");
-				dob = String.valueOf(datespilt[0]);
-				gender = jsonMainArr.getJSONObject(0).getString("gender");
-				licenseNo = jsonMainArr.getJSONObject(0)
-						.getString("license_no");
-				street = jsonMainArr.getJSONObject(0).getString("street");
-				suburb = jsonMainArr.getJSONObject(0).getString("suburb");
-				postcode = jsonMainArr.getJSONObject(0).getString("postcode");
-				dtModified = jsonMainArr.getJSONObject(0).getString("dob");
-				fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
-				fbToken = jsonMainArr.getJSONObject(0).getString("fb_token");
-				// cname = jsonMainArr.getJSONObject(0).getString(
-				// "emergency_contact");
-				// cnumber = jsonMainArr.getJSONObject(0).getString(
-				// "emergency_contact_number");
-				sques = jsonMainArr.getJSONObject(0).getString(
-						"security_question");
-				sans = jsonMainArr.getJSONObject(0)
-						.getString("security_answer");
-				profilecom = jsonMainArr.getJSONObject(0).getInt(
-						"profile_completed");
-				pin = jsonMainArr.getJSONObject(0).getString("pin");
-				points = jsonMainArr.getJSONObject(0).getString(
-						"samaritan_points");
-				photourl = jsonMainArr.getJSONObject(0).getString("photo_url");
-				int pos = photourl.lastIndexOf("/");
-				photoname = photourl.substring(pos + 1);
-
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
-			} catch (JSONException e) {
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
+
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					success = profile.getString("status");
+					mess = profile.getString("message");
+
+					jsonMainArr = profile.getJSONArray("response");
+
+					jsonVehicleArr = profile.getJSONArray("vehicles");
+
+					user_id = jsonMainArr.getJSONObject(0).getString("user_id");
+					fName = jsonMainArr.getJSONObject(0)
+							.getString("first_name");
+					lName = jsonMainArr.getJSONObject(0).getString("last_name");
+					email = jsonMainArr.getJSONObject(0).getString("email");
+					mobileNumber = jsonMainArr.getJSONObject(0).getString(
+							"mobile_number");
+					String[] datespilt = jsonMainArr.getJSONObject(0)
+							.getString("dob").split("\\s+");
+					dob = String.valueOf(datespilt[0]);
+					gender = jsonMainArr.getJSONObject(0).getString("gender");
+					licenseNo = jsonMainArr.getJSONObject(0).getString(
+							"license_no");
+					street = jsonMainArr.getJSONObject(0).getString("street");
+					suburb = jsonMainArr.getJSONObject(0).getString("suburb");
+					postcode = jsonMainArr.getJSONObject(0).getString(
+							"postcode");
+					dtModified = jsonMainArr.getJSONObject(0).getString("dob");
+					fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
+					fbToken = jsonMainArr.getJSONObject(0)
+							.getString("fb_token");
+					// cname = jsonMainArr.getJSONObject(0).getString(
+					// "emergency_contact");
+					// cnumber = jsonMainArr.getJSONObject(0).getString(
+					// "emergency_contact_number");
+					sques = jsonMainArr.getJSONObject(0).getString(
+							"security_question");
+					sans = jsonMainArr.getJSONObject(0).getString(
+							"security_answer");
+					profilecom = jsonMainArr.getJSONObject(0).getInt(
+							"profile_completed");
+					pin = jsonMainArr.getJSONObject(0).getString("pin");
+					points = jsonMainArr.getJSONObject(0).getString(
+							"samaritan_points");
+					photourl = jsonMainArr.getJSONObject(0).getString(
+							"photo_url");
+					int pos = photourl.lastIndexOf("/");
+					photoname = photourl.substring(pos + 1);
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			}
+
+			// try {
+			// info.device();
+			// json.put("email", id.getText().toString());
+			// pin = pin1.getText().toString() + pin2.getText().toString()
+			// + pin3.getText().toString() + pin4.getText().toString();
+			// json.put("pin", pin);
+			// json.put("make", info.manufacturer);
+			// json.put("os", "Android" + " " + info.Version);
+			// json.put("model", info.model);
+			//
+			// System.out.println("Element1-->" + json);
+			// postMethod.setHeader("Content-Type", "application/json");
+			// postMethod.setEntity(new ByteArrayEntity(json.toString()
+			// .getBytes("UTF8")));
+			// String response = httpClient
+			// .execute(postMethod, resonseHandler);
+			// Log.e("response :", response);
+			//
+			// JSONObject profile = new JSONObject(response);
+			// jsonMainArr = profile.getJSONArray("response");
+			// jsonVehicleArr = profile.getJSONArray("vehicles");
+			// success = profile.getString("status");
+			//
+			// mess = profile.getString("message");
 
 			if (success.equals("success")) {
 

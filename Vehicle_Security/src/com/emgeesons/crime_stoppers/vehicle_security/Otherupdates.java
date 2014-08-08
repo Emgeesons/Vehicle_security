@@ -1,6 +1,7 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -10,12 +11,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,11 +57,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.nostra13.universalimageloader.cache.disc.naming.Md5FileNameGenerator;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
-import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.display.FadeInBitmapDisplayer;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 import com.nostra13.universalimageloader.core.listener.ImageLoadingListener;
@@ -92,7 +98,7 @@ public class Otherupdates extends Fragment {
 	boolean IsInternetPresent;
 	int rsize = 0, ssize = 0;
 	double LATITUDE, LONGITUDE;
-	String pos;
+	String pos, reponse;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -113,6 +119,8 @@ public class Otherupdates extends Fragment {
 		vdetails = (RelativeLayout) rootView.findViewById(R.id.vdetails);
 		data.setOnScrollListener(new EndlessScrollListener());
 		IsInternetPresent = cd.isConnectingToInternet();
+		Updates.imageLoader.clearMemoryCache();
+		Updates.imageLoader.clearDiskCache();
 		if (IsInternetPresent == false) {
 			cd.showNoInternetPopup();
 		} else {
@@ -184,115 +192,144 @@ public class Otherupdates extends Fragment {
 
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(otherUpdates_url);
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			HttpPost httppost = new HttpPost(otherUpdates_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 
-			JSONObject json = new JSONObject();
 			try {
 				info.device();
 				info.showInfo(getActivity());
 				if (atPrefs.getBoolean(Data.checkllogin, true)) {
-					json.put("userId", "0");
-					json.put("pin", "0000");
+
+					mpEntity.addPart("userId", new StringBody("0"));
+					mpEntity.addPart("pin", new StringBody("0000"));
 				} else {
-					json.put("userId", info.user_id);
-					json.put("pin", info.pin);
+					mpEntity.addPart("userId", new StringBody(info.user_id));
+					mpEntity.addPart("pin", new StringBody(info.pin));
+
+				}
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
+				mpEntity.addPart("countReports",
+						new StringBody(String.valueOf(rsize)));
+				mpEntity.addPart("countSightings",
+						new StringBody(String.valueOf(ssize)));
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArrs = profile.getJSONArray("reports");
+					jsonarrs = profile.getJSONArray("sightings");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				if (success.equals("success")) {
 
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
-				json.put("countReports", rsize);
-				json.put("countSightings", ssize);
-				json.put("location", pos);
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArrs = profile.getJSONArray("reports");
-				jsonarrs = profile.getJSONArray("sightings");
-				success = profile.getString("status");
-				mess = profile.getString("message");
+					getActivity().runOnUiThread(new Runnable() {
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
-			}
+						public void run() {
+							pBar.setVisibility(View.GONE);
+							try {
 
-			if (success.equals("success")) {
-
-				getActivity().runOnUiThread(new Runnable() {
-
-					public void run() {
-						pBar.setVisibility(View.GONE);
-						try {
-
-							testimonialData = getContactData();
-						} catch (JSONException e) {
-							e.printStackTrace();
+								testimonialData = getContactData();
+							} catch (JSONException e) {
+								e.printStackTrace();
+							}
 						}
-					}
-				});
-			}
-			// response failure
-			else if (success.equals("failure")) {
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
 
-				getActivity().runOnUiThread(new Runnable() {
+					getActivity().runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
 
-			} else if (success.equals("error")) {
-				getActivity().runOnUiThread(new Runnable() {
+				} else if (success.equals("error")) {
+					getActivity().runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
 
+				}
 			}
 
 			return null;
@@ -373,8 +410,15 @@ public class Otherupdates extends Fragment {
 			sloc = (ImageView) vv.findViewById(R.id.imageView2);
 			oname.setText(testimonialData.get(position).getmake() + " "
 					+ testimonialData.get(position).getmodel());
-			oreg.setText("Registration Number:" + " "
-					+ testimonialData.get(position).getReg());
+			if (testimonialData.get(position).gettype()
+					.equalsIgnoreCase("report")) {
+				oreg.setText("Registration Number:" + " "
+						+ testimonialData.get(position).getReg());
+			} else {
+				oreg.setText("Serial Number:" + " "
+						+ testimonialData.get(position).getReg());
+			}
+
 			otype.setText(testimonialData.get(position).getRtype());
 			odate.setText(dateformate(testimonialData.get(position).getdate()));
 			otime.setText(testimonialData.get(position).getTime());
@@ -386,13 +430,17 @@ public class Otherupdates extends Fragment {
 			} else if (testimonialData.get(position).getVtype()
 					.equalsIgnoreCase("Bicycle")) {
 				ovtype.setImageResource(R.drawable.ic_cycle);
+//				oreg.setText("Serial Number:" + " "
+//						+ testimonialData.get(position).getReg());
 			} else if (testimonialData.get(position).getVtype()
 					.equalsIgnoreCase("MotorCycle")) {
 				ovtype.setImageResource(R.drawable.ic_bike);
 			} else {
 				ovtype.setImageResource(R.drawable.ic_other);
 			}
-
+//			if (testimonialData.get(position).getReg().isEmpty()) {
+//				oreg.setVisibility(View.GONE);
+//			}
 			spottype.setText(testimonialData.get(position).getsstat());
 
 			name.setText(testimonialData.get(position).getfname());
@@ -510,238 +558,266 @@ public class Otherupdates extends Fragment {
 
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(DetailsUpdates_url);
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+			HttpPost httppost = new HttpPost(DetailsUpdates_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 
-			JSONObject json = new JSONObject();
 			try {
 				info.device();
 				info.showInfo(getActivity());
 
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
 				gps = new GPSTracker(getActivity());
-				if (gps.canGetLocation()) {
-					double LATITUDE = gps.getLatitude();
-					double LONGITUDE = gps.getLongitude();
-					json.put("latitude", LATITUDE);
-					json.put("longitude", LONGITUDE);
 
-				} else {
-					json.put("latitude", 0);
-					json.put("longitude", 0);
-				}
-				json.put("vehicleId", vid);
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
 
-				System.out.println("Element1-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				// jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				jsonarr = profile.getJSONArray("response");
+				mpEntity.addPart("vehicleId", new StringBody(vid));
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
 
-				getActivity().runOnUiThread(new Runnable() {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
 
-					public void run() {
-						ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
-						TextView name, reg, type, date, time, location, comm;
-						ImageView vtype, locicon, pic1, pic2, pic3;
-						Button report;
-						pBar.setVisibility(View.GONE);
-						// String[] datespilt = selected_time.split("\\:");
-						// selected_time = datespilt[0] + ":" + datespilt[1];
-						data.setVisibility(View.GONE);
+					jsonarr = profile.getJSONArray("response");
 
-						vdetails.setVisibility(View.VISIBLE);
-						report = (Button) rootView.findViewById(R.id.report);
-						final View v = (RelativeLayout) getActivity()
-								.getLayoutInflater().inflate(
-										R.layout.updateheader, null);
-						name = (TextView) v.findViewById(R.id.name);
-						reg = (TextView) v.findViewById(R.id.reg);
-						type = (TextView) v.findViewById(R.id.type);
-						date = (TextView) v.findViewById(R.id.date);
-						time = (TextView) v.findViewById(R.id.time);
-						location = (TextView) v.findViewById(R.id.location);
-						comm = (TextView) v.findViewById(R.id.comm);
-						vtype = (ImageView) v.findViewById(R.id.vtype);
-						locicon = (ImageView) v.findViewById(R.id.imageView2);
-						pic1 = (ImageView) v.findViewById(R.id.pic1);
-						pic3 = (ImageView) v.findViewById(R.id.pic3);
-						pic2 = (ImageView) v.findViewById(R.id.pic2);
-						data1.setVisibility(View.VISIBLE);
-						data1.addHeaderView(v);
-						if (jsonarr.length() == 0) {
-							RelativeLayout stays = (RelativeLayout) rootView
-									.findViewById(R.id.stays);
-							stays.setVisibility(View.VISIBLE);
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-						}
-						data1.setAdapter(new Adapter());
-						atPrefs = PreferenceManager
-								.getDefaultSharedPreferences(getActivity());
+				if (success.equals("success")) {
 
-						report.setOnClickListener(new OnClickListener() {
+					getActivity().runOnUiThread(new Runnable() {
 
-							@Override
-							public void onClick(View arg0) {
-								if (atPrefs.getBoolean(info.checkllogin, true)) {
-									Intent next = new Intent(getActivity(),
-											LoginActivity.class);
-									startActivity(next);
-									getActivity().finish();
-								} else {
-									Intent next = new Intent(getActivity(),
-											ReportSighting.class);
-									next.putExtra("type", rtype);
-									next.putExtra("reg", vreg);
-									next.putExtra("com", vcomm);
-									next.putExtra("make", vmake);
-									next.putExtra("model", vmodel);
+						public void run() {
+							ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
+							TextView name, reg, type, date, time, location, comm;
+							ImageView vtype, locicon, pic1, pic2, pic3;
+							Button report;
+							pBar.setVisibility(View.GONE);
+							// String[] datespilt = selected_time.split("\\:");
+							// selected_time = datespilt[0] + ":" +
+							// datespilt[1];
+							data.setVisibility(View.GONE);
 
-									startActivity(next);
-									getActivity().finish();
+							vdetails.setVisibility(View.VISIBLE);
+							report = (Button) rootView
+									.findViewById(R.id.report);
+							final View v = (RelativeLayout) getActivity()
+									.getLayoutInflater().inflate(
+											R.layout.updateheader, null);
+							name = (TextView) v.findViewById(R.id.name);
+							reg = (TextView) v.findViewById(R.id.reg);
+							type = (TextView) v.findViewById(R.id.type);
+							date = (TextView) v.findViewById(R.id.date);
+							time = (TextView) v.findViewById(R.id.time);
+							location = (TextView) v.findViewById(R.id.location);
+							comm = (TextView) v.findViewById(R.id.comm);
+							vtype = (ImageView) v.findViewById(R.id.vtype);
+							locicon = (ImageView) v
+									.findViewById(R.id.imageView2);
+							pic1 = (ImageView) v.findViewById(R.id.pic1);
+							pic3 = (ImageView) v.findViewById(R.id.pic3);
+							pic2 = (ImageView) v.findViewById(R.id.pic2);
+							data1.setVisibility(View.VISIBLE);
+							data1.addHeaderView(v);
+							if (jsonarr.length() == 0) {
+								RelativeLayout stays = (RelativeLayout) rootView
+										.findViewById(R.id.stays);
+								stays.setVisibility(View.VISIBLE);
+
+							}
+							data1.setAdapter(new Adapter());
+							atPrefs = PreferenceManager
+									.getDefaultSharedPreferences(getActivity());
+
+							report.setOnClickListener(new OnClickListener() {
+
+								@Override
+								public void onClick(View arg0) {
+									if (atPrefs.getBoolean(info.checkllogin,
+											true)) {
+										Intent next = new Intent(getActivity(),
+												LoginActivity.class);
+										startActivity(next);
+										getActivity().finish();
+									} else {
+										Intent next = new Intent(getActivity(),
+												ReportSighting.class);
+										next.putExtra("type", rtype);
+										next.putExtra("reg", vreg);
+										next.putExtra("com", vcomm);
+										next.putExtra("make", vmake);
+										next.putExtra("model", vmodel);
+
+										startActivity(next);
+										getActivity().finish();
+									}
+								}
+							});
+							String[] datespilt = vtime.split("\\:");
+							selected_time = datespilt[0] + ":" + datespilt[1];
+							name.setText(vmake + " " + vmodel);
+							reg.setText("Registration Number:" + " " + vreg);
+							type.setText(rtype);
+							date.setText(dateformate(vdate));
+							time.setText(selected_time);
+							location.setText(vloc);
+							comm.setText(vcomm);
+
+							String s[] = { spic1, spic2, spic3 };
+							ImageView arr[] = { pic1, pic2, pic3 };
+							for (int i = 0; i < s.length; i++) {
+								Updates.imageLoader.displayImage(s[i], arr[i],
+										options, animateFirstListener);
+								arr[i].setVisibility(View.VISIBLE);
+								if (s[i].isEmpty()) {
+									arr[i].setVisibility(View.GONE);
 								}
 							}
-						});
-						String[] datespilt = vtime.split("\\:");
-						selected_time = datespilt[0] + ":" + datespilt[1];
-						name.setText(vmake + " " + vmodel);
-						reg.setText("Registration Number:" + " " + vreg);
-						type.setText(rtype);
-						date.setText(dateformate(vdate));
-						time.setText(selected_time);
-						location.setText(vloc);
-						comm.setText(vcomm);
 
-						String s[] = { spic1, spic2, spic3 };
-						ImageView arr[] = { pic1, pic2, pic3 };
-						for (int i = 0; i < s.length; i++) {
-							Updates.imageLoader.displayImage(s[i], arr[i],
-									options, animateFirstListener);
-							arr[i].setVisibility(View.VISIBLE);
-							if (s[i].isEmpty()) {
-								arr[i].setVisibility(View.GONE);
+							if (location.getText().toString().isEmpty()) {
+								location.setVisibility(View.GONE);
+								locicon.setVisibility(View.GONE);
 							}
+							pic1.setOnClickListener(new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									Intent intent = new Intent(getActivity(),
+											Fullimage.class);
+									intent.putExtra("IMAGES", spic1);
+									startActivity(intent);
+								}
+							});
+							pic2.setOnClickListener(new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									Intent intent = new Intent(getActivity(),
+											Fullimage.class);
+									intent.putExtra("IMAGES", spic2);
+									startActivity(intent);
+
+								}
+							});
+							pic3.setOnClickListener(new OnClickListener() {
+
+								@Override
+								public void onClick(View v) {
+									Intent intent = new Intent(getActivity(),
+											Fullimage.class);
+									intent.putExtra("IMAGES", spic3);
+									startActivity(intent);
+
+								}
+							});
+							if (vtypes.equalsIgnoreCase("Car")) {
+								vtype.setImageResource(R.drawable.ic_car);
+							} else if (vtypes.equalsIgnoreCase("Bicycle")) {
+								vtype.setImageResource(R.drawable.ic_cycle);
+							} else if (vtypes.equalsIgnoreCase("MotorCycle")) {
+								vtype.setImageResource(R.drawable.ic_bike);
+							} else {
+								vtype.setImageResource(R.drawable.ic_other);
+							}
+
 						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
 
-						if (location.getText().toString().isEmpty()) {
-							location.setVisibility(View.GONE);
-							locicon.setVisibility(View.GONE);
+					getActivity().runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
 						}
-						pic1.setOnClickListener(new OnClickListener() {
+					});
 
-							@Override
-							public void onClick(View v) {
-								Intent intent = new Intent(getActivity(),
-										Fullimage.class);
-								intent.putExtra("IMAGES", spic1);
-								startActivity(intent);
-							}
-						});
-						pic2.setOnClickListener(new OnClickListener() {
+				} else if (success.equals("error")) {
+					getActivity().runOnUiThread(new Runnable() {
 
-							@Override
-							public void onClick(View v) {
-								Intent intent = new Intent(getActivity(),
-										Fullimage.class);
-								intent.putExtra("IMAGES", spic2);
-								startActivity(intent);
-
-							}
-						});
-						pic3.setOnClickListener(new OnClickListener() {
-
-							@Override
-							public void onClick(View v) {
-								Intent intent = new Intent(getActivity(),
-										Fullimage.class);
-								intent.putExtra("IMAGES", spic3);
-								startActivity(intent);
-
-							}
-						});
-						if (vtypes.equalsIgnoreCase("Car")) {
-							vtype.setImageResource(R.drawable.ic_car);
-						} else if (vtypes.equalsIgnoreCase("Bicycle")) {
-							vtype.setImageResource(R.drawable.ic_cycle);
-						} else if (vtypes.equalsIgnoreCase("MotorCycle")) {
-							vtype.setImageResource(R.drawable.ic_bike);
-						} else {
-							vtype.setImageResource(R.drawable.ic_other);
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									getActivity()).create();
+							Dialog.setTitle("Error");
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
 						}
+					});
 
-					}
-				});
-			}
-			// response failure
-			else if (success.equals("failure")) {
-
-				getActivity().runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-
-			} else if (success.equals("error")) {
-				getActivity().runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								getActivity()).create();
-						Dialog.setTitle("Error");
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
-
+				}
+			} else {
+				cd.showNoInternetPopup();
 			}
 
 			return null;

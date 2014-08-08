@@ -1,15 +1,22 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.UnknownHostException;
 import java.util.Calendar;
-import java.util.Date;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.ResponseHandler;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
-import org.apache.http.impl.client.BasicResponseHandler;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -33,10 +40,10 @@ import android.text.Html;
 import android.text.TextWatcher;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnFocusChangeListener;
 import android.view.View.OnKeyListener;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -46,7 +53,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -79,7 +85,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 	int qusvalue;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
-	String oldpin;
+	String oldpin, reponse;
 	GPSTracker gps;
 	double LATITUDE, LONGITUDE;
 
@@ -165,6 +171,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				String AGe = String.valueOf(info.date + "-" + info.month + "-"
 						+ info.year);
 				dob.setText(AGe);
+				input_date = AGe;
 			}
 			oldpin = info.pin;
 			String[] pinnumber = info.pin.split("(?!^)");
@@ -172,7 +179,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			pin2.setText(pinnumber[1]);
 			pin3.setText(pinnumber[2]);
 			pin4.setText(pinnumber[3]);
-
+			
 			if (info.gender.equalsIgnoreCase("male")) {
 				male.setImageResource(R.drawable.male_active);
 				female.setImageResource(R.drawable.female_inactive);
@@ -187,7 +194,6 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			address.setText(info.street);
 			postcode.setText(info.postcode);
 			tqus = info.qusvalues(info.squs);
-			
 
 			if (tqus == 9) {
 
@@ -341,13 +347,13 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			DatePickerDialog dialog = new DatePickerDialog(this,
 					datePickerListener, years, months, date);
 			Calendar calendars = Calendar.getInstance();
-			calendars.set(Calendar.YEAR, years-13);
+			calendars.set(Calendar.YEAR, years - 13);
 			calendars.set(Calendar.MONTH, months);
 			calendars.set(Calendar.MINUTE, date);
 			dialog.getDatePicker().setMaxDate(calendars.getTimeInMillis());
 			// 13 year
-//			dialog.getDatePicker().setMaxDate(
-//					new Date().getTime() - 1L * 13 * 365 * 24 * 60 * 60 * 1000);
+			// dialog.getDatePicker().setMaxDate(
+			// new Date().getTime() - 1L * 13 * 365 * 24 * 60 * 60 * 1000);
 			return dialog;
 
 		}
@@ -470,14 +476,14 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 						bpin4 = false;
 
 					}
-//					if (lnumber.getText().toString().length() < 6) {
-//						lnumber.setHintTextColor(getResources().getColor(
-//								R.color.red));
-//						lnumber.setTextColor(getResources().getColor(
-//								R.color.red));
-//						blnumber = false;
-//
-//					}
+					// if (lnumber.getText().toString().length() < 6) {
+					// lnumber.setHintTextColor(getResources().getColor(
+					// R.color.red));
+					// lnumber.setTextColor(getResources().getColor(
+					// R.color.red));
+					// blnumber = false;
+					//
+					// }
 					if (address.getText().toString().length() < 6) {
 						address.setHintTextColor(getResources().getColor(
 								R.color.red));
@@ -523,39 +529,62 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(update_url);
-			System.out.println(update_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			HttpEntity resEntity;
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(update_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
-				
+				gps = new GPSTracker(EditInfo.this);
 				info.device();
 				info.showInfo(getApplicationContext());
 
-				json.put("userId", info.user_id);
-				json.put("firstName", fname.getText().toString());
-				json.put("lastName", lname.getText().toString());
-				json.put("mobileNumber", number.getText().toString());
-				json.put("dob", input_date);
-				json.put("email", email.getText().toString());
-				json.put("gender", title);
+				mpEntity.addPart("userId", new StringBody(info.user_id));
+				mpEntity.addPart("firstName", new StringBody(fname.getText()
+						.toString()));
+				mpEntity.addPart("lastName", new StringBody(lname.getText()
+						.toString()));
+				mpEntity.addPart("mobileNumber", new StringBody(number
+						.getText().toString()));
+
+				mpEntity.addPart("dob", new StringBody(input_date));
+				mpEntity.addPart("email", new StringBody(email.getText()
+						.toString()));
+				mpEntity.addPart("gender", new StringBody(title));
 				pin = pin1.getText().toString() + pin2.getText().toString()
 						+ pin3.getText().toString() + pin4.getText().toString();
-				json.put("pin", pin);
-				json.put("oldPin", oldpin);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				json.put("licenceNo", lnumber.getText().toString());
-				json.put("address", address.getText().toString());
-				json.put("pincode", postcode.getText().toString());
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
+				mpEntity.addPart("pin", new StringBody(pin));
+				mpEntity.addPart("oldPin", new StringBody(oldpin));
+				mpEntity.addPart("gender", new StringBody(title));
+
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+
+				pin = pin1.getText().toString() + pin2.getText().toString()
+						+ pin3.getText().toString() + pin4.getText().toString();
+
+				mpEntity.addPart("licenceNo", new StringBody(lnumber.getText()
+						.toString()));
+				mpEntity.addPart("address", new StringBody(address.getText()
+						.toString()));
+				mpEntity.addPart("pincode", new StringBody(postcode.getText()
+						.toString()));
+
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
 				switch (buffKey) {
 				case 0:
 					qus = "What's your Passport Number ?";
@@ -594,110 +623,137 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				default:
 					break;
 				}
-				json.put("securityQuestion", qus);
-				json.put("securityAnswer", answer.getText().toString());
+				mpEntity.addPart("securityQuestion",
+						new StringBody(String.valueOf(qus)));
+				mpEntity.addPart("securityAnswer", new StringBody(answer
+						.getText().toString()));
 
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						// qusvalue = info.qusvalues(qus);
-
-						qus = DatabaseUtils.sqlEscapeString(qus);
-						SQLiteDatabase dbbb = db.getReadableDatabase();
-						dbbb.execSQL("UPDATE profile SET user_id = '" + id
-								+ "',fName = '" + fname.getText().toString()
-								+ "',lName = '" + lname.getText().toString()
-								+ "',email = '" + email.getText().toString()
-								+ "',mobileNumber = '"
-								+ number.getText().toString() + "',dob = '"
-								+ input_date + "',gender = '" + title
-								+ "',licenseNo = '"
-								+ lnumber.getText().toString()
-								+ "',street = '"
-								+ address.getText().toString()
-								+ "',postcode = '"
-								+ postcode.getText().toString() + "',pin = '"
-								+ pin + "',squs = " + qus + ",sans = '"
-								+ answer.getText().toString() + "'");
-
-						atPrefs.edit().putBoolean(info.checkllogin, false)
-								.commit();
-						Intent next = new Intent(EditInfo.this,
-								ProfileScreen.class);
-						startActivity(next);
-						finish();
-
-					}
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			// response failure
-			else if (success.equals("failure")) {
+			 resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
 
-				runOnUiThread(new Runnable() {
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								EditInfo.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+				if (success.equals("success")) {
 
-			} else if (success.equals("error")) {
+					runOnUiThread(new Runnable() {
 
-				runOnUiThread(new Runnable() {
+						public void run() {
+							// qusvalue = info.qusvalues(qus);
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								EditInfo.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+							qus = DatabaseUtils.sqlEscapeString(qus);
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("UPDATE profile SET user_id = '" + id
+									+ "',fName = '"
+									+ fname.getText().toString()
+									+ "',lName = '"
+									+ lname.getText().toString()
+									+ "',email = '"
+									+ email.getText().toString()
+									+ "',mobileNumber = '"
+									+ number.getText().toString() + "',dob = '"
+									+ input_date + "',gender = '" + title
+									+ "',licenseNo = '"
+									+ lnumber.getText().toString()
+									+ "',street = '"
+									+ address.getText().toString()
+									+ "',postcode = '"
+									+ postcode.getText().toString()
+									+ "',pin = '" + pin + "',squs = " + qus
+									+ ",sans = '" + answer.getText().toString()
+									+ "'");
+
+							atPrefs.edit().putBoolean(info.checkllogin, false)
+									.commit();
+							Intent next = new Intent(EditInfo.this,
+									ProfileScreen.class);
+							startActivity(next);
+							finish();
+
+						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									EditInfo.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									EditInfo.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;
@@ -718,11 +774,9 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		if (pin1.hasFocus() && pin1.getText().toString().length() == 1) {
 			pin2.requestFocus();
 
-		}
-		if (pin2.hasFocus() && pin2.getText().toString().length() == 1) {
+		} else if (pin2.hasFocus() && pin2.getText().toString().length() == 1) {
 			pin3.requestFocus();
-		}
-		if (pin3.hasFocus() && pin3.getText().toString().length() == 1) {
+		} else if (pin3.hasFocus() && pin3.getText().toString().length() == 1) {
 			pin4.requestFocus();
 		}
 
@@ -777,22 +831,28 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		// go back
 
 		if (keyCode == KeyEvent.KEYCODE_DEL) {
-			if (pin4.hasFocus()) {
-				// pin4.setText("");
-				pin3.requestFocus();
-			} else if (pin3.hasFocus()) {
-				// pin3.setText("");
-				pin2.requestFocus();
-			} else if (pin2.hasFocus()) {
-				// pin2.setText("");
-				pin1.requestFocus();
+			try {
 
+				if (pin4.hasFocus()) {
+					// pin4.setText("");
+					pin3.requestFocus();
+					pin3.setSelection(pin3.getText().toString().length());
+				} else if (pin3.hasFocus()) {
+					// pin3.setText("");
+					pin2.requestFocus();
+					pin2.setSelection(pin2.getText().toString().length());
+				} else if (pin2.hasFocus()) {
+					// pin2.setText("");
+					pin1.requestFocus();
+					pin1.setSelection(pin1.getText().toString().length());
+
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
-
 		}
 		return false;
 	}
-	
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {

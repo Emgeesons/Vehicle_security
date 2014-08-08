@@ -59,6 +59,8 @@
             android:id="@+id/stays"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_above="@+id/report"
+            android:layout_marginBottom="15dp"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
             android:visibility="gone" >

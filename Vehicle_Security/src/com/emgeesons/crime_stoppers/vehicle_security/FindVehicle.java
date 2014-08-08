@@ -1,15 +1,25 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Locale;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -85,6 +95,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 	static String longitude = "longitude";
 	MarkerOptions markerOptionss;
 	int i = 0;
+	String reponse;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -326,164 +337,199 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(feed_url);
-			System.out.println(feed_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
-			try {
 
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(feed_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
+			try {
 				info.device();
 				info.showInfo(getApplicationContext());
-				json.put("userId", info.user_id);
-				json.put("pin", info.pin);
+
+				mpEntity.addPart("userId", new StringBody(info.user_id));
+
+				mpEntity.addPart("pin", new StringBody(info.pin));
 				if (vehicles.size() == 0) {
-					json.put("vehicleId", "0");
+					mpEntity.addPart("vehicleId", new StringBody("0"));
 				} else {
-					json.put("vehicleId", vid);
+					mpEntity.addPart("vehicleId", new StringBody(vid));
+				}
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(curLATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(curLONGITUDE)));
+
+				mpEntity.addPart("rating",
+						new StringBody(String.valueOf(ratepts)));
+				mpEntity.addPart("feedback", new StringBody(feedbacks.getText()
+						.toString()));
+
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+					points = jsonMainArr.getJSONObject(0).getString(
+							"samaritan_points");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
 
-				json.put("latitude", curLATITUDE);
-				json.put("longitude", curLONGITUDE);
-				json.put("feedback", feedbacks.getText().toString());
-				json.put("rating", ratepts);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				points = jsonMainArr.getJSONObject(0).getString(
-						"samaritan_points");
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
-			}
+				if (success.equals("success")) {
 
-			if (success.equals("success")) {
+					runOnUiThread(new Runnable() {
 
-				runOnUiThread(new Runnable() {
+						public void run() {
 
-					public void run() {
+							final Dialog dialog = new Dialog(FindVehicle.this);
+							dialog.setContentView(R.layout.feedbackpoint);
+							dialog.setTitle("Sweet!");
+							TextView point;
+							RelativeLayout close, profile;
 
-						final Dialog dialog = new Dialog(FindVehicle.this);
-						dialog.setContentView(R.layout.feedbackpoint);
-						dialog.setTitle("Sweet!");
-						TextView point;
-						RelativeLayout close, profile;
+							point = (TextView) dialog.findViewById(R.id.points);
+							profile = (RelativeLayout) dialog
+									.findViewById(R.id.profile);
+							close = (RelativeLayout) dialog
+									.findViewById(R.id.close);
+							close.setOnClickListener(new OnClickListener() {
 
-						point = (TextView) dialog.findViewById(R.id.points);
-						profile = (RelativeLayout) dialog
-								.findViewById(R.id.profile);
-						close = (RelativeLayout) dialog
-								.findViewById(R.id.close);
-						close.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View arg0) {
+									Intent next = new Intent(
+											getApplicationContext(),
+											MainActivity.class);
+									startActivity(next);
+									finish();
 
-							@Override
-							public void onClick(View arg0) {
-								Intent next = new Intent(
-										getApplicationContext(),
-										MainActivity.class);
-								startActivity(next);
-								finish();
+								}
+							});
+							profile.setOnClickListener(new OnClickListener() {
 
+								@Override
+								public void onClick(View arg0) {
+									Intent next = new Intent(
+											getApplicationContext(),
+											ProfileScreen.class);
+									startActivity(next);
+									finish();
+
+								}
+							});
+							point.setText("Total Samaritan Points :" + " "
+									+ points);
+							dialog.setCancelable(false);
+							dialog.show();
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							if (vehicles.size() == 0) {
+								atPrefs.edit()
+										.putString(info.glatitude,
+												String.valueOf("not")).commit();
+								atPrefs.edit()
+										.putString(info.glongitude,
+												String.valueOf("not")).commit();
+							} else {
+
+								dbbb.execSQL("UPDATE Vehicle_park SET lat = '"
+										+ "" + "',lon = '" + "" + "',mark = '"
+										+ "" + "'WHERE vid='" + vid + "'");
 							}
-						});
-						profile.setOnClickListener(new OnClickListener() {
 
-							@Override
-							public void onClick(View arg0) {
-								Intent next = new Intent(
-										getApplicationContext(),
-										ProfileScreen.class);
-								startActivity(next);
-								finish();
+							dbbb.execSQL("UPDATE profile SET spoints = '"
+									+ points + "'");
 
-							}
-						});
-						point.setText("Total Samaritan Points :" + " " + points);
-						dialog.setCancelable(false);
-						dialog.show();
-						SQLiteDatabase dbbb = db.getReadableDatabase();
-						if (vehicles.size() == 0) {
-							atPrefs.edit()
-									.putString(info.glatitude,
-											String.valueOf("not")).commit();
-							atPrefs.edit()
-									.putString(info.glongitude,
-											String.valueOf("not")).commit();
-						} else {
-
-							dbbb.execSQL("UPDATE Vehicle_park SET lat = '" + ""
-									+ "',lon = '" + "" + "',mark = '" + ""
-									+ "'WHERE vid='" + vid + "'");
 						}
+					});
+				}
 
-						dbbb.execSQL("UPDATE profile SET spoints = '" + points
-								+ "'");
+				// response failure
+				else if (success.equals("failure")) {
 
-					}
-				});
-			}
+					runOnUiThread(new Runnable() {
 
-			// response failure
-			else if (success.equals("failure")) {
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									FindVehicle.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											Dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
 
-				runOnUiThread(new Runnable() {
+				} else if (success.equals("error")) {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								FindVehicle.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+					runOnUiThread(new Runnable() {
 
-			} else if (success.equals("error")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								FindVehicle.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									FindVehicle.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;

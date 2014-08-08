@@ -1,5 +1,7 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
+import java.net.InetAddress;
+
 import android.app.AlertDialog;
 import android.app.Service;
 import android.content.BroadcastReceiver;
@@ -63,6 +65,7 @@ public class GPSTracker implements LocationListener {
 			if (!isGPSEnabled && !isNetworkEnabled) {
 				// no network provider is enabled
 			} else {
+//				if (InetAddress.getByName("www.xy.com").isReachable(3000))
 				this.canGetLocation = true;
 				if (isNetworkEnabled) {
 					locationManager.requestLocationUpdates(

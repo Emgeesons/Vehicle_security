@@ -676,7 +676,7 @@ int id imageView2 0x7f050018
 int id imageView3 0x7f05001a
 int id imageView4 0x7f05001b
 int id imagetype 0x7f05012c
-int id ins 0x7f0500ed
+int id ins 0x7f0500f0
 int id inscall 0x7f05011c
 int id l 0x7f05005c
 int id l_main 0x7f0500d0
@@ -721,12 +721,12 @@ int id pic2 0x7f0500b1
 int id pic3 0x7f0500b2
 int id picker_subtitle 0x7f050077
 int id pin 0x7f050095
-int id pin1 0x7f050092
-int id pin2 0x7f050091
+int id pin1 0x7f050091
+int id pin2 0x7f050092
 int id pin3 0x7f050093
 int id pin4 0x7f050094
 int id points 0x7f0500a4
-int id pol 0x7f0500ec
+int id pol 0x7f0500ef
 int id police 0x7f05009a
 int id policy 0x7f050116
 int id policyno 0x7f050058
@@ -743,7 +743,7 @@ int id radioButton1 0x7f050131
 int id rate 0x7f050046
 int id ratebar 0x7f050045
 int id ratingBar1 0x7f05009f
-int id rdate 0x7f0500f0
+int id rdate 0x7f0500ee
 int id recover 0x7f0500e1
 int id reg 0x7f0500b6
 int id register 0x7f0500ce
@@ -758,9 +758,9 @@ int id relativeLayout5 0x7f050040
 int id relbg 0x7f0500fb
 int id report 0x7f0500c2
 int id ress 0x7f0500e3
-int id rloc 0x7f0500ee
+int id rloc 0x7f0500ec
 int id rreport 0x7f050102
-int id rtime 0x7f0500ef
+int id rtime 0x7f0500ed
 int id rtype 0x7f05010a
 int id s 0x7f050107
 int id satellite 0x7f050004

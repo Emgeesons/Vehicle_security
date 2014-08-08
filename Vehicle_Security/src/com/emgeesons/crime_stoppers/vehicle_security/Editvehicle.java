@@ -1,13 +1,23 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,7 +62,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 	Data info;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
-	String id;
+	String id, reponse;
 	GPSTracker gps;
 	double LATITUDE, LONGITUDE;
 
@@ -318,11 +328,30 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bmake = false;
 					}
-					if (model.getText().toString().length() < 2) {
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
+							|| type.getText().toString()
+									.equalsIgnoreCase("Other")
+							&& model.getText().toString().length() < 2) {
 
 						model.setTextColor(getResources().getColor(R.color.red));
 						model.setHintTextColor(getResources().getColor(
 								R.color.red));
+
+						bmodel = false;
+					}
+					if ((type.getText().toString().equalsIgnoreCase("Bicycle"))
+							&& (model.getText().toString().trim().isEmpty() && make
+									.getText().toString().trim().isEmpty())) {
+
+						model.setTextColor(getResources().getColor(R.color.red));
+						model.setHintTextColor(getResources().getColor(
+								R.color.red));
+						make.setTextColor(getResources().getColor(R.color.red));
+						make.setHintTextColor(getResources().getColor(
+								R.color.red));
+						bmake = false;
 						bmodel = false;
 					}
 					if ((type.getText().toString().equalsIgnoreCase("Car") || type
@@ -490,22 +519,24 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(editVehicle_url);
-			System.out.println(editVehicle_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(editVehicle_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 
 				info.device();
 				info.showInfo(getApplicationContext());
-				json.put("userId", info.user_id);
-				json.put("vehicleId", id);
-				json.put("pin", info.pin);
 				if (type.getText().toString().equalsIgnoreCase("other")) {
 
 					types = type_other.getText().toString();
@@ -514,131 +545,170 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 					types = type.getText().toString();
 
 				}
-				json.put("vehicleType", types);
-				json.put("vehicleMake", make.getText().toString());
-				json.put("vehicleModel", model.getText().toString());
-				json.put("vehicleBodyType", body.getText().toString());
-				json.put("registrationSerialNo", reg.getText().toString());
-				json.put("engineNo", engine.getText().toString());
-				json.put("vinChassisNo", chassis.getText().toString());
-				json.put("state", state.getText().toString());
-				json.put("colour", colour.getText().toString());
-				json.put("uniqueFeatures", acc.getText().toString());
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
 
-				json.put("latitude", LATITUDE);
-				json.put("longitude", LONGITUDE);
+				mpEntity.addPart("vehicleId", new StringBody(id));
+				mpEntity.addPart("vehicleType", new StringBody(types));
+				mpEntity.addPart("vehicleMake", new StringBody(make.getText()
+						.toString()));
+				mpEntity.addPart("vehicleModel", new StringBody(model.getText()
+						.toString()));
+				mpEntity.addPart("vehicleBodyType", new StringBody(body
+						.getText().toString()));
+				mpEntity.addPart("registrationSerialNo", new StringBody(reg
+						.getText().toString()));
+				mpEntity.addPart("engineNo", new StringBody(engine.getText()
+						.toString()));
+				mpEntity.addPart("vinChassisNo", new StringBody(chassis
+						.getText().toString()));
+				mpEntity.addPart("state", new StringBody(state.getText()
+						.toString()));
+				mpEntity.addPart("colour", new StringBody(colour.getText()
+						.toString()));
+				mpEntity.addPart("uniqueFeatures", new StringBody(acc.getText()
+						.toString()));
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("latitude",
+						new StringBody(String.valueOf(LATITUDE)));
+				mpEntity.addPart("longitude",
+						new StringBody(String.valueOf(LONGITUDE)));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
 
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-
-						SQLiteDatabase dbbb = db.getReadableDatabase();
-						dbbb.execSQL("UPDATE vehicle_info SET vehicle_id = '"
-								+ id + "',vehicle_type = '" + types
-								+ "',vehicle_make = '"
-								+ make.getText().toString()
-								+ "',vehicle_model = '"
-								+ model.getText().toString()
-								+ "',vehicle_body = '"
-								+ body.getText().toString()
-								+ "',vehicle_eng = '"
-								+ engine.getText().toString()
-								+ "',vehicle_ch = '"
-								+ chassis.getText().toString()
-								+ "',vehicle_colour = '"
-								+ colour.getText().toString()
-								+ "',vehicle_acc = '"
-								+ acc.getText().toString()
-								+ "',vehicle_reg = '"
-								+ reg.getText().toString()
-								+ "',vehicle_state = '"
-								+ state.getText().toString()
-								+ "'WHERE vehicle_id='" + id + "'");
-
-						dbbb.execSQL("UPDATE Vehicle_park SET type = '" + types
-								+ "',model = '" + model.getText().toString()
-								+ "'WHERE vid='" + id + "'");
-
-						Intent next = new Intent(getApplicationContext(),
-								VehicleProfile.class);
-						next.putExtra("id", id);
-						startActivity(next);
-						finish();
-
-					}
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			// response failure
-			else if (success.equals("failure")) {
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
 
-				runOnUiThread(new Runnable() {
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								Editvehicle.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+				if (success.equals("success")) {
 
-			} else if (success.equals("error")) {
+					runOnUiThread(new Runnable() {
 
-				runOnUiThread(new Runnable() {
+						public void run() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								Editvehicle.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("UPDATE vehicle_info SET vehicle_id = '"
+									+ id
+									+ "',vehicle_type = '"
+									+ types
+									+ "',vehicle_make = '"
+									+ make.getText().toString()
+									+ "',vehicle_model = '"
+									+ model.getText().toString()
+									+ "',vehicle_body = '"
+									+ body.getText().toString()
+									+ "',vehicle_eng = '"
+									+ engine.getText().toString()
+									+ "',vehicle_ch = '"
+									+ chassis.getText().toString()
+									+ "',vehicle_colour = '"
+									+ colour.getText().toString()
+									+ "',vehicle_acc = '"
+									+ acc.getText().toString()
+									+ "',vehicle_reg = '"
+									+ reg.getText().toString()
+									+ "',vehicle_state = '"
+									+ state.getText().toString()
+									+ "'WHERE vehicle_id='" + id + "'");
+
+							dbbb.execSQL("UPDATE Vehicle_park SET type = '"
+									+ types + "',model = '"
+									+ model.getText().toString()
+									+ "'WHERE vid='" + id + "'");
+
+							Intent next = new Intent(getApplicationContext(),
+									VehicleProfile.class);
+							next.putExtra("id", id);
+							startActivity(next);
+							finish();
+
+						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									Editvehicle.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											Dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									Editvehicle.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;

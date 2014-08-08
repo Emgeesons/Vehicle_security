@@ -1,13 +1,23 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -55,6 +65,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 	SQLiteDatabase dbb;
 	int typevalue;
 	GPSTracker gps;
+	String reponse;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -228,6 +239,8 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 					if ((type.getText().toString().equalsIgnoreCase("Car") || type
 							.getText().toString()
 							.equalsIgnoreCase("MotorCycle"))
+							|| type.getText().toString()
+									.equalsIgnoreCase("Other")
 							&& model.getText().toString().length() < 2) {
 
 						model.setTextColor(getResources().getColor(R.color.red));
@@ -236,6 +249,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 
 						bmodel = false;
 					}
+
 					if ((type.getText().toString().equalsIgnoreCase("Bicycle"))
 							&& (model.getText().toString().trim().isEmpty() && make
 									.getText().toString().trim().isEmpty())) {
@@ -416,20 +430,24 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(addVehicle_url);
-			System.out.println(addVehicle_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(addVehicle_url);
+			@SuppressWarnings("deprecation")
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 				gps = new GPSTracker(Addvehicle.this);
 				info.device();
 				info.showInfo(getApplicationContext());
-				json.put("userId", info.user_id);
 				if (type.getText().toString().equalsIgnoreCase("other")) {
 					typevalue = type_other.getText().toString();
 
@@ -437,127 +455,161 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 					typevalue = type.getText().toString();
 
 				}
-				json.put("vehicleType", typevalue);
-				json.put("vehicleMake", make.getText().toString());
-				json.put("vehicleModel", model.getText().toString());
-				json.put("vehicleBodyType", body.getText().toString());
-				json.put("registrationSerialNo", reg.getText().toString());
-				json.put("engineNo", engine.getText().toString());
-				json.put("vinChassisNo", chassis.getText().toString());
-				json.put("colour", colour.getText().toString());
-				json.put("uniqueFeatures", acc.getText().toString());
-				json.put("state", state.getText().toString());
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				json.put("pin", info.pin);
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				vid = jsonMainArr.getJSONObject(0).getString("vehicle_id");
+				mpEntity.addPart("vehicleBodyType", new StringBody(body
+						.getText().toString()));
+				mpEntity.addPart("registrationSerialNo", new StringBody(reg
+						.getText().toString()));
+				mpEntity.addPart("engineNo", new StringBody(engine.getText()
+						.toString()));
 
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+				mpEntity.addPart("vinChassisNo", new StringBody(chassis
+						.getText().toString()));
+				mpEntity.addPart("colour", new StringBody(colour.getText()
+						.toString()));
+				mpEntity.addPart("uniqueFeatures", new StringBody(acc.getText()
+						.toString()));
+				mpEntity.addPart("state", new StringBody(state.getText()
+						.toString()));
+				mpEntity.addPart("vehicleType", new StringBody(typevalue));
+				mpEntity.addPart("vehicleMake", new StringBody(make.getText()
+						.toString()));
+				mpEntity.addPart("vehicleModel", new StringBody(model.getText()
+						.toString()));
+				mpEntity.addPart("pin", new StringBody(info.pin));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+				mpEntity.addPart("userId", new StringBody(info.user_id));
+
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-
-						VehicleData data = new VehicleData(
-								Integer.valueOf(vid), typevalue, make.getText()
-										.toString(),
-								model.getText().toString(), body.getText()
-										.toString(), engine.getText()
-										.toString(), chassis.getText()
-										.toString(), colour.getText()
-										.toString(), acc.getText().toString(),
-								reg.getText().toString(), "", "", "", "", "",
-								"", state.getText().toString());
-						// check = make
-						ParkingData datas = new ParkingData(vid, model
-								.getText().toString(), "", "", "", make
-								.getText().toString(), typevalue);
-						db.inserparkData(datas);
-						db.insertvehicleData(data);
-						// SQLiteDatabase dbbb = db.getReadableDatabase();
-						// dbbb.execSQL("UPDATE vehicle_info SET vehicle_model = '"
-						// + model.getText().toString()
-						//
-						// + "'WHERE vehicle_id='" + "5" + "'");
-
-						Intent next = new Intent(getApplicationContext(),
-								VehicleProfile.class);
-						next.putExtra("id", vid);
-						startActivity(next);
-						finish();
-
-					}
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+					vid = jsonMainArr.getJSONObject(0).getString("vehicle_id");
 
-			// response failure
-			else if (success.equals("failure")) {
+				} catch (JSONException e) {
+					System.out.println("JSONException");
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-				runOnUiThread(new Runnable() {
+				if (success.equals("success")) {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								Addvehicle.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+					runOnUiThread(new Runnable() {
 
-			} else if (success.equals("error")) {
+						public void run() {
 
-				runOnUiThread(new Runnable() {
+							VehicleData data = new VehicleData(
+									Integer.valueOf(vid), typevalue, make
+											.getText().toString(), model
+											.getText().toString(), body
+											.getText().toString(), engine
+											.getText().toString(), chassis
+											.getText().toString(), colour
+											.getText().toString(), acc
+											.getText().toString(), reg
+											.getText().toString(), "", "", "",
+									"", "", "", state.getText().toString());
+							// check = make
+							ParkingData datas = new ParkingData(vid, model
+									.getText().toString(), "", "", "", make
+									.getText().toString(), typevalue);
+							db.inserparkData(datas);
+							db.insertvehicleData(data);
+							// SQLiteDatabase dbbb = db.getReadableDatabase();
+							// dbbb.execSQL("UPDATE vehicle_info SET vehicle_model = '"
+							// + model.getText().toString()
+							//
+							// + "'WHERE vehicle_id='" + "5" + "'");
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								Addvehicle.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+							Intent next = new Intent(getApplicationContext(),
+									VehicleProfile.class);
+							next.putExtra("id", vid);
+							startActivity(next);
+							finish();
+
+						}
+					});
+				}
+
+				// response failure
+				else if (success.equals("failure")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									Addvehicle.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											Dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									Addvehicle.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
-
 			return null;
 
 		}

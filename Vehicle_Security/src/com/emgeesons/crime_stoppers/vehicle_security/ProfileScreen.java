@@ -87,7 +87,7 @@ public class ProfileScreen extends BaseActivity {
 	ArrayList<String> f = new ArrayList<String>();// list of file paths
 	File[] listFile;
 	int height;
-
+	double LATITUDE, LONGITUDE;
 	GPSTracker gps;
 
 	@Override
@@ -210,6 +210,14 @@ public class ProfileScreen extends BaseActivity {
 			addvehicle.setText("My Vehicles");
 		}
 
+		gps = new GPSTracker(ProfileScreen.this);
+		if (gps.canGetLocation()) {
+			LATITUDE = gps.getLatitude();
+			LONGITUDE = gps.getLongitude();
+		} else {
+			LATITUDE = 0.0;
+			LONGITUDE = 0.0;
+		}
 		addvehicle.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -290,41 +298,41 @@ public class ProfileScreen extends BaseActivity {
 
 		// change images
 
-		if (f.size() == 0) {
-			height = getWindowManager().getDefaultDisplay().getHeight();
-			int image_hs = height * 30 / 100;
-			RelativeLayout.LayoutParams parmss = new RelativeLayout.LayoutParams(
-					LayoutParams.MATCH_PARENT, image_hs);
-			bg.setLayoutParams(parmss);
-			bg.setImageResource(R.drawable.default_profile_bg);
-			bg.setScaleType(ScaleType.FIT_XY);
+		// if (f.size() == 0) {
+		height = getWindowManager().getDefaultDisplay().getHeight();
+		int image_hs = height * 30 / 100;
+		RelativeLayout.LayoutParams parmss = new RelativeLayout.LayoutParams(
+				LayoutParams.MATCH_PARENT, image_hs);
+		bg.setLayoutParams(parmss);
+		bg.setImageResource(R.drawable.default_profile_bg);
+		bg.setScaleType(ScaleType.FIT_XY);
 
-		} else {
-
-			final Handler handlers = new Handler();
-			Runnable runnable = new Runnable() {
-
-				public void run() {
-					Drawable d = (Drawable) Drawable.createFromPath(f
-							.get(count));
-					// int image_hs = height * 30 / 100;
-					// RelativeLayout.LayoutParams parmss = new
-					// RelativeLayout.LayoutParams(
-					// LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-					// bg.setLayoutParams(parmss);
-					bg.setImageDrawable(d);
-					count++;
-
-					if (count > f.size() - 1) {
-
-						count = 0;
-					}
-
-					handlers.postDelayed(this, 3000); // for interval...
-				}
-			};
-			handlers.post(runnable);
-		}
+		// } else {
+		//
+		// final Handler handlers = new Handler();
+		// Runnable runnable = new Runnable() {
+		//
+		// public void run() {
+		// Drawable d = (Drawable) Drawable.createFromPath(f
+		// .get(count));
+		// // int image_hs = height * 30 / 100;
+		// // RelativeLayout.LayoutParams parmss = new
+		// // RelativeLayout.LayoutParams(
+		// // LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+		// // bg.setLayoutParams(parmss);
+		// bg.setImageDrawable(d);
+		// count++;
+		//
+		// if (count > f.size() - 1) {
+		//
+		// count = 0;
+		// }
+		//
+		// handlers.postDelayed(this, 3000); // for interval...
+		// }
+		// };
+		// handlers.post(runnable);
+		// }
 
 		profilepic.setOnClickListener(new OnClickListener() {
 
@@ -583,7 +591,7 @@ public class ProfileScreen extends BaseActivity {
 				photo = Bitmap.createScaledBitmap(photo, 200, 200, false);
 				ByteArrayOutputStream bytes = new ByteArrayOutputStream();
 				photo.compress(Bitmap.CompressFormat.PNG, 100, bytes);
-				File f = new File(sdRoot, dir + "profilePic.png");
+				File f = new File(sdRoot, dir + "profile.png");
 				try {
 
 					f.createNewFile();
@@ -688,22 +696,47 @@ public class ProfileScreen extends BaseActivity {
 
 			try {
 				JSONObject profile = new JSONObject(names);
-				String res = profile.getString("response");
-				int pos = res.lastIndexOf("/");
-				names = res.substring(pos + 1);
-				Log.i("name", names);
-			} catch (Exception e) {
-			}
+				success = profile.getString("status");
+				// mess = profile.getString("message");
+				if (success.equalsIgnoreCase("success")) {
+					String res = profile.getString("response");
+					int pos = res.lastIndexOf("/");
+					names = res.substring(pos + 1);
+					Log.i("name", names);
+					String photoName = "profile.png";
+					// change image name
+					File photo = new File(sdRoot, dir + "profile.png");
+					while (photo.exists()) {
+						photoName = names;
+						photo.renameTo(new File(sdRoot, dir + photoName));
+						atPrefs.edit()
+								.putString(SplashscreenActivity.profile_pic,
+										photoName).commit();
+					}
+				} else if (!success.equalsIgnoreCase("success")) {
+					runOnUiThread(new Runnable() {
 
-			String photoName = "profile.png";
-			// change image name
-			File photo = new File(sdRoot, dir + "profile.png");
-			while (photo.exists()) {
-				photoName = names;
-				photo.renameTo(new File(sdRoot, dir + photoName));
-				atPrefs.edit()
-						.putString(SplashscreenActivity.profile_pic, photoName)
-						.commit();
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									ProfileScreen.this).create();
+							Dialog.setTitle(success);
+							// Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
+
+			} catch (Exception e) {
 			}
 
 		}
@@ -725,25 +758,16 @@ public class ProfileScreen extends BaseActivity {
 		ContentBody cbFile = new FileBody(file);
 		info.device();
 		info.showInfo(getApplicationContext());
-		gps = new GPSTracker(ProfileScreen.this);
 		mpEntity.addPart("image", cbFile);
 		mpEntity.addPart("make", new StringBody(info.manufacturer));
 		mpEntity.addPart("os", new StringBody("Android" + " " + info.Version));
 		mpEntity.addPart("model", new StringBody(info.model));
 		mpEntity.addPart("userId", new StringBody(info.user_id));
 		mpEntity.addPart("pin", new StringBody(info.pin));
-		if (gps.canGetLocation()) {
-			double LATITUDE = gps.getLatitude();
-			double LONGITUDE = gps.getLongitude();
-			mpEntity.addPart("latitude",
-					new StringBody(String.valueOf(LATITUDE)));
-			mpEntity.addPart("longitude",
-					new StringBody(String.valueOf(LONGITUDE)));
 
-		} else {
-			mpEntity.addPart("latitude", new StringBody(String.valueOf(0)));
-			mpEntity.addPart("longitude", new StringBody(String.valueOf(0)));
-		}
+		mpEntity.addPart("latitude", new StringBody(String.valueOf(LATITUDE)));
+		mpEntity.addPart("longitude", new StringBody(String.valueOf(LONGITUDE)));
+
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
 		HttpResponse response = httpclient.execute(httppost);

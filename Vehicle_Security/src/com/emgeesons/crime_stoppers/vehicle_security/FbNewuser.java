@@ -1,14 +1,24 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -73,7 +83,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 	SQLiteDatabase dbb;
 	String pin;
 	// int qusvalue;
-	String fname, lname;
+	String fname, lname, reponse;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -301,78 +311,31 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(fbregister_url);
-			System.out.println(fbregister_url);
 			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(fbregister_url);
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
 			try {
 				info.device();
 				info.showInfo(getApplicationContext());
 
-				json.put("mobileNumber", number.getText().toString());
-				json.put("oldPin", oldpin);
-				json.put("userId", userid);
-				json.put("email", email);
+				mpEntity.addPart("mobileNumber", new StringBody(number
+						.getText().toString()));
+
+				mpEntity.addPart("oldPin", new StringBody(oldpin));
+				mpEntity.addPart("userId", new StringBody(userid));
+				mpEntity.addPart("email", new StringBody(email));
 				pin = pin1.getText().toString() + pin2.getText().toString()
 						+ pin3.getText().toString() + pin4.getText().toString();
-				json.put("pin", pin);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
-				// if (otherqus.getVisibility() == View.GONE) {
-				// json.put("securityQuestion", qus);
-				// } else {
-				// json.put("securityQuestion", otherqus);
-				// }
-				// switch (buffKey) {
-				// case 0:
-				// json.put("securityQuestion",
-				// "What’s your Passport Number ?");
-				// break;
-				// case 1:
-				// json.put("securityQuestion", "What’s your License Number ?");
-				// break;
-				//
-				// case 2:
-				// json.put("securityQuestion",
-				// "What’s your Mothers Maiden Name ?");
-				// break;
-				//
-				// case 3:
-				// json.put("securityQuestion",
-				// "What’s your First Pets Name ?");
-				// break;
-				//
-				// case 4:
-				// json.put("securityQuestion",
-				// "Who was your First Childhood Friend ?");
-				// break;
-				// case 5:
-				// json.put("securityQuestion",
-				// "What Primary School did you First Attend ?");
-				// break;
-				// case 6:
-				// json.put("securityQuestion",
-				// "What was the Colour of your First Car ?");
-				// break;
-				// case 7:
-				// json.put("securityQuestion",
-				// "What is your All Time Favourite Movie ?");
-				// break;
-				// case 8:
-				// json.put("securityQuestion",
-				// "What was your First Paid Job ?");
-				// break;
-				// case 9:
-				// json.put("securityQuestion", otherqus.getText().toString());
-				// break;
-				//
-				// default:
-				// break;
-				// }
-
+				mpEntity.addPart("pin", new StringBody(pin));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
 				switch (buffKey) {
 				case 0:
 					quss = "What's your Passport Number ?";
@@ -431,144 +394,167 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 				default:
 					break;
 				}
-				json.put("securityQuestion", quss);
-				json.put("userId", userid);
+				mpEntity.addPart("securityQuestion", new StringBody(quss));
+				mpEntity.addPart("userId", new StringBody(userid));
+				mpEntity.addPart("securityAnswer", new StringBody(answer
+						.getText().toString()));
 
-				json.put("securityAnswer", answer.getText().toString());
-
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				// jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				// id = jsonMainArr.getJSONObject(0).getString("user_id");
-
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-
-			if (success.equals("success")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						quss = DatabaseUtils.sqlEscapeString(quss);
-
-						db = new DatabaseHandler(FbNewuser.this);
-						try {
-
-							db.createDataBase();
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-						dbb = db.openDataBase();
-						dbb = db.getReadableDatabase();
-
-						atPrefs.edit().putBoolean(info.checkllogin, false)
-								.commit();
-						SQLiteDatabase dbbb = db.getReadableDatabase();
-						dbbb.execSQL("UPDATE profile SET mobileNumber = '"
-								+ number.getText().toString() + "'");
-
-						dbbb.execSQL("UPDATE profile SET pin = '" + pin + "'");
-						dbbb.execSQL("UPDATE profile SET squs = " + quss + "");
-						dbbb.execSQL("UPDATE profile SET sans = '"
-								+ answer.getText().toString() + "'");
-
-						String selectQuery = "SELECT * FROM profile";
-
-						Cursor cursor = dbb.rawQuery(selectQuery, null);
-						if (cursor.moveToFirst()) {
-							do {
-								fname = cursor.getString(cursor
-										.getColumnIndex("fName"));
-								lname = cursor.getString(cursor
-										.getColumnIndex("lName"));
-							} while (cursor.moveToNext());
-						}
-						atPrefs.edit()
-								.putInt(SplashscreenActivity.progress, 30)
-								.commit();
-						AirshipConfigOptions options = AirshipConfigOptions
-								.loadDefaultOptions(FbNewuser.this);
-						UAirship.takeOff(getApplication(), options);
-						PushManager.shared().setAlias(String.valueOf(userid));
-
-						// Tags
-						HashSet<String> tags = new HashSet<String>();
-						tags.add(fname);
-						tags.add(lname);
-						PushManager.shared().setTags(tags);
-						PushManager.enablePush();
-						PushManager.shared().setIntentReceiver(
-								IntentReceiver.class);
-						String apid = PushManager.shared().getAPID();
-						Logger.info("My Application onCreate - App APID: "
-								+ apid);
-						Intent next = new Intent(FbNewuser.this,
-								MainActivity.class);
-						startActivity(next);
-						finish();
-
-					}
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			// response failure
-			else if (success.equals("failure")) {
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
 
-				runOnUiThread(new Runnable() {
+				try {
+					reponse = EntityUtils.toString(resEntity);
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								FbNewuser.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+					System.out.println(reponse);
+					JSONObject profile = new JSONObject(reponse);
+					success = profile.getString("status");
+					mess = profile.getString("message");
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-			} else if (success.equals("error")) {
+				if (success.equals("success")) {
 
-				runOnUiThread(new Runnable() {
+					runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								FbNewuser.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							quss = DatabaseUtils.sqlEscapeString(quss);
+
+							db = new DatabaseHandler(FbNewuser.this);
+							try {
+
+								db.createDataBase();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							dbb = db.openDataBase();
+							dbb = db.getReadableDatabase();
+
+							atPrefs.edit().putBoolean(info.checkllogin, false)
+									.commit();
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("UPDATE profile SET mobileNumber = '"
+									+ number.getText().toString() + "'");
+
+							dbbb.execSQL("UPDATE profile SET pin = '" + pin
+									+ "'");
+							dbbb.execSQL("UPDATE profile SET squs = " + quss
+									+ "");
+							dbbb.execSQL("UPDATE profile SET sans = '"
+									+ answer.getText().toString() + "'");
+
+							String selectQuery = "SELECT * FROM profile";
+
+							Cursor cursor = dbb.rawQuery(selectQuery, null);
+							if (cursor.moveToFirst()) {
+								do {
+									fname = cursor.getString(cursor
+											.getColumnIndex("fName"));
+									lname = cursor.getString(cursor
+											.getColumnIndex("lName"));
+								} while (cursor.moveToNext());
+							}
+							atPrefs.edit()
+									.putInt(SplashscreenActivity.progress, 30)
+									.commit();
+							AirshipConfigOptions options = AirshipConfigOptions
+									.loadDefaultOptions(FbNewuser.this);
+							UAirship.takeOff(getApplication(), options);
+							PushManager.shared().setAlias(
+									String.valueOf(userid));
+
+							// Tags
+							HashSet<String> tags = new HashSet<String>();
+							tags.add(fname);
+							tags.add(lname);
+							PushManager.shared().setTags(tags);
+							PushManager.enablePush();
+							PushManager.shared().setIntentReceiver(
+									IntentReceiver.class);
+							String apid = PushManager.shared().getAPID();
+							Logger.info("My Application onCreate - App APID: "
+									+ apid);
+							Intent next = new Intent(FbNewuser.this,
+									MainActivity.class);
+							startActivity(next);
+							finish();
+
+						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									FbNewuser.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									FbNewuser.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;

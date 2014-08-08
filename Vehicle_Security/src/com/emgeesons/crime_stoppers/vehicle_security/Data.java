@@ -22,9 +22,9 @@ public class Data {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String manufacturer, model, Version;
-	static String url = "http://emgeesonsdevelopment.in/crimestoppers/mobile2.0/";
-//	 static String url = "https://www.mywheels.biz/mobile2.0/";
-
+//	static String url = "http://emgeesonsdevelopment.in/crimestoppers/mobile2.0/";
+	 static String url = "https://www.mywheels.biz/mobile2.0/";
+//k@k.com
 	String user_id, fName, lName, email, mobileNumber, dob, gender, licenseNo,
 			street, address, postcode, dtModified, fbId, fbToken, contact_name,
 			contact_number, pin, sans, type, make, vmodel, reg, body, eng, vin,

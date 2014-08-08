@@ -41,7 +41,7 @@ public class CarPark extends BaseActivity {
 	SharedPreferences atPrefs;
 	Data info;
 	RelativeLayout tips;
-
+	String s;
 	JSONArray jsonMainArr;
 
 	@Override
@@ -57,14 +57,19 @@ public class CarPark extends BaseActivity {
 		info = new Data();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(CarPark.this);
 		Intent intent = getIntent();
-		
+
 		Rate = intent.getStringExtra("Rate");
 		notip = intent.getStringExtra("tips");
 		type = intent.getStringExtra("type");
 		Address = intent.getStringExtra("Address");
 		vid = intent.getStringExtra("id");
 		tips = (RelativeLayout) findViewById(R.id.tipsrel);
-		String s = String.format("%.2f", Double.valueOf(Rate));
+		try {
+			s = String.format("%.2f", Double.valueOf(Rate));
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
 		Rate = String.valueOf(s);
 		db = new DatabaseHandler(CarPark.this);
 		try {
@@ -86,7 +91,7 @@ public class CarPark extends BaseActivity {
 		data = (ListView) findViewById(R.id.listView1);
 		address.setText(Address);
 		rates.setText(Rate);
-		if (notip.isEmpty()) {
+		if (notip.isEmpty() || notip.equalsIgnoreCase("0")) {
 			tip.setVisibility(View.INVISIBLE);
 		} else {
 			tip.setText(notip + "  " + "tips for this location");
@@ -143,7 +148,7 @@ public class CarPark extends BaseActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				if (!notip.isEmpty()) {
+				if (!notip.isEmpty() || notip.equalsIgnoreCase("0")) {
 
 					Intent next = new Intent(getApplicationContext(),
 							Tips.class);
@@ -152,7 +157,6 @@ public class CarPark extends BaseActivity {
 					next.putExtra("Address", Address);
 					next.putExtra("vid", vid);
 					next.putExtra("notip", notip);
-					
 
 					startActivity(next);
 

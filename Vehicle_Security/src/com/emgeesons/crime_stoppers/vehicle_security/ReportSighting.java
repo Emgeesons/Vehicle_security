@@ -732,6 +732,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 										MainActivity.class);
 								startActivity(next);
 								finish();
+								dialog.dismiss();
 
 							}
 						});
@@ -743,6 +744,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 										getApplicationContext(),
 										ProfileScreen.class);
 								startActivity(next);
+								dialog.dismiss();
 								finish();
 
 							}

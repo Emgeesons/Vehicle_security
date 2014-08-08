@@ -1,17 +1,27 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpVersion;
+import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ByteArrayEntity;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.CoreProtocolPNames;
+import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,6 +93,8 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 	static int buffKey = 0;
 	static CharSequence[] secqus;
 	int tqus = -1;
+	String reponse;
+	JSONArray jsonMainArr;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -520,29 +532,41 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
-			DefaultHttpClient httpClient = new DefaultHttpClient();
-			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-			HttpPost postMethod = new HttpPost(register_url);
-			System.out.println(register_url);
-			JSONArray jsonMainArr;
-			JSONObject json = new JSONObject();
+			HttpClient httpclient = new DefaultHttpClient();
+			httpclient.getParams().setParameter(
+					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
+
+			HttpPost httppost = new HttpPost(register_url);
+			MultipartEntity mpEntity = null;
+			mpEntity = new MultipartEntity();
+
+			info.device();
 			try {
-				info.device();
-				json.put("firstName", fname.getText().toString());
-				json.put("lastName", lname.getText().toString());
-				json.put("mobileNumber", number.getText().toString());
-				json.put("dob", input_date);
-				json.put("email", email.getText().toString());
-				json.put("gender", title);
+				mpEntity.addPart("firstName", new StringBody(fname.getText()
+						.toString()));
+
+				mpEntity.addPart("lastName", new StringBody(lname.getText()
+						.toString()));
+				mpEntity.addPart("mobileNumber", new StringBody(number
+						.getText().toString()));
+				mpEntity.addPart("email", new StringBody(email.getText()
+						.toString()));
+
+				mpEntity.addPart("dob", new StringBody(input_date));
+
+				mpEntity.addPart("gender", new StringBody(title));
 				pin = pin1.getText().toString() + pin2.getText().toString()
 						+ pin3.getText().toString() + pin4.getText().toString();
-				json.put("pin", pin);
-				json.put("make", info.manufacturer);
-				json.put("os", "Android" + " " + info.Version);
-				json.put("model", info.model);
+				mpEntity.addPart("pin", new StringBody(pin));
+				mpEntity.addPart("os", new StringBody(info.manufacturer));
+				mpEntity.addPart("make", new StringBody("Android" + " "
+						+ info.Version));
+				mpEntity.addPart("model", new StringBody(info.model));
+
 				// if (otherqus.getVisibility() == View.GONE) {
 				// json.put("securityQuestion", qus);
 				// } else {
@@ -606,123 +630,149 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 				default:
 					break;
 				}
-				json.put("securityQuestion", qus);
-				json.put("securityAnswer", answer.getText().toString());
+				mpEntity.addPart("securityQuestion", new StringBody(qus));
+				mpEntity.addPart("securityAnswer", new StringBody(answer
+						.getText().toString()));
 
-				System.out.println("Elements-->" + json);
-				postMethod.setHeader("Content-Type", "application/json");
-				postMethod.setEntity(new ByteArrayEntity(json.toString()
-						.getBytes("UTF8")));
-				String response = httpClient
-						.execute(postMethod, resonseHandler);
-				Log.e("response :", response);
-				JSONObject profile = new JSONObject(response);
-				jsonMainArr = profile.getJSONArray("response");
-				success = profile.getString("status");
-				mess = profile.getString("message");
-				id = jsonMainArr.getJSONObject(0).getString("user_id");
-
-			} catch (JSONException e) {
-				System.out.println("JSONException");
-			} catch (ClientProtocolException e) {
-				System.out.println("ClientProtocolException");
-				e.printStackTrace();
-			} catch (IOException e) {
-				System.out.println("IOException");
-				e.printStackTrace();
+			} catch (UnsupportedEncodingException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
 
-			if (success.equals("success")) {
-
-				runOnUiThread(new Runnable() {
-
-					public void run() {
-						// qusvalue = info.qusvalues(qus);
-						db = new DatabaseHandler(RegisterActivity.this);
-						PersonalData data = new PersonalData(id, fname
-								.getText().toString(), lname.getText()
-								.toString(), email.getText().toString(), number
-								.getText().toString(), input_date, title, "",
-								"", "", "", "", "", "", "", "", pin, qus,
-								answer.getText().toString(), "0");
-						db.updateprofileData(data);
-						atPrefs.edit().putBoolean(info.checkllogin, false)
-								.commit();
-						atPrefs.edit()
-								.putInt(SplashscreenActivity.progress, 30)
-								.commit();
-						//
-						// atPrefs.edit()
-						// .putInt(SplashscreenActivity.progress, 30)
-						// .commit();
-						AirshipConfigOptions options = AirshipConfigOptions
-								.loadDefaultOptions(RegisterActivity.this);
-						UAirship.takeOff(getApplication(), options);
-						PushManager.shared().setAlias(String.valueOf(id));
-
-						// Tags
-						HashSet<String> tags = new HashSet<String>();
-						tags.add(fname.getText().toString());
-						tags.add(lname.getText().toString());
-						PushManager.shared().setTags(tags);
-						PushManager.enablePush();
-						PushManager.shared().setIntentReceiver(
-								IntentReceiver.class);
-						String apid = PushManager.shared().getAPID();
-						Logger.info("My Application onCreate - App APID: "
-								+ apid);
-						Intent next = new Intent(RegisterActivity.this,
-								MainActivity.class);
-						startActivity(next);
-						finish();
-
-					}
-				});
+			httppost.setEntity(mpEntity);
+			System.out.println(httppost.getRequestLine());
+			HttpResponse response = null;
+			try {
+				response = httpclient.execute(httppost);
+			} catch (ClientProtocolException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
 			}
-			// response failure
-			else if (success.equals("failure")) {
+			HttpEntity resEntity = response.getEntity();
+			System.out.println(response.getStatusLine());
+			if (resEntity != null) {
 
-				runOnUiThread(new Runnable() {
+				try {
+					reponse = EntityUtils.toString(resEntity);
+				} catch (ParseException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								RegisterActivity.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										Dialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+				System.out.println(reponse);
+				try {
+					JSONObject profile = new JSONObject(reponse);
+					jsonMainArr = profile.getJSONArray("response");
+					success = profile.getString("status");
+					mess = profile.getString("message");
+					id = jsonMainArr.getJSONObject(0).getString("user_id");
+				} catch (JSONException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 
-			} else if (success.equals("error")) {
+				if (success.equals("success")) {
 
-				runOnUiThread(new Runnable() {
+					runOnUiThread(new Runnable() {
 
-					public void run() {
-						final AlertDialog Dialog = new AlertDialog.Builder(
-								RegisterActivity.this).create();
-						Dialog.setTitle("Error");
-						Dialog.setIcon(R.drawable.ic_action_error);
-						Dialog.setMessage(mess);
-						Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										pDialog.dismiss();
-									}
-								});
-						Dialog.setCancelable(true);
-						Dialog.show();
-					}
-				});
+						public void run() {
+							// qusvalue = info.qusvalues(qus);
+							db = new DatabaseHandler(RegisterActivity.this);
+							PersonalData data = new PersonalData(id, fname
+									.getText().toString(), lname.getText()
+									.toString(), email.getText().toString(),
+									number.getText().toString(), input_date,
+									title, "", "", "", "", "", "", "", "", "",
+									pin, qus, answer.getText().toString(), "0");
+							db.updateprofileData(data);
+							atPrefs.edit().putBoolean(info.checkllogin, false)
+									.commit();
+							atPrefs.edit()
+									.putInt(SplashscreenActivity.progress, 30)
+									.commit();
+							//
+							// atPrefs.edit()
+							// .putInt(SplashscreenActivity.progress, 30)
+							// .commit();
+							AirshipConfigOptions options = AirshipConfigOptions
+									.loadDefaultOptions(RegisterActivity.this);
+							UAirship.takeOff(getApplication(), options);
+							PushManager.shared().setAlias(String.valueOf(id));
+
+							// Tags
+							HashSet<String> tags = new HashSet<String>();
+							tags.add(fname.getText().toString());
+							tags.add(lname.getText().toString());
+							PushManager.shared().setTags(tags);
+							PushManager.enablePush();
+							PushManager.shared().setIntentReceiver(
+									IntentReceiver.class);
+							String apid = PushManager.shared().getAPID();
+							Logger.info("My Application onCreate - App APID: "
+									+ apid);
+							Intent next = new Intent(RegisterActivity.this,
+									MainActivity.class);
+							startActivity(next);
+							finish();
+
+						}
+					});
+				}
+				// response failure
+				else if (success.equals("failure")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									RegisterActivity.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											Dialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+
+				} else if (success.equals("error")) {
+
+					runOnUiThread(new Runnable() {
+
+						public void run() {
+							final AlertDialog Dialog = new AlertDialog.Builder(
+									RegisterActivity.this).create();
+							Dialog.setTitle("Error");
+							Dialog.setIcon(R.drawable.ic_action_error);
+							Dialog.setMessage(mess);
+							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
+									"OK",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											pDialog.dismiss();
+										}
+									});
+							Dialog.setCancelable(true);
+							Dialog.show();
+						}
+					});
+				}
 			}
 
 			return null;
