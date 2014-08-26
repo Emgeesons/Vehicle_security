@@ -7,7 +7,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:background="@drawable/box_whiteb"
         android:paddingBottom="10dp" >
 
@@ -18,7 +18,7 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
             android:layout_marginLeft="16dp"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="75dp"
             android:text="TextView"
             android:textSize="@dimen/medium_text" />
 
@@ -41,13 +41,23 @@
             android:text="TextView"
             android:textSize="@dimen/medium_text" />
 
+        <RelativeLayout
+            android:id="@+id/rline"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_below="@+id/slocation"
+            android:layout_marginTop="10dp"
+            android:background="@color/gry_profile"
+            android:visibility="gone" >
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/scomm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/simageView1"
             android:layout_alignRight="@+id/stime"
-            android:layout_below="@+id/slocation"
+            android:layout_below="@+id/rline"
             android:layout_marginTop="5dp"
             android:text="locationlocationlocationlocationlocationlocation"
             android:textColor="@color/light_black"
@@ -116,7 +126,7 @@
         android:layout_alignLeft="@+id/relativeLayout2"
         android:layout_alignParentTop="true"
         android:layout_alignRight="@+id/relativeLayout2"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:layout_marginTop="18dp"
         android:background="@drawable/box_crb"
         android:paddingBottom="10dp" >
@@ -139,8 +149,8 @@
             android:layout_height="wrap_content"
             android:layout_alignBaseline="@+id/sname"
             android:layout_alignBottom="@+id/sname"
+            android:layout_alignParentRight="true"
             android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@+id/stype"
             android:layout_toRightOf="@+id/sname"
             android:text="TextView"
             android:textSize="@dimen/big_text" />
@@ -149,13 +159,15 @@
             android:id="@+id/stype"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignBaseline="@+id/sspot"
-            android:layout_alignBottom="@+id/sspot"
             android:layout_alignParentRight="true"
-            android:layout_marginRight="17dp"
+            android:layout_below="@+id/sspot"
+            android:ellipsize="end"
+            android:gravity="right"
+            android:singleLine="true"
             android:text="TextView"
             android:textColor="@color/red"
             android:textSize="@dimen/big_text" />
+
     </RelativeLayout>
 
 </RelativeLayout>

@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -223,6 +224,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 			@Override
 			public void onError(FacebookException error) {
 				Log.i("TAG", "Error " + error.getMessage());
+
 			}
 		});
 		// set permission list, Don't foeget to add email
@@ -561,6 +563,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 			// BasicResponseHandler();
 			// HttpPost postMethod = new HttpPost(forgot_url);
 			JSONArray jsonMainArr;
+			HttpEntity resEntity;
 			// JSONObject json = new JSONObject();
 
 			HttpClient httpclient = new DefaultHttpClient();
@@ -597,7 +600,19 @@ public class LoginActivity extends Activity implements TextWatcher,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -770,6 +785,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		@Override
 		protected Void doInBackground(Void... params) {
 			JSONArray jsonMainArr;
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -807,7 +823,19 @@ public class LoginActivity extends Activity implements TextWatcher,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -947,7 +975,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -997,7 +1025,19 @@ public class LoginActivity extends Activity implements TextWatcher,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 
@@ -1361,6 +1401,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 			// BasicResponseHandler();
 			// HttpPost postMethod = new HttpPost(login_url);
 			JSONArray jsonMainArr;
+			HttpEntity resEntity;
 			// JSONObject json = new JSONObject();
 
 			HttpClient httpclient = new DefaultHttpClient();
@@ -1399,7 +1440,19 @@ public class LoginActivity extends Activity implements TextWatcher,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -1752,9 +1805,13 @@ public class LoginActivity extends Activity implements TextWatcher,
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-
-		Session.getActiveSession().onActivityResult(this, requestCode,
-				resultCode, data);
+		// when net in not present
+		if (resultCode == 0) {
+			cd.showNoInternetPopup();
+		} else {
+			Session.getActiveSession().onActivityResult(this, requestCode,
+					resultCode, data);
+		}
 
 	}
 

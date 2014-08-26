@@ -34,9 +34,10 @@ public class IntentReceiver extends BroadcastReceiver {
 			atPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 			// for updates @homescreen
 			int no = atPrefs.getInt("updates", 0);
-			atPrefs.edit().putInt("updates", no+1)	.commit();
-			//refresh homescreen ui for update
-			HomescreenActivity.checkupdate();
+			atPrefs.edit().putInt("updates", no + 1).commit();
+			// refresh homescreen ui for update
+
+			HomescreenActivity.checkupdate(context);
 			logPushExtras(intent);
 
 		} else if (action.equals(PushManager.ACTION_NOTIFICATION_OPENED)) {

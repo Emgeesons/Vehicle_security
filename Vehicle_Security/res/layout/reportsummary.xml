@@ -18,9 +18,9 @@
                 android:id="@+id/basic"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/box_whiteb"
                 android:paddingBottom="5dp" >
 
@@ -30,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentLeft="true"
                     android:layout_alignParentTop="true"
-                    android:layout_marginLeft="24dp"
+                    android:layout_marginLeft="15dp"
                     android:layout_marginTop="24dp"
                     android:src="@drawable/ic_car" />
 
@@ -68,10 +68,8 @@
 
                 <RelativeLayout
                     android:id="@+id/relativeLayout1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="1.25dp"
-                    android:layout_alignLeft="@+id/reg"
-                    android:layout_alignRight="@+id/rtype"
                     android:layout_below="@+id/reg"
                     android:layout_marginTop="10dp"
                     android:background="@color/light_black" >
@@ -83,6 +81,7 @@
                     android:layout_height="wrap_content"
                     android:layout_alignLeft="@+id/relativeLayout1"
                     android:layout_below="@+id/relativeLayout1"
+                    android:layout_marginLeft="5dp"
                     android:layout_marginTop="14dp"
                     android:text="TextView"
                     android:textSize="@dimen/medium_text" />
@@ -123,8 +122,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/basic"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 android:background="@drawable/box_whiteb"
                 android:paddingTop="5dp" >
 
@@ -200,9 +199,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/textView1"
-                android:layout_marginLeft="10dp"
-                android:layout_marginRight="10dp"
-                android:layout_marginTop="10dp"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
+                android:layout_marginTop="5dp"
                 android:background="@drawable/box_whiteb"
                 android:paddingTop="5dp" >
 
@@ -343,7 +342,7 @@
                         android:layout_alignLeft="@+id/vin"
                         android:layout_below="@+id/vin"
                         android:layout_marginTop="5dp"
-                        android:text="Color :"
+                        android:text="Colour :"
                         android:textColor="@color/light_black"
                         android:textSize="@dimen/medium_text" />
 

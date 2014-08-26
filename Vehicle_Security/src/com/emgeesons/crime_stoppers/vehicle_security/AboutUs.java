@@ -53,9 +53,12 @@ public class AboutUs extends BaseActivity {
 	@Override
 	public void onBackPressed() {
 		// TODO Auto-generated method stub
-		Intent next = new Intent(getApplicationContext(), MainActivity.class);
-		startActivity(next);
-		finish();
+		// Intent next = new Intent(getApplicationContext(),
+		// MainActivity.class);
+		// startActivity(next);
+		//
+		// finish();
+		super.onBackPressed();
 
 	}
 
@@ -64,9 +67,10 @@ public class AboutUs extends BaseActivity {
 		switch (item.getItemId()) {
 		case android.R.id.home:
 			// app icon @ action bar clicked; go home
-			Intent back = new Intent(AboutUs.this, MainActivity.class);
-			startActivity(back);
-			finish();
+			// Intent back = new Intent(AboutUs.this, MainActivity.class);
+			// startActivity(back);
+			// finish();
+			onBackPressed();
 			break;
 		}
 		return true;

@@ -535,7 +535,7 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -651,7 +651,18 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 

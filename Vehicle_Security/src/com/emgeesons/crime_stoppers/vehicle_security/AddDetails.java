@@ -170,7 +170,19 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+			HttpEntity resEntity;
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {

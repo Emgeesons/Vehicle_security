@@ -57,6 +57,7 @@ import android.provider.MediaStore;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup.LayoutParams;
@@ -72,6 +73,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.facebook.Session;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -81,6 +83,7 @@ import com.google.android.gms.maps.GoogleMap.OnCameraChangeListener;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.urbanairship.push.PushManager;
 
 public class ReportSighting extends BaseActivity implements LocationListener,
 		TextWatcher, android.location.LocationListener {
@@ -102,7 +105,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	boolean exp_col;
 	int map_height;
 	final static CharSequence[] typeSighting = { "Theft", "Vandalism",
-			"Suspicious Activity", "Other" };
+			"Suspicious Activity" };
 	int tSighting = -1;
 	Data info;
 	static int buffKey = 0;
@@ -126,6 +129,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	ProgressDialog pDialog;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
+	String ampm;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -233,7 +237,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map))
 				.getMap();
 		map.setMyLocationEnabled(true);
-		map.getMyLocation();
+		// map.getMyLocation();
 		// check gps is on\off and set location
 
 		// current date and time
@@ -241,7 +245,6 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		years = c.get(Calendar.YEAR);
 		months = c.get(Calendar.MONTH) + 1;
 		dates = c.get(Calendar.DAY_OF_MONTH);
-
 		Hrs = c.get(Calendar.HOUR_OF_DAY);
 		min = c.get(Calendar.MINUTE);
 		// String ampm = "AM";
@@ -260,6 +263,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		// locationRequest.setFastestInterval(5000);
 
 		gpscheck();
+
 		timevalue = String.format("%02d:%02d", Hrs, min);
 		// timevalue = Hrs + ":" + min;
 		datevalue = years + "-" + months + "-" + dates;
@@ -341,7 +345,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 						.findViewById(R.id.datePicker1);
 
 				datePicker.init(years, months - 1, dates, datePickerListener);
-
+				Calendar calendars = Calendar.getInstance();
+				datePicker.setMaxDate(calendars.getTimeInMillis());
 				timePicker
 						.setOnTimeChangedListener(new OnTimeChangedListener() {
 
@@ -351,11 +356,12 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 
 								Hrs = hourOfDay;
 								min = minute;
-								// String ampm = "AM";
-								// if (Hrs >= 12) {
-								// Hrs -= 12;
-								// ampm = "PM";
-								// }
+
+								ampm = "AM";
+								if (Hrs >= 12) {
+									// Hrs -= 12;
+									ampm = "PM";
+								}
 								timevalue = Hrs + ":" + min;
 
 							}
@@ -364,9 +370,32 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 
 					@Override
 					public void onClick(View v) {
+						Calendar c = Calendar.getInstance();
+						int monthss = c.get(Calendar.MONTH) + 1;
+						int yearss = c.get(Calendar.YEAR);
+						int datess = c.get(Calendar.DAY_OF_MONTH);
+						int Hrss = c.get(Calendar.HOUR_OF_DAY);
+						int mins = c.get(Calendar.MINUTE);
+						String ampms = "AM";
+						if (Hrss >= 12) {
+							// Hrss -= 12;
+							ampms = "PM";
+						}
 						date.setText((info.getdateformate(datevalue + "-"
 								+ timevalue)));
-						dialog.dismiss();
+						String d = String.valueOf(yearss + "-" + monthss + "-"
+								+ datess);
+						if (datevalue.compareTo(d) == 0
+								&& ((Hrs > Hrss || Hrs == Hrss && min > mins) && ampms
+										.equalsIgnoreCase(ampm))) {
+
+							Toast.makeText(getApplicationContext(),
+									"Please select valid time",
+									Toast.LENGTH_LONG).show();
+
+						} else {
+							dialog.dismiss();
+						}
 					}
 				});
 				dialog.show();
@@ -679,10 +708,15 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		mpEntity.addPart("os", new StringBody(info.manufacturer));
 		mpEntity.addPart("make", new StringBody("Android" + " " + info.Version));
 		mpEntity.addPart("model", new StringBody(info.model));
-		mpEntity.addPart("userId", new StringBody(info.user_id));
 		mpEntity.addPart("location", new StringBody(marker_label.getText()
 				.toString()));
-		mpEntity.addPart("pin", new StringBody(info.pin));
+		if (!atPrefs.getBoolean(info.checkllogin, true)) {
+			mpEntity.addPart("userId", new StringBody(info.user_id));
+			mpEntity.addPart("pin", new StringBody(info.pin));
+		} else {
+			mpEntity.addPart("userId", new StringBody("0"));
+			mpEntity.addPart("pin", new StringBody("0000"));
+		}
 		mpEntity.addPart("selectedLatitude",
 				new StringBody(String.valueOf(slat)));
 		mpEntity.addPart("selectedLongitude",
@@ -693,8 +727,34 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				new StringBody(String.valueOf(olon)));
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
-		HttpResponse response = httpclient.execute(httppost);
-		HttpEntity resEntity = response.getEntity();
+		System.out.println("ne8ts");
+		HttpResponse response = null;
+		try {
+			response = httpclient.execute(httppost);
+		} catch (Exception e) {
+			runOnUiThread(new Runnable() {
+
+				public void run() {
+					System.out.println("net");
+					cd.showNoInternetPopup();
+				}
+			});
+			return;
+		}
+
+		HttpEntity resEntity;
+		try {
+			resEntity = response.getEntity();
+		} catch (Exception e) {
+			runOnUiThread(new Runnable() {
+
+				public void run() {
+					System.out.println("net");
+					cd.showNoInternetPopup();
+				}
+			});
+			return;
+		}
 		System.out.println(response.getStatusLine());
 		if (resEntity != null) {
 			reponse = EntityUtils.toString(resEntity);
@@ -709,53 +769,101 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				runOnUiThread(new Runnable() {
 
 					public void run() {
-						final Dialog dialog = new Dialog(ReportSighting.this);
-						dialog.setContentView(R.layout.feedbackpoint);
-						dialog.setTitle("Good Job!");
-						TextView line, point, totalp;
-						RelativeLayout close, profile;
-						totalp = (TextView) dialog.findViewById(R.id.points);
-						line = (TextView) dialog.findViewById(R.id.textView1);
-						point = (TextView) dialog.findViewById(R.id.textView3);
-						profile = (RelativeLayout) dialog
-								.findViewById(R.id.profile);
-						point.setText("50");
-						line.setText("You  earned yourself 50 good Samaritan points!!!");
-						close = (RelativeLayout) dialog
-								.findViewById(R.id.close);
-						close.setOnClickListener(new OnClickListener() {
+						if (!atPrefs.getBoolean(info.checkllogin, true)) {
+							final Dialog dialog = new Dialog(
+									ReportSighting.this);
+							dialog.setContentView(R.layout.feedbackpoint);
+							dialog.setTitle("Good Job!");
+							TextView line, point, totalp;
+							RelativeLayout close, profile;
+							totalp = (TextView) dialog
+									.findViewById(R.id.points);
+							line = (TextView) dialog
+									.findViewById(R.id.textView1);
+							point = (TextView) dialog
+									.findViewById(R.id.textView3);
+							profile = (RelativeLayout) dialog
+									.findViewById(R.id.profile);
+							point.setText("50");
+							line.setText("You  earned yourself 50 Good Samaritan points!");
+							close = (RelativeLayout) dialog
+									.findViewById(R.id.close);
 
-							@Override
-							public void onClick(View arg0) {
-								Intent next = new Intent(
-										getApplicationContext(),
-										MainActivity.class);
-								startActivity(next);
-								finish();
-								dialog.dismiss();
+							close.setOnClickListener(new OnClickListener() {
 
-							}
-						});
-						profile.setOnClickListener(new OnClickListener() {
+								@Override
+								public void onClick(View arg0) {
+									Intent next = new Intent(
+											getApplicationContext(),
+											MainActivity.class);
+									startActivity(next);
+									// dialog.dismiss();
+									finish();
 
-							@Override
-							public void onClick(View arg0) {
-								Intent next = new Intent(
-										getApplicationContext(),
-										ProfileScreen.class);
-								startActivity(next);
-								dialog.dismiss();
-								finish();
+								}
+							});
+							profile.setOnClickListener(new OnClickListener() {
 
-							}
-						});
-						totalp.setText("Total Samaritan Points :" + " "
-								+ points);
-						dialog.setCancelable(false);
-						dialog.show();
-						SQLiteDatabase dbbb = db.getReadableDatabase();
-						dbbb.execSQL("UPDATE profile SET spoints = '" + points
-								+ "'");
+								@Override
+								public void onClick(View arg0) {
+									Intent next = new Intent(
+											getApplicationContext(),
+											ProfileScreen.class);
+									startActivity(next);
+									// dialog.dismiss();
+									finish();
+
+								}
+							});
+							totalp.setText("Total Samaritan Points :" + " "
+									+ points);
+							dialog.setCancelable(false);
+							dialog.show();
+							SQLiteDatabase dbbb = db.getReadableDatabase();
+							dbbb.execSQL("UPDATE profile SET spoints = '"
+									+ points + "'");
+
+						} else {
+							AlertDialog.Builder builder = new AlertDialog.Builder(
+									ReportSighting.this);
+							builder.setMessage(
+									"Thank you for your sighting. Sign in and earn good samaritan points")
+									.setCancelable(false)
+
+									.setNegativeButton(
+											"Not Now",
+											new DialogInterface.OnClickListener() {
+
+												@Override
+												public void onClick(
+														DialogInterface dialog,
+														int which) {
+													// TODO Auto-generated
+													// method stub
+													Intent next = new Intent(
+															getApplicationContext(),
+															MainActivity.class);
+													startActivity(next);
+//													finish();
+												}
+											})
+									.setPositiveButton(
+											"Sign in",
+											new DialogInterface.OnClickListener() {
+												public void onClick(
+														DialogInterface dialog,
+														int id) {
+													Intent next = new Intent(
+															getApplicationContext(),
+															LoginActivity.class);
+													startActivity(next);
+													finish();
+												}
+
+											});
+							builder.show();
+
+						}
 
 					}
 				});
@@ -1093,7 +1201,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 					});
 
 				} else {
-					pos = String.valueOf(LATITUDE + LONGITUDE);
+					// pos = String.valueOf(LATITUDE + LONGITUDE);
+					pos = "";
 					runOnUiThread(new Runnable() {
 
 						public void run() {
@@ -1144,9 +1253,10 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	@Override
 	public void onBackPressed() {
 
-		Intent next = new Intent(getApplicationContext(), MainActivity.class);
-		startActivity(next);
-		finish();
+		// Intent next = new Intent(getApplicationContext(),
+		// MainActivity.class);
+		// startActivity(next);
+		// finish();
 		super.onBackPressed();
 	}
 
@@ -1154,13 +1264,13 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-
+			onBackPressed();
 			// app icon @ action bar clicked; go home
-			Intent next = new Intent(getApplicationContext(),
-					MainActivity.class);
-
-			startActivity(next);
-			finish();
+			// Intent next = new Intent(getApplicationContext(),
+			// MainActivity.class);
+			//
+			// startActivity(next);
+			// finish();
 
 			break;
 		}

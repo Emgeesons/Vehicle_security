@@ -93,41 +93,41 @@ public class Reportsummary extends SherlockActivity {
 		sharedpreferences = getSharedPreferences(Data.MyPREFERENCES,
 				Context.MODE_PRIVATE);
 		String vid = sharedpreferences.getString(Data.vid, "notcall");
-		if (vid.isEmpty() || !vid.equalsIgnoreCase("notcall")) {
-			location = sharedpreferences.getString(Data.location, "");
-			comments = sharedpreferences.getString(Data.comm, "");
-			report_type = sharedpreferences.getString(Data.rtype, "");
-			File f = new File(sharedpreferences.getString(Data.p1, ""));
-			Uri imageUri1 = Uri.fromFile(f);
-			spic1 = imageUri1.toString().replaceAll("%20", " ");
-			File f2 = new File(sharedpreferences.getString(Data.p2, ""));
-			Uri imageUri2 = Uri.fromFile(f2);
-			spic2 = imageUri2.toString().replaceAll("%20", " ");
-			File f3 = new File(sharedpreferences.getString(Data.p3, ""));
-			Uri imageUri3 = Uri.fromFile(f3);
-			spic3 = imageUri3.toString().replaceAll("%20", " ");
-			String date = sharedpreferences.getString(Data.time, "");
-			String[] datespilt = date.split("\\*");
-			selected_time = datespilt[1];
-			selected_date = datespilt[0];
-			info = new Data();
-			info.vehicleInfo(getApplicationContext(), vid);
-			vehicle_type = (info.type);
-			make = (info.make);
-			model = (info.vmodel);
-			engine_no = (info.eng);
-			body_type = (info.body);
-			chassis = (info.vin);
-			colour = (info.color);
-			acc = (info.acc);
-			reg = (info.reg);
-			icom = info.iname;
-			ipno = info.ipolicy;
-			iexp = info.exp;
-			insurance_company_number = info.inum;
-			state = info.state;
-
-		} else {
+//		if (vid.isEmpty() || !vid.equalsIgnoreCase("notcall")) {
+//			location = sharedpreferences.getString(Data.location, "");
+//			comments = sharedpreferences.getString(Data.comm, "");
+//			report_type = sharedpreferences.getString(Data.rtype, "");
+//			File f = new File(sharedpreferences.getString(Data.p1, ""));
+//			Uri imageUri1 = Uri.fromFile(f);
+//			spic1 = imageUri1.toString().replaceAll("%20", " ");
+//			File f2 = new File(sharedpreferences.getString(Data.p2, ""));
+//			Uri imageUri2 = Uri.fromFile(f2);
+//			spic2 = imageUri2.toString().replaceAll("%20", " ");
+//			File f3 = new File(sharedpreferences.getString(Data.p3, ""));
+//			Uri imageUri3 = Uri.fromFile(f3);
+//			spic3 = imageUri3.toString().replaceAll("%20", " ");
+//			String date = sharedpreferences.getString(Data.time, "");
+//			String[] datespilt = date.split("\\*");
+//			selected_time = datespilt[1];
+//			selected_date = datespilt[0];
+//			info = new Data();
+//			info.vehicleInfo(getApplicationContext(), vid);
+//			vehicle_type = (info.type);
+//			make = (info.make);
+//			model = (info.vmodel);
+//			engine_no = (info.eng);
+//			body_type = (info.body);
+//			chassis = (info.vin);
+//			colour = (info.color);
+//			acc = (info.acc);
+//			reg = (info.reg);
+//			icom = info.iname;
+//			ipno = info.ipolicy;
+//			iexp = info.exp;
+//			insurance_company_number = info.inum;
+//			state = info.state;
+//
+//		} else {
 
 			try {
 
@@ -173,7 +173,7 @@ public class Reportsummary extends SherlockActivity {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		}
+//		}
 		pic1 = (ImageView) findViewById(R.id.pic1);
 		pic2 = (ImageView) findViewById(R.id.pic2);
 		pic3 = (ImageView) findViewById(R.id.pic3);

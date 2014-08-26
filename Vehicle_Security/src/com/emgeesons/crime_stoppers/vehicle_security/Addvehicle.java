@@ -126,20 +126,20 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								if (type.getText().toString()
 										.equalsIgnoreCase("Other")) {
 									type_other.setVisibility(View.VISIBLE);
-									make.setHint("make");
+									make.setHint("make*");
 									model.setHint("model*");
 									state.setVisibility(View.VISIBLE);
-									state.setHint("  state of registration");
-									reg.setHint("registration no");
+									state.setHint("state of registration (max 3 chars)");
+									reg.setHint("registration no (max 10 chars)");
 								} else {
 									type_other.setVisibility(View.GONE);
 								}
 
 								if (type.getText().toString()
 										.equalsIgnoreCase("Bicycle")) {
-									reg.setHint("serial no");
-									make.setHint("make");
-									model.setHint("model");
+									reg.setHint("serial no (max 13 chars)");
+									make.setHint("make*");
+									model.setHint("model*");
 									state.setVisibility(View.GONE);
 								}
 
@@ -149,7 +149,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 												.equalsIgnoreCase("MotorCycle")) {
 									reg.setHint("registration no*(max 10 chars)");
 									state.setVisibility(View.VISIBLE);
-									state.setHint("  state of registration*(max 3 chars) ");
+									state.setHint("state of registration*(max 3 chars) ");
 								}
 								if (type.getText().toString()
 										.equalsIgnoreCase("Car")) {
@@ -236,11 +236,9 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bmake = false;
 					}
-					if ((type.getText().toString().equalsIgnoreCase("Car") || type
-							.getText().toString()
-							.equalsIgnoreCase("MotorCycle"))
+					if ((type.getText().toString().equalsIgnoreCase("Car")
 							|| type.getText().toString()
-									.equalsIgnoreCase("Other")
+									.equalsIgnoreCase("MotorCycle") )
 							&& model.getText().toString().length() < 2) {
 
 						model.setTextColor(getResources().getColor(R.color.red));
@@ -250,7 +248,8 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 						bmodel = false;
 					}
 
-					if ((type.getText().toString().equalsIgnoreCase("Bicycle"))
+					if ((type.getText().toString().equalsIgnoreCase("Bicycle") || type
+							.getText().toString().equalsIgnoreCase("Other"))
 							&& (model.getText().toString().trim().isEmpty() && make
 									.getText().toString().trim().isEmpty())) {
 
@@ -418,7 +417,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 
 	private class add extends AsyncTask<Void, Void, Void> {
 		String success, mess, response;
-		String vid, typevalue;
+		String vid, typevalue,status;
 
 		@Override
 		protected void onPreExecute() {
@@ -435,7 +434,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		protected Void doInBackground(Void... params) {
 
 			JSONArray jsonMainArr;
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -499,7 +498,19 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -510,7 +521,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 					success = profile.getString("status");
 					mess = profile.getString("message");
 					vid = jsonMainArr.getJSONObject(0).getString("vehicle_id");
-
+					status= jsonMainArr.getJSONObject(0).getString("vehicle_status");
 				} catch (JSONException e) {
 					System.out.println("JSONException");
 				} catch (ParseException e) {
@@ -537,7 +548,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 											.getText().toString(), acc
 											.getText().toString(), reg
 											.getText().toString(), "", "", "",
-									"", "", "", state.getText().toString());
+											status, "", "", state.getText().toString());
 							// check = make
 							ParkingData datas = new ParkingData(vid, model
 									.getText().toString(), "", "", "", make

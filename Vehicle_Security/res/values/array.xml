@@ -4,8 +4,8 @@
     <string-array name="sec_qus">
         <item>passport number</item>
         <item>license number</item>
-        <item>mothers maiden name </item>
-        <item>first pets name</item>
+        <item>mother\'s maiden name </item>
+        <item>first pet\'s name</item>
         <item>first childhood friend</item>
         <item>first primary school </item>
         <item>colour of your first car </item>
@@ -16,7 +16,7 @@
     <string-array name="vech_type">
         <item>Bicycle</item>
         <item>Car</item>
-        <item>MotorCycle</item>
+        <item>Motorcycle</item>
         <item>Other</item>
     </string-array>
     <string-array name="body_type">

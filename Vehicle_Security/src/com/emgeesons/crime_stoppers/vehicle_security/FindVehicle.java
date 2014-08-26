@@ -102,7 +102,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		super.onCreate(savedInstanceState);
 		// setContentView(R.layout.find_vehicle);
 		getSupportActionBar().setTitle(
-				Html.fromHtml("<font color='#FFFFFF'>Find My Car</font>"));
+				Html.fromHtml("<font color='#FFFFFF'>Find My Vehicle</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
@@ -180,8 +180,8 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 						public void onClick(View v) {
 							SQLiteDatabase dbbb = db.getReadableDatabase();
 							dbbb.execSQL("UPDATE Vehicle_park SET lat = '" + ""
-									+ "',lon = '" + "" + "',mark = '" + ""
-									+ "'WHERE vid='" + vid + "'");
+									+ "',lon = '" + "" + "'WHERE vid='" + vid
+									+ "'");
 							atPrefs.edit()
 									.putString(info.glatitude,
 											String.valueOf("not")).commit();
@@ -334,11 +334,12 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 
 			JSONArray jsonMainArr;
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -374,7 +375,6 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 						+ info.Version));
 				mpEntity.addPart("model", new StringBody(info.model));
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -384,13 +384,23 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 			try {
 				response = httpclient.execute(httppost);
 			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -404,13 +414,10 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 					points = jsonMainArr.getJSONObject(0).getString(
 							"samaritan_points");
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -470,8 +477,8 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 							} else {
 
 								dbbb.execSQL("UPDATE Vehicle_park SET lat = '"
-										+ "" + "',lon = '" + "" + "',mark = '"
-										+ "" + "'WHERE vid='" + vid + "'");
+										+ "" + "',lon = '" + ""
+										+ "'WHERE vid='" + vid + "'");
 							}
 
 							dbbb.execSQL("UPDATE profile SET spoints = '"
@@ -692,7 +699,6 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 
 	// @Override
 	// protected void onStop() {
-	// // TODO Auto-generated method stub
 	// atPrefs.edit().putString(check, "True").commit();
 	// Log.i("find", "true");
 	// super.onStop();

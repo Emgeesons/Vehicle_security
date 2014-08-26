@@ -220,10 +220,10 @@ public class MainActivity extends SherlockFragmentActivity implements
 		case 7:
 			AlertDialog.Builder builder = new AlertDialog.Builder(
 					MainActivity.this);
-			builder.setMessage("Are you sure you want to Logout?")
+			builder.setMessage("Are you sure you want to Logout ?")
 					.setCancelable(false)
 					.setMessage(
-							"Are you sure you want to logout")
+							"Are you sure you want to logout?")
 					.setNegativeButton("Cancel",
 							new DialogInterface.OnClickListener() {
 

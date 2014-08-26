@@ -81,7 +81,7 @@ public class Data {
 	}
 
 	public String getdateformate(String date) {
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-hh:mm");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH:mm");
 		Date datef;
 		String dateformat = "";
 		try {

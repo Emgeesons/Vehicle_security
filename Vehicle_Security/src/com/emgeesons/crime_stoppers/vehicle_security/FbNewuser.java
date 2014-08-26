@@ -310,7 +310,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 
 		@Override
 		protected Void doInBackground(Void... params) {
-
+			HttpEntity resEntity;
 			JSONArray jsonMainArr;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
@@ -415,7 +415,19 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+			
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 

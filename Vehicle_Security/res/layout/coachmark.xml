@@ -29,7 +29,7 @@
         android:layout_marginTop="31dp"
         android:textSize="@dimen/medium_text"
         android:textColor="@color/white" 
-        android:text="Complete your profile now,you will thank us later" />
+        android:text="Complete your profile now, you will thank us later" />
 
     <ImageView
         android:id="@+id/imageView1"

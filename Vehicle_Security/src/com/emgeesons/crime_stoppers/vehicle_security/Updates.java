@@ -2,16 +2,20 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.app.AlertDialog;
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 
 import com.actionbarsherlock.app.SherlockFragmentActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -56,6 +60,7 @@ public class Updates extends SherlockFragmentActivity implements
 		info = new Data();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(Updates.this);
 		atPrefs.edit().putInt("updates", 0).commit();
+		HomescreenActivity.checkupdate(getApplicationContext());
 		viewPager.setAdapter(mAdapter);
 		// actionBar.setHomeButtonEnabled(false);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
@@ -65,6 +70,7 @@ public class Updates extends SherlockFragmentActivity implements
 				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
 				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
 		ImageLoader.getInstance().init(config);
+
 		// Adding Tabs
 		for (String tab_name : tabs) {
 			actionBar.addTab(actionBar.newTab().setText(tab_name)
@@ -90,14 +96,39 @@ public class Updates extends SherlockFragmentActivity implements
 
 			@Override
 			public void onPageScrollStateChanged(int arg0) {
-				if (arg0 == 1) {
-					if (atPrefs.getBoolean(Data.checkllogin, true)) {
-						Intent next = new Intent(getApplicationContext(),
-								LoginActivity.class);
-						startActivity(next);
-						finish();
-					}
-				}
+				// if (arg0 == 1) {
+				// if (atPrefs.getBoolean(Data.checkllogin, true)) {
+				//
+				// AlertDialog.Builder builder = new AlertDialog.Builder(
+				// Updates.this);
+				// builder.setMessage("Please log in to use this feature")
+				// .setCancelable(false)
+				// // .setMessage("Are you sure?")
+				// .setNegativeButton("Cancel",
+				// new DialogInterface.OnClickListener() {
+				//
+				// @Override
+				// public void onClick(DialogInterface dialog,
+				// int which) {
+				// dialog.dismiss();
+				// }
+				// })
+				// .setPositiveButton("Sign in",
+				// new DialogInterface.OnClickListener() {
+				// public void onClick(DialogInterface dialog,
+				// int id) {
+				// Intent next = new Intent(Updates.this,
+				// LoginActivity.class);
+				// startActivity(next);
+				// finish();
+				//
+				// }
+				//
+				// });
+				// builder.show();
+				//
+				// }
+				// }
 			}
 		});
 	}
@@ -111,10 +142,38 @@ public class Updates extends SherlockFragmentActivity implements
 		// only login user
 		if (tab.getPosition() == 1) {
 			if (atPrefs.getBoolean(Data.checkllogin, true)) {
-				Intent next = new Intent(getApplicationContext(),
-						LoginActivity.class);
-				startActivity(next);
-				finish();
+
+				AlertDialog.Builder builder = new AlertDialog.Builder(
+						Updates.this);
+				builder.setMessage("Please log in to use this feature")
+						.setCancelable(false)
+						// .setMessage("Are you sure?")
+						.setNegativeButton("Cancel",
+								new DialogInterface.OnClickListener() {
+
+									@Override
+									public void onClick(DialogInterface dialog,
+											int which) {
+										actionBar.setSelectedNavigationItem(0);
+										dialog.dismiss();
+									}
+								})
+						.setPositiveButton("Sign in",
+								new DialogInterface.OnClickListener() {
+									public void onClick(DialogInterface dialog,
+											int id) {
+										Intent next = new Intent(Updates.this,
+												LoginActivity.class);
+										next.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+												| Intent.FLAG_ACTIVITY_CLEAR_TASK);
+										startActivity(next);
+										finish();
+
+									}
+
+								});
+				builder.show();
+
 			}
 		}
 
@@ -139,13 +198,88 @@ public class Updates extends SherlockFragmentActivity implements
 
 	@Override
 	public void onBackPressed() {
+		OStrings.clear();
 		mStrings.clear();
 		imageLoader.clearMemoryCache();
 		imageLoader.clearDiskCache();
-		Intent next = new Intent(getApplicationContext(), MainActivity.class);
-		startActivity(next);
-		finish();
+		// Intent next = new Intent(getApplicationContext(),
+		// MainActivity.class);
+		// startActivity(next);
+		// finish();
 
 		super.onBackPressed();
+	}
+
+	@Override
+	protected void onStop() {
+		// TODO Auto-generated method stub
+		try {
+
+			boolean foregroud = new ForegroundCheckTask().execute(Updates.this)
+					.get();
+			atPrefs.edit().putString("check", String.valueOf(foregroud))
+					.commit();
+			Log.i("onStop", String.valueOf(foregroud));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		super.onStop();
+
+	}
+
+	@Override
+	protected void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		// pin check
+		// time @30min
+		String time = atPrefs.getString("time", "");
+		String times = String.valueOf(System.currentTimeMillis());
+		double t = Double.valueOf(time);
+		double tw = Double.valueOf(times);
+		String ch = atPrefs.getString("check", "true");
+		String chh = atPrefs.getString("callcheck", "true");
+		Log.i("con", ch);
+		Log.i("cons", chh);
+		Log.i("call form", getClass().getName());
+		if (ch.equalsIgnoreCase("false")) {
+
+			if (chh.equalsIgnoreCase("true")) {
+				// when we open maps,pic dont show pin
+				atPrefs.edit().putString("callcheck", "false").commit();
+				return;
+			} else {
+
+				if (!atPrefs.getBoolean(info.checkllogin, true) && tw > t) {
+					Intent ne = new Intent(getApplicationContext(),
+							PinLock.class);
+					startActivity(ne);
+				}
+
+			}
+
+		}
+
+	}
+
+	@Override
+	protected void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		try {
+			boolean foregroud = new ForegroundCheckTask().execute(Updates.this)
+					.get();
+			Log.i("onPause", String.valueOf(foregroud));
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

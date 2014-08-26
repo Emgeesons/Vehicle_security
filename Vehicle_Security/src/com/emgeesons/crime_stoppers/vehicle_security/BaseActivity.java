@@ -85,6 +85,7 @@ public abstract class BaseActivity extends SherlockActivity {
 				if (!atPrefs.getBoolean(info.checkllogin, true) && tw > t) {
 					Intent ne = new Intent(getApplicationContext(),
 							PinLock.class);
+					
 					startActivity(ne);
 				}
 

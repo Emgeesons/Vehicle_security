@@ -11,7 +11,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="60dp"
-        android:text="Rate Us !"
+        android:text="Rate your experience"
         android:textSize="@dimen/big_text" />
 
     <RatingBar

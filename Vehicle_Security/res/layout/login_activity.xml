@@ -128,7 +128,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/box_white"
-                android:hint="enter email"
+                android:hint="enter email id"
                 android:inputType="textEmailAddress"
                 android:nextFocusDown="@+id/pin1"
                 android:paddingLeft="10dp"
@@ -299,7 +299,7 @@
                 android:layout_marginRight="20dp"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/box_white"
-                android:hint="enter email"
+                android:hint="enter email id"
                 android:inputType="textEmailAddress"
                 android:paddingLeft="10dp"
                 android:textColor="@color/black" />

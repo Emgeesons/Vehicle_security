@@ -22,7 +22,7 @@
         android:clickable="false"
         android:divider="@android:color/transparent"
         android:dividerHeight="20dp"
-        android:padding="15dp"
+        android:padding="5dp"
         android:scrollbars="none"
         android:visibility="visible" >
     </ListView>
@@ -51,7 +51,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
-            android:background="@drawable/green_button"
+            android:background="@color/blue"
             android:text="Report Sighting"
             android:textColor="@color/white_trs" />
 
@@ -107,7 +107,7 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:text="Hooray!! No Vehicles Reported!!"
+            android:text="Hooray! No vehicles reported."
             android:textColor="@color/blue_text"
             android:textSize="@dimen/big_text" />
     </RelativeLayout>

@@ -3,6 +3,7 @@ package com.emgeesons.crime_stoppers.vehicle_security;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 import org.json.JSONArray;
 
@@ -43,6 +44,7 @@ public class CarPark extends BaseActivity {
 	RelativeLayout tips;
 	String s;
 	JSONArray jsonMainArr;
+	Vector<String> alreadyUsed;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,6 @@ public class CarPark extends BaseActivity {
 		try {
 			s = String.format("%.2f", Double.valueOf(Rate));
 		} catch (Exception e) {
-			// TODO: handle exception
 		}
 
 		Rate = String.valueOf(s);
@@ -91,7 +92,8 @@ public class CarPark extends BaseActivity {
 		data = (ListView) findViewById(R.id.listView1);
 		address.setText(Address);
 		rates.setText(Rate);
-		if (notip.isEmpty() || notip.equalsIgnoreCase("0")) {
+		if (notip.isEmpty() || notip.equalsIgnoreCase("0")
+				|| notip.equalsIgnoreCase("0.00")) {
 			tip.setVisibility(View.INVISIBLE);
 		} else {
 			tip.setText(notip + "  " + "tips for this location");
@@ -111,6 +113,17 @@ public class CarPark extends BaseActivity {
 
 		checkadapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, checkdata);
+		alreadyUsed = new Vector<String>();
+
+		for (int i = 0; i < 3; i++) {
+			String as = String.valueOf(getnumber());
+			if (alreadyUsed.contains(as)) {
+				--i;
+			} else {
+				alreadyUsed.add(as);
+			}
+
+		}
 
 		data.setAdapter(new listAdapter());
 		done.setOnClickListener(new OnClickListener() {
@@ -148,8 +161,10 @@ public class CarPark extends BaseActivity {
 
 			@Override
 			public void onClick(View arg0) {
-				if (!notip.isEmpty() || notip.equalsIgnoreCase("0")) {
+				if (notip.isEmpty() || notip.equalsIgnoreCase("0")
+						|| notip.equalsIgnoreCase("0.00")) {
 
+				} else {
 					Intent next = new Intent(getApplicationContext(),
 							Tips.class);
 
@@ -159,9 +174,6 @@ public class CarPark extends BaseActivity {
 					next.putExtra("notip", notip);
 
 					startActivity(next);
-
-				} else {
-
 				}
 			}
 		});
@@ -195,14 +207,27 @@ public class CarPark extends BaseActivity {
 			Random random = new Random();
 
 			int maxIndex = checkdata.length;
-			int generatedIndex = random.nextInt(maxIndex);
+			int generatedIndex = Integer
+					.valueOf((int) (Math.random() * maxIndex));
+
 			TextView name = (TextView) v.findViewById(R.id.textView1);
+
+			name.setText(checkdata[Integer.valueOf(alreadyUsed.get(position))]);
+
 			TextView check = (TextView) v.findViewById(R.id.checkBox1);
-			name.setText(checkdata[generatedIndex]);
+			// name.setText(checkdata[generatedIndex]);
 
 			return v;
 
 		}
+
+	}
+
+	private int getnumber() {
+
+		int maxIndex = checkdata.length;
+		int generatedIndex = Integer.valueOf((int) (Math.random() * maxIndex));
+		return generatedIndex;
 	}
 
 	@Override

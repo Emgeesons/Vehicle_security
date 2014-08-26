@@ -70,7 +70,7 @@ public class ProfileScreen extends BaseActivity {
 	Data info;
 	File sdRoot;
 	String dir, imgPath;
-
+	Connection_Detector cd = new Connection_Detector(this);
 	private String imagepath = null;
 	ProgressBar progress;
 	int oldprogress = 0;
@@ -151,7 +151,7 @@ public class ProfileScreen extends BaseActivity {
 		} else {
 			gender.setImageResource(R.drawable.ic_female);
 		}
-		if (!info.licenseNo.isEmpty()) {
+		if (!info.street.isEmpty()) {
 			adddetails.setText("Edit Details");
 
 			// newprogress = 50;
@@ -394,7 +394,7 @@ public class ProfileScreen extends BaseActivity {
 		} else if (newprogress == 60) {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.middlebar));
-			status.setText("Add license details and Add photo/insurance of vehicle");
+			status.setText("Add details and Add photo/insurance of vehicle");
 			profile_comp.setText("Your profile is " + newprogress + "%"
 					+ " complete");
 			ProgressBarAnimation anim = new ProgressBarAnimation(progress, 0,
@@ -404,8 +404,8 @@ public class ProfileScreen extends BaseActivity {
 		} else if (newprogress <= 80) {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.fourbar));
-			if (info.licenseNo.isEmpty()) {
-				status.setText("Add license details to your profile");
+			if (info.street.isEmpty()) {
+				status.setText("Add details to your profile");
 			} else {
 				status.setText("Add photo/insurance of vehicle");
 			}
@@ -435,10 +435,11 @@ public class ProfileScreen extends BaseActivity {
 			progress.setAnimation(anim);
 		}
 		if (newprogress >= 100) {
-
-			progress.setVisibility(View.GONE);
-			status.setVisibility(View.GONE);
-			profile_comp.setVisibility(View.GONE);
+			newprogress = 100;
+			profile_comp.setText("Your profile is complete");
+			// progress.setVisibility(View.GONE);
+		 status.setVisibility(View.GONE);
+			// profile_comp.setVisibility(View.GONE);
 
 		}
 		// if (newprogress > 50) {
@@ -770,7 +771,20 @@ public class ProfileScreen extends BaseActivity {
 
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
-		HttpResponse response = httpclient.execute(httppost);
+		HttpResponse response = null;
+		try {
+			response = httpclient.execute(httppost);
+		} catch (Exception e) {
+			runOnUiThread(new Runnable() {
+
+				public void run() {
+					System.out.println("net");
+					cd.showNoInternetPopup();
+				}
+			});
+			return;
+		}
+
 		HttpEntity resEntity = response.getEntity();
 		System.out.println(response.getStatusLine());
 

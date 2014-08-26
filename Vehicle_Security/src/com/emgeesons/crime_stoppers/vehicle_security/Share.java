@@ -114,6 +114,9 @@ public class Share extends BaseActivity {
 				editor.remove("tw").commit();
 				Intent next = new Intent(getApplicationContext(),
 						ReportSubmit.class);
+				// sometime it remain in stackF
+				next.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+						| Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				startActivity(next);
 				finish();
 			}
@@ -308,10 +311,13 @@ public class Share extends BaseActivity {
 		// TODO Auto-generated method stub
 		if (check == true) {
 			check = false;
-			pDialog.dismiss();
 			Intent next = new Intent(getApplicationContext(),
 					ReportSubmit.class);
+			// sometime it remain in stack
+			next.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			startActivity(next);
+			pDialog.dismiss();
 			finish();
 
 		}
@@ -710,6 +716,9 @@ public class Share extends BaseActivity {
 
 		Intent next = new Intent(getApplicationContext(), ReportSubmit.class);
 		startActivity(next);
+		// sometime it remain in stackF
+		next.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		finish();
 		super.onBackPressed();
 	}
@@ -722,7 +731,9 @@ public class Share extends BaseActivity {
 			// app icon @ action bar clicked; go home
 			Intent next = new Intent(getApplicationContext(),
 					ReportSubmit.class);
-
+			// sometime it remain in stackF
+			next.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+					| Intent.FLAG_ACTIVITY_CLEAR_TASK);
 			startActivity(next);
 			finish();
 

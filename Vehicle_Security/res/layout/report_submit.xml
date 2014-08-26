@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="22dp"
+        android:layout_marginTop="20dp"
         android:src="@drawable/report_submitted" />
 
     <TextView
@@ -32,19 +32,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="15dp"
         android:gravity="center"
-        android:text="Your Report has been successfully  submitted"
-        android:textSize="@dimen/regular_text" />
-
-    <TextView
-        android:id="@+id/textView3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="62dp"
-        android:gravity="center"
-        android:text="The community will now try their best to help you get your vehicle back"
-        android:textColor="@color/light_black"
+        android:text="Your report has been successfully submitted"
         android:textSize="@dimen/regular_text" />
 
     <Button
@@ -53,7 +41,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView3"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/blue_button"
         android:padding="10dp"
         android:text="Report Summary"
@@ -95,7 +83,19 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="25dp"
         android:gravity="center"
-        android:text="If you have more important information about this crime"
+        android:text="If you have more information about this crime"
+        android:textColor="@color/light_black"
+        android:textSize="@dimen/regular_text" />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/textView2"
+        android:gravity="center"
+        android:layout_marginTop="15dp"
+        android:text="Please check the report summary and share the information with the police, your insurance company and the My Wheels community. We&apos;ll all do our best to help you out"
         android:textColor="@color/light_black"
         android:textSize="@dimen/regular_text" />
 

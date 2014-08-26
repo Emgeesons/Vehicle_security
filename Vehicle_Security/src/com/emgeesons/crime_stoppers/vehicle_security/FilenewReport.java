@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -36,6 +35,7 @@ import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
@@ -152,6 +152,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 	static String fphoto = "fphoto";
 	static String tphoto = "tphoto";
 	SharedPreferences sharedpreferences;
+	String ampm;
+	HttpClient httpclient;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -252,9 +254,9 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			@Override
 			public void onClick(View arg0) {
 				dialog = new Dialog(FilenewReport.this);
-				dialog.setContentView(R.layout.vehicle_info);
+				dialog.setContentView(R.layout.vehicle_infod);
 				dialog.setTitle("Select Vehicle");
-				ListView list = (ListView) dialog.findViewById(R.id.listView1);
+				ListView list = (ListView) dialog.findViewById(R.id.listView2);
 				list.setAdapter(new ffAdapter());
 
 				dialog.show();
@@ -265,9 +267,9 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			@Override
 			public void onClick(View arg0) {
 				dialog = new Dialog(FilenewReport.this);
-				dialog.setContentView(R.layout.vehicle_info);
+				dialog.setContentView(R.layout.vehicle_infod);
 				dialog.setTitle("Select Vehicle");
-				ListView list = (ListView) dialog.findViewById(R.id.listView1);
+				ListView list = (ListView) dialog.findViewById(R.id.listView2);
 				list.setAdapter(new ffAdapter());
 
 				dialog.show();
@@ -446,8 +448,9 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 						.findViewById(R.id.timePicker1);
 				DatePicker datePicker = (DatePicker) dialog
 						.findViewById(R.id.datePicker1);
-
 				datePicker.init(years, months - 1, dates, datePickerListener);
+				Calendar calendars = Calendar.getInstance();
+				datePicker.setMaxDate(calendars.getTimeInMillis());
 
 				timePicker
 						.setOnTimeChangedListener(new OnTimeChangedListener() {
@@ -458,11 +461,11 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 								Hrs = hourOfDay;
 								min = minute;
-								// String ampm = "AM";
-								// if (Hrs >= 12) {
-								// Hrs -= 12;
-								// ampm = "PM";
-								// }
+								ampm = "AM";
+								if (Hrs >= 12) {
+									// Hrs -= 12;
+									ampm = "PM";
+								}
 								timevalue = Hrs + ":" + min;
 
 							}
@@ -471,9 +474,33 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 					@Override
 					public void onClick(View v) {
+						Calendar c = Calendar.getInstance();
+						int monthss = c.get(Calendar.MONTH) + 1;
+						int yearss = c.get(Calendar.YEAR);
+						int datess = c.get(Calendar.DAY_OF_MONTH);
+						int Hrss = c.get(Calendar.HOUR_OF_DAY);
+						int mins = c.get(Calendar.MINUTE);
+						String ampms = "AM";
+						if (Hrss >= 12) {
+							// Hrss -= 12;
+							ampms = "PM";
+						}
 						date.setText((info.getdateformate(datevalue + "-"
 								+ timevalue)));
-						dialog.dismiss();
+						String d = String.valueOf(yearss + "-" + monthss + "-"
+								+ datess);
+						if (datevalue.compareTo(d) == 0
+								&& ((Hrs > Hrss || Hrs == Hrss && min > mins) && ampms
+										.equalsIgnoreCase(ampm))) {
+
+							Toast.makeText(getApplicationContext(),
+									"Please select valid time",
+									Toast.LENGTH_LONG).show();
+
+						} else {
+							dialog.dismiss();
+						}
+
 					}
 				});
 				dialog.show();
@@ -665,6 +692,20 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			pDialog.setMessage("Updating ");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
+			pDialog.setOnCancelListener(new OnCancelListener() {
+
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					// TODO Auto-generated method stub
+					runOnUiThread(new Runnable() {
+						public void run() {
+
+							httpclient.getConnectionManager().shutdown();
+						}
+					});
+				}
+			});
+
 			pDialog.show();
 		}
 
@@ -679,6 +720,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 				e.printStackTrace();
 			} catch (JSONException e) {
 				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
 
 			return null;
@@ -699,7 +742,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			ClientProtocolException, JSONException {
 		final JSONArray jsonphotoArr;
 
-		HttpClient httpclient = new DefaultHttpClient();
+		httpclient = new DefaultHttpClient();
 		httpclient.getParams().setParameter(
 				CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 
@@ -753,7 +796,20 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 				.toString()));
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
-		HttpResponse response = httpclient.execute(httppost);
+		HttpResponse response = null;
+		try {
+			response = httpclient.execute(httppost);
+		} catch (Exception e) {
+			runOnUiThread(new Runnable() {
+
+				public void run() {
+					System.out.println("net");
+					cd.showNoInternetPopup();
+				}
+			});
+			return;
+		}
+
 		HttpEntity resEntity = response.getEntity();
 		System.out.println(response.getStatusLine());
 		if (resEntity != null) {
@@ -976,19 +1032,18 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 	private void select() {
 		name.setText(names.get(selected));
-		reg.setText(regs.get(selected));
+		reg.setText("Reg No:-" + " " + regs.get(selected));
 		if (vehicles.get(selected).getvehicle_type().equalsIgnoreCase("Car")) {
 			typeimage.setImageResource(R.drawable.ic_car);
 		} else if (vehicles.get(selected).getvehicle_type()
 				.equalsIgnoreCase("Bicycle")) {
+			reg.setText("Serial No:-" + " " + regs.get(selected));
 			typeimage.setImageResource(R.drawable.ic_cycle);
 		} else if (vehicles.get(selected).getvehicle_type()
 				.equalsIgnoreCase("MotorCycle")) {
 			typeimage.setImageResource(R.drawable.ic_bike);
 		} else {
-
 			typeimage.setImageResource(R.drawable.ic_other);
-
 		}
 	}
 
@@ -1212,7 +1267,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 					});
 
 				} else {
-					pos = String.valueOf(LATITUDE + LONGITUDE);
+					// pos = String.valueOf(LATITUDE + LONGITUDE);
+					pos = "";
 					runOnUiThread(new Runnable() {
 
 						public void run() {
@@ -1262,10 +1318,11 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 	@Override
 	public void onBackPressed() {
-
-		Intent next = new Intent(getApplicationContext(), MainActivity.class);
-		startActivity(next);
-		finish();
+		//
+		// Intent next = new Intent(getApplicationContext(),
+		// MainActivity.class);
+		// startActivity(next);
+		// finish();
 		super.onBackPressed();
 	}
 
@@ -1275,11 +1332,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		case android.R.id.home:
 
 			// app icon @ action bar clicked; go home
-			Intent next = new Intent(getApplicationContext(),
-					MainActivity.class);
-
-			startActivity(next);
-			finish();
+			onBackPressed();
 
 			break;
 		}

@@ -221,7 +221,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 									make.setHint("make");
 									model.setHint("model");
 									state.setVisibility(View.VISIBLE);
-									state.setHint("  state of registration");
+									state.setHint("state of registration");
 									reg.setHint("registration no");
 								} else {
 									type_other.setVisibility(View.GONE);
@@ -241,7 +241,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 												.equalsIgnoreCase("MotorCycle")) {
 									reg.setHint("registration no*(max 10 chars)");
 									state.setVisibility(View.VISIBLE);
-									state.setHint("  state of registration*(max 3 chars) ");
+									state.setHint("state of registration*(max 3 chars) ");
 								}
 								if (type.getText().toString()
 										.equalsIgnoreCase("Car")) {
@@ -328,11 +328,10 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bmake = false;
 					}
-					if ((type.getText().toString().equalsIgnoreCase("Car") || type
-							.getText().toString()
-							.equalsIgnoreCase("MotorCycle"))
+					if ((type.getText().toString().equalsIgnoreCase("Car")
 							|| type.getText().toString()
-									.equalsIgnoreCase("Other")
+									.equalsIgnoreCase("MotorCycle") || type
+							.getText().toString().equalsIgnoreCase("Other"))
 							&& model.getText().toString().length() < 2) {
 
 						model.setTextColor(getResources().getColor(R.color.red));
@@ -524,7 +523,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		protected Void doInBackground(Void... params) {
 
 			JSONArray jsonMainArr;
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -594,7 +593,19 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -649,6 +660,8 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 							dbbb.execSQL("UPDATE Vehicle_park SET type = '"
 									+ types + "',model = '"
 									+ model.getText().toString()
+									+ "',mark = '"
+									+ make.getText().toString()
 									+ "'WHERE vid='" + id + "'");
 
 							Intent next = new Intent(getApplicationContext(),

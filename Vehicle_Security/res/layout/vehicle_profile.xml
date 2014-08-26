@@ -183,7 +183,7 @@
                 android:layout_alignLeft="@+id/vin"
                 android:layout_below="@+id/vin"
                 android:layout_marginTop="5dp"
-                android:text="Color: "
+                android:text="Colour: "
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/medium_text" />
 

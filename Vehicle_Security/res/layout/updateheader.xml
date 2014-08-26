@@ -6,7 +6,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
+        android:layout_margin="5dp"
         android:background="@drawable/box_whiteb" >
 
         <ImageView
@@ -15,7 +15,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="24dp"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="30dp"
             android:src="@drawable/ic_car" />
 
@@ -59,10 +59,11 @@
             android:id="@+id/relativeLayout1"
             android:layout_width="wrap_content"
             android:layout_height="1.25dp"
-            android:layout_alignLeft="@+id/reg"
+            android:layout_alignParentLeft="true"
             android:layout_alignRight="@+id/type"
             android:layout_below="@+id/reg"
-            android:layout_marginTop="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="15dp"
             android:background="@color/light_black" >
         </RelativeLayout>
 
@@ -72,6 +73,7 @@
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/relativeLayout1"
             android:layout_below="@+id/relativeLayout1"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="14dp"
             android:text="TextView"
             android:textSize="@dimen/medium_text" />
@@ -105,7 +107,8 @@
             android:layout_toRightOf="@+id/imageView2"
             android:text="TextView"
             android:textSize="@dimen/medium_text" />
-        <RelativeLayout
+
+        <RelativeLayout
             android:id="@+id/pic"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -149,14 +152,25 @@
             </ImageView>
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/rline"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignLeft="@+id/scomm"
+            android:layout_alignRight="@+id/scomm"
+            android:layout_below="@+id/location"
+            android:layout_marginTop="10dp"
+            android:background="@color/gry_profile"
+            android:visibility="gone" >
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/comm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/imageView2"
-            android:layout_below="@+id/location"
+            android:layout_below="@+id/rline"
             android:text="" />
-
     </RelativeLayout>
 
 </RelativeLayout>

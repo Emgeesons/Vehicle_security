@@ -179,7 +179,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			pin2.setText(pinnumber[1]);
 			pin3.setText(pinnumber[2]);
 			pin4.setText(pinnumber[3]);
-			
+
 			if (info.gender.equalsIgnoreCase("male")) {
 				male.setImageResource(R.drawable.male_active);
 				female.setImageResource(R.drawable.female_inactive);
@@ -645,7 +645,18 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			 resEntity = response.getEntity();
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {

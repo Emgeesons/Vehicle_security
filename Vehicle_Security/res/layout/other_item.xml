@@ -2,9 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_margin="10dp"
-    android:layout_marginRight="10dp"
-    android:layout_marginTop="10dp" >
+    android:layout_margin="5dp" >
 
     <RelativeLayout
         android:id="@+id/relativeLayout1"
@@ -50,7 +48,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_alignParentTop="true"
-            android:layout_marginLeft="24dp"
+            android:layout_marginLeft="15dp"
             android:layout_marginTop="30dp"
             android:src="@drawable/ic_car" />
 
@@ -82,11 +80,11 @@
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/name"
-            android:text="TextView"
-            android:gravity="right"
-            android:ellipsize="end"
             android:layout_marginRight="10dp"
+            android:ellipsize="end"
+            android:gravity="right"
             android:singleLine="true"
+            android:text="TextView"
             android:textColor="@color/red"
             android:textSize="@dimen/medium_text" />
 
@@ -94,11 +92,12 @@
             android:id="@+id/relativeLayout1"
             android:layout_width="wrap_content"
             android:layout_height="1.25dp"
-            android:layout_alignLeft="@+id/reg"
+            android:layout_alignParentLeft="true"
             android:layout_alignRight="@+id/type"
             android:layout_below="@+id/reg"
             android:layout_marginTop="10dp"
             android:background="@color/light_black" >
+
         </RelativeLayout>
 
         <TextView
@@ -109,6 +108,7 @@
             android:layout_below="@+id/relativeLayout1"
             android:layout_marginTop="14dp"
             android:text="TextView"
+            android:layout_marginLeft="5dp"
             android:textSize="@dimen/medium_text" />
 
         <TextView
@@ -141,13 +141,26 @@
             android:text="TextView"
             android:textSize="@dimen/medium_text" />
 
+        <RelativeLayout
+            android:id="@+id/rline"
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/location"
+            android:layout_marginTop="10dp"
+            android:visibility="gone"
+            android:background="@color/gry_profile" >
+
+        </RelativeLayout>
+
         <TextView
             android:id="@+id/scomm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignLeft="@+id/vtype"
             android:layout_alignRight="@+id/time"
-            android:layout_below="@+id/location"
+            android:layout_below="@+id/rline"
             android:layout_marginTop="5dp"
             android:text="locationlocationlocationlocationlocationlocation"
             android:textColor="@color/light_black"

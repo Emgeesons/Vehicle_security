@@ -1,5 +1,6 @@
 package com.emgeesons.crime_stoppers.vehicle_security;
 
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
@@ -34,6 +35,7 @@ public class Website extends BaseActivity {
 	}
 
 	private class MyWebViewClient extends WebViewClient {
+
 		@Override
 		public boolean shouldOverrideUrlLoading(WebView view, String url) {
 			view.loadUrl(url);

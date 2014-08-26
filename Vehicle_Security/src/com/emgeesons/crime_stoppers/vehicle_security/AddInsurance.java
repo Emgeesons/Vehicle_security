@@ -227,7 +227,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 			} else if (info.iname.equalsIgnoreCase("RealBike")) {
 				tname = 32;
 
-			} else if (info.iname.equalsIgnoreCase("RealBike")) {
+			} else if (info.iname.equalsIgnoreCase("Velosure")) {
 				tname = 33;
 
 			} else {
@@ -236,7 +236,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 
 			}
 
-			if (!type.equalsIgnoreCase("Bicycle") && tname == 34) {
+			if (type.equalsIgnoreCase("MotorCycle") && tname == 34) {
 				tname = 30;
 
 			}
@@ -248,8 +248,13 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 				other_name.setVisibility(View.GONE);
 				cname.setText(cnametype[tname]);
 			}
+//			if (!type.equalsIgnoreCase("other")) {
+//				number.setText(cnotype[tname]);
+//			} else {
+				number.setText(info.inum);
+//			}
 
-			number.setText(cnotype[tname]);
+			
 			policy.setText(info.ipolicy);
 			if (info.exp.contains("0000-00-00")
 					|| info.exp.equalsIgnoreCase("null")) {
@@ -400,7 +405,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 	}
 
 	private class ins extends AsyncTask<Void, Void, Void> {
-		String success, mess, response, pin, qus, name;
+		String success, mess, response, pin, qus, name, status;
 
 		@Override
 		protected void onPreExecute() {
@@ -417,7 +422,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 		protected Void doInBackground(Void... params) {
 
 			JSONArray jsonMainArr;
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -484,7 +489,19 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -492,9 +509,12 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 					System.out.println(reponse);
 					JSONObject profile = new JSONObject(reponse);
 
-//					jsonMainArr = profile.getJSONArray("response");
+					// jsonMainArr = profile.getJSONArray("response");
+					jsonMainArr = profile.getJSONArray("response");
 					success = profile.getString("status");
 					mess = profile.getString("message");
+					status = jsonMainArr.getJSONObject(0).getString(
+							"vehicle_status");
 
 				} catch (JSONException e) {
 					// TODO Auto-generated catch block
@@ -518,6 +538,8 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 									+ expdate
 									+ "',vehicle_insnum = '"
 									+ number.getText().toString()
+									+ "',vehicle_status = '"
+									+ status
 									+ "'WHERE vehicle_id='" + id + "'");
 
 							Intent next = new Intent(AddInsurance.this,

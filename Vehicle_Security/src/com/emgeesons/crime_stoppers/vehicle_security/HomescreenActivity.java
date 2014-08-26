@@ -13,12 +13,9 @@ import org.apache.http.HttpVersion;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
@@ -68,12 +65,12 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.app.SherlockFragment;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.google.android.gms.internal.at;
-import com.google.android.gms.internal.el;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class HomescreenActivity extends SherlockFragment implements
@@ -121,6 +118,7 @@ public class HomescreenActivity extends SherlockFragment implements
 	private String imagepath = null;
 	AlertDialog alert;
 	String reponse;
+	String as;
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -180,7 +178,7 @@ public class HomescreenActivity extends SherlockFragment implements
 		gps = new GPSTracker(getActivity());
 		// checkupdate cno
 
-		checkupdate();
+		checkupdate(getActivity());
 
 		// COACHMARK
 		if (!atPrefs.getBoolean(info.checkllogin, true)
@@ -280,9 +278,36 @@ public class HomescreenActivity extends SherlockFragment implements
 			public void onClick(View view) {
 
 				if (atPrefs.getBoolean(info.checkllogin, true)) {
-					Intent next = new Intent(getActivity(), LoginActivity.class);
-					startActivity(next);
-					getActivity().finish();
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							getActivity());
+					builder.setMessage("Please log in to use this feature")
+							.setCancelable(false)
+							// .setMessage("Are you sure?")
+							.setNegativeButton("Cancel",
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									})
+							.setPositiveButton("Sign in",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											Intent next = new Intent(
+													getActivity(),
+													LoginActivity.class);
+											startActivity(next);
+											getActivity().finish();
+
+										}
+
+									});
+					builder.show();
+
 				} else {
 
 					// profile = new getprofile().execute();
@@ -331,21 +356,30 @@ public class HomescreenActivity extends SherlockFragment implements
 		// check gps is on\off and set location
 
 		gpscheck();
+
+		map.setOnMarkerClickListener(new OnMarkerClickListener() {
+
+			@Override
+			public boolean onMarkerClick(Marker marker) {
+
+				marker.setTitle(getaddress());
+				return false;
+
+			}
+		});
 		report.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-				if (!atPrefs.getBoolean(info.checkllogin, true)) {
+				IsInternetPresent = cd.isConnectingToInternet();
+				if (IsInternetPresent == false) {
+					cd.showNoInternetPopup();
+				} else {
 					Intent next = new Intent(getActivity(),
 							ReportSighting.class);
 					startActivity(next);
-					getActivity().finish();
-				} else {
-					Intent next = new Intent(getActivity(), LoginActivity.class);
-					startActivity(next);
-					getActivity().finish();
+					// getActivity().finish();
 				}
-
 			}
 		});
 		file.setOnClickListener(new OnClickListener() {
@@ -353,13 +387,45 @@ public class HomescreenActivity extends SherlockFragment implements
 			@Override
 			public void onClick(View arg0) {
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
-					Intent next = new Intent(getActivity(), FilenewReport.class);
-					startActivity(next);
-					getActivity().finish();
+					IsInternetPresent = cd.isConnectingToInternet();
+					if (IsInternetPresent == false) {
+						cd.showNoInternetPopup();
+					} else {
+						Intent next = new Intent(getActivity(),
+								FilenewReport.class);
+						startActivity(next);
+					}
+					// getActivity().finish();
 				} else {
-					Intent next = new Intent(getActivity(), LoginActivity.class);
-					startActivity(next);
-					getActivity().finish();
+					AlertDialog.Builder builder = new AlertDialog.Builder(
+							getActivity());
+					builder.setMessage("Please log in to use this feature")
+							.setCancelable(false)
+							// .setMessage("Are you sure?")
+							.setNegativeButton("Cancel",
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.dismiss();
+										}
+									})
+							.setPositiveButton("Sign in",
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog, int id) {
+											Intent next = new Intent(
+													getActivity(),
+													LoginActivity.class);
+											startActivity(next);
+											getActivity().finish();
+
+										}
+
+									});
+					builder.show();
 				}
 				// Intent next = new Intent(getActivity(), AboutUs.class);
 				// startActivity(next);
@@ -373,18 +439,22 @@ public class HomescreenActivity extends SherlockFragment implements
 			public void onClick(View arg0) {
 				Intent next = new Intent(getActivity(), AboutUs.class);
 				startActivity(next);
-				getActivity().finish();
+				// getActivity().finish();
 			}
 		});
 		update.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
+				IsInternetPresent = cd.isConnectingToInternet();
+				if (IsInternetPresent == false) {
+					cd.showNoInternetPopup();
+				} else {
+					Intent next = new Intent(getActivity(), Updates.class);
 
-				Intent next = new Intent(getActivity(), Updates.class);
-
-				startActivity(next);
-				getActivity().finish();
+					startActivity(next);
+					// getActivity().finish();
+				}
 
 			}
 		});
@@ -416,17 +486,19 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	}
 
-	static void checkupdate() {
-		RelativeLayout updates;
-		updates = (RelativeLayout) view.findViewById(R.id.updatesc);
-		int no = atPrefs.getInt("updates", 0);
-		if (no != 0) {
+	static void checkupdate(Context con) {
+		if (con != null) {
+			RelativeLayout updates;
+			updates = (RelativeLayout) view.findViewById(R.id.updatesc);
+			int no = atPrefs.getInt("updates", 0);
+			if (no != 0) {
 
-			updates.setVisibility(View.VISIBLE);
-			TextView nos = (TextView) view.findViewById(R.id.no);
-			nos.setText(String.valueOf(no));
-		} else {
-			updates.setVisibility(View.GONE);
+				updates.setVisibility(View.VISIBLE);
+				TextView nos = (TextView) view.findViewById(R.id.no);
+				nos.setText(String.valueOf(no));
+			} else {
+				updates.setVisibility(View.GONE);
+			}
 		}
 
 	}
@@ -510,7 +582,6 @@ public class HomescreenActivity extends SherlockFragment implements
 				mpEntity.addPart("model", new StringBody(info.model));
 
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -520,16 +591,13 @@ public class HomescreenActivity extends SherlockFragment implements
 			try {
 				response = httpclient.execute(httppost);
 			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			try {
-				 resEntity = response.getEntity();
+				resEntity = response.getEntity();
 			} catch (Exception e) {
-				// TODO: handle exception
 				getActivity().runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -552,13 +620,10 @@ public class HomescreenActivity extends SherlockFragment implements
 					rate = jsonMainArr.getJSONObject(0).getString("rating");
 					notip = jsonMainArr.getJSONObject(0).getString("noTips");
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -585,8 +650,8 @@ public class HomescreenActivity extends SherlockFragment implements
 							SQLiteDatabase dbbb = db.getReadableDatabase();
 							dbbb.execSQL("UPDATE Vehicle_park SET lat = '"
 									+ LATITUDE + "',lon = '" + LONGITUDE
-									+ "',mark = '" + "true" + "',type = '"
-									+ typename + "'WHERE vid='" + vid + "'");
+									+ "',type = '" + typename + "'WHERE vid='"
+									+ vid + "'");
 						}
 						Intent next = new Intent(getActivity(), CarPark.class);
 						next.putExtra("Rate", rate);
@@ -723,11 +788,11 @@ public class HomescreenActivity extends SherlockFragment implements
 		// BitmapDescriptor icon = BitmapDescriptorFactory
 		// .fromResource(R.drawable.ic_location_marker);
 		markerOptions.position(position);
-		// new Runnable() {
+		// getActivity().runOnUiThread(new Runnable() {
 		// public void run() {
-		markerOptions.title(getaddress());
+		// markerOptions.title(getaddress());
 		// }
-		// };
+		// });
 
 		// markerOptions.icon(icon);
 		map.clear();
@@ -1217,8 +1282,6 @@ public class HomescreenActivity extends SherlockFragment implements
 											+ ""
 											+ "',lon = '"
 											+ ""
-											+ "',mark = '"
-											+ ""
 											+ "'WHERE vid='" + vid + "'");
 
 									checkinfo();
@@ -1243,7 +1306,7 @@ public class HomescreenActivity extends SherlockFragment implements
 			parkrel.setBackgroundColor(getResources().getColor(
 					R.color.white_trs1));
 			park.setTextColor(getResources().getColor(R.color.blue_text));
-			find.setTextColor(getResources().getColor(R.color.blue_trs));
+			find.setTextColor(getResources().getColor(R.color.gry_text));
 			find.setEnabled(false);
 			find.setAlpha(50);
 			park.setOnClickListener(new OnClickListener() {
@@ -1327,8 +1390,6 @@ public class HomescreenActivity extends SherlockFragment implements
 											+ ""
 											+ "',lon = '"
 											+ ""
-											+ "',mark = '"
-											+ ""
 											+ "'WHERE vid='" + vid + "'");
 
 									check();
@@ -1353,7 +1414,7 @@ public class HomescreenActivity extends SherlockFragment implements
 			parkrel.setBackgroundColor(getResources().getColor(
 					R.color.white_trs1));
 			park.setTextColor(getResources().getColor(R.color.blue_text));
-			find.setTextColor(getResources().getColor(R.color.blue_trs));
+			find.setTextColor(getResources().getColor(R.color.gry_text));
 			find.setEnabled(false);
 			find.setAlpha(50);
 			park.setOnClickListener(new OnClickListener() {

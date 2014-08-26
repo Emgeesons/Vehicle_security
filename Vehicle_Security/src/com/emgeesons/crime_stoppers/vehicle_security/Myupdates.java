@@ -77,7 +77,7 @@ public class Myupdates extends Fragment {
 	GPSTracker gps;
 	private AsyncTask<Void, Void, Void> vinfo;
 	TextView name, reg, type, date, time, location, rtype;
-	String pos="";
+	String pos = "";
 	ImageView vtype, rvtype;
 	RelativeLayout listHeaderView;
 	private ProgressBar pBar;
@@ -119,7 +119,8 @@ public class Myupdates extends Fragment {
 		Vrecover = (RelativeLayout) rootView.findViewById(R.id.ress);
 		go = (Button) rootView.findViewById(R.id.go);
 		pBar = (ProgressBar) rootView.findViewById(R.id.progressBar1);
-
+		Updates.imageLoader.clearMemoryCache();
+		Updates.imageLoader.clearDiskCache();
 		rtype = (TextView) rootView.findViewById(R.id.typess);
 		info = new Data();
 		db = new DatabaseHandler(getActivity());
@@ -204,7 +205,7 @@ public class Myupdates extends Fragment {
 							getActivity());
 					builder.setMessage("Vehicle Recovered")
 							.setCancelable(false)
-							.setMessage("Are you sure")
+							.setMessage("Are you sure?")
 							.setNegativeButton("No",
 									new DialogInterface.OnClickListener() {
 
@@ -257,7 +258,7 @@ public class Myupdates extends Fragment {
 		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -313,7 +314,19 @@ public class Myupdates extends Fragment {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				getActivity().runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
+			;
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -396,7 +409,7 @@ public class Myupdates extends Fragment {
 						}
 					});
 				}
-			}else {
+			} else {
 				cd.showNoInternetPopup();
 			}
 
@@ -564,6 +577,8 @@ public class Myupdates extends Fragment {
 		if (rno.isEmpty()) {
 			reg.setVisibility(View.GONE);
 		}
+		RelativeLayout rline = (RelativeLayout) v.findViewById(R.id.rline);
+		reg.setVisibility(View.GONE);
 
 	}
 
@@ -580,7 +595,7 @@ public class Myupdates extends Fragment {
 		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -622,7 +637,19 @@ public class Myupdates extends Fragment {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				getActivity().runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -714,13 +741,19 @@ public class Myupdates extends Fragment {
 							}
 
 							if ((jsonarr.length() < 1)) {
-//								if (status.equalsIgnoreCase("recovered")) {
-//									report_type = "Recovered";
-//									rtype.setTextColor(getResources().getColor(
-//											R.color.green));
-//									recoverfun();
-//								}
+								// if (status.equalsIgnoreCase("recovered")) {
+								// report_type = "Recovered";
+								// rtype.setTextColor(getResources().getColor(
+								// R.color.green));
+								// recoverfun();
+								// }
+								TextView title = (TextView) rootView
+										.findViewById(R.id.textView1);
+								TextView subtitle = (TextView) rootView
+										.findViewById(R.id.textView2);
 								noupdate.setVisibility(View.VISIBLE);
+								title.setText("No Vehicles Reported");
+								subtitle.setText("Your reported vehicle updates will be displayed here");
 								data.setAdapter(new ffAdapter());
 							} else {
 								if (status.equalsIgnoreCase("recovered")) {
@@ -729,6 +762,7 @@ public class Myupdates extends Fragment {
 											R.color.green));
 									recoverfun();
 								}
+
 								noupdate.setVisibility(View.INVISIBLE);
 								data.setAdapter(new ffAdapter());
 							}
@@ -784,7 +818,7 @@ public class Myupdates extends Fragment {
 					});
 
 				}
-			}else {
+			} else {
 				cd.showNoInternetPopup();
 			}
 
@@ -819,7 +853,9 @@ public class Myupdates extends Fragment {
 				ViewGroup parent) {
 			View vv;
 			TextView name, type, time, date, location, comm, spot;
-			ImageView pic1, pic2, pic3;
+			final ImageView pic1;
+			final ImageView pic2;
+			final ImageView pic3;
 			ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
 			int j = 0, x = 0;
 			if (convertView == null) {
@@ -874,38 +910,80 @@ public class Myupdates extends Fragment {
 				e.printStackTrace();
 			}
 			// for next row pos*no of photo
-			if (!(position == 0)) {
-				j = position * 3;
-			}
+//			if (!(position == 0)) {
+//				j = position * 3;
+//			}
 			if (comm.getText().toString().isEmpty()) {
 				comm.setVisibility(View.GONE);
 			}
 
 			String[] imageUrls = { spic1, spic2, spic3 };
-			for (int i = 0; i < imageUrls.length; i++) {
-				Updates.mStrings.add(imageUrls[i]);
+			if (!imageUrls[0].isEmpty() && !imageUrls[0].equalsIgnoreCase("")) {
+				Updates.imageLoader.displayImage(imageUrls[0], pic1, options,
+						animateFirstListener);
+				pic1.setVisibility(View.VISIBLE);
+				pic1.setTag(imageUrls[0]);
 
-			}
-			ImageView arr[] = { pic1, pic2, pic3 };
-			for (int i = j; i < j + 3; i++) {
+				if (!imageUrls[1].isEmpty()
+						&& !imageUrls[1].equalsIgnoreCase("")) {
+					Updates.imageLoader.displayImage(imageUrls[1], pic2,
+							options, animateFirstListener);
+					pic2.setVisibility(View.VISIBLE);
+					pic2.setTag(imageUrls[1]);
 
-				Updates.imageLoader.displayImage(Updates.mStrings.get(i),
-						arr[x], options, animateFirstListener);
-				arr[x].setVisibility(View.VISIBLE);
-				if (Updates.mStrings.get(i).isEmpty()) {
-					arr[x].setVisibility(View.GONE);
+					if (!imageUrls[2].isEmpty()
+							&& !imageUrls[2].equalsIgnoreCase("")) {
+						Updates.imageLoader.displayImage(imageUrls[2], pic3,
+								options, animateFirstListener);
+						pic3.setVisibility(View.VISIBLE);
+						pic3.setTag(imageUrls[2]);
+					} else {
+						pic3.setVisibility(View.GONE);
+					}
+
+				} else {
+					pic2.setVisibility(View.GONE);
 				}
-				x++;
+
+			} else {
+				pic1.setVisibility(View.GONE);
+
+				// pic2.setVisibility(View.GONE);
 
 			}
+			if (comm.getVisibility() == View.VISIBLE
+					|| (pic1.getVisibility() == View.VISIBLE
+							|| pic2.getVisibility() == View.VISIBLE || pic3
+							.getVisibility() == View.VISIBLE)) {
+				RelativeLayout rline = (RelativeLayout) vv
+						.findViewById(R.id.rline);
+				rline.setVisibility(View.VISIBLE);
+			}
+//			for (int i = 0; i < imageUrls.length; i++) {
+//				Updates.mStrings.add(imageUrls[i]);
+//
+//			}
+//			ImageView arr[] = { pic1, pic2, pic3 };
+//			for (int i = j; i < j + 3; i++) {
+//
+//				Updates.imageLoader.displayImage(Updates.mStrings.get(i),
+//						arr[x], options, animateFirstListener);
+//				arr[x].setVisibility(View.VISIBLE);
+//				if (Updates.mStrings.get(i).isEmpty()) {
+//					arr[x].setVisibility(View.GONE);
+//				}
+//				x++;
+//
+//			}
 
 			pic1.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), Fullimage.class);
-					intent.putExtra("IMAGES",
-							Updates.mStrings.get((position * 3)));
+					// Toast.makeText(getActivity(), "1", Toast.LENGTH_LONG)
+					// .show();
+					intent.putExtra("IMAGES", String.valueOf(pic1.getTag()));
 					startActivity(intent);
 				}
 			});
@@ -914,24 +992,28 @@ public class Myupdates extends Fragment {
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), Fullimage.class);
-					intent.putExtra("IMAGES",
-							Updates.mStrings.get((position * 3) + 1));
+					intent.putExtra("IMAGES", String.valueOf(pic2.getTag()));
+
+					// Toast.makeText(getActivity(), "2", Toast.LENGTH_LONG)
+					// .show();
 					startActivity(intent);
 
 				}
 			});
+
 			pic3.setOnClickListener(new OnClickListener() {
 
 				@Override
 				public void onClick(View v) {
 					Intent intent = new Intent(getActivity(), Fullimage.class);
-					intent.putExtra("IMAGES",
-							Updates.mStrings.get((position * 3) + 2));
+					intent.putExtra("IMAGES", String.valueOf(pic3.getTag()));
 					startActivity(intent);
+
+					// Toast.makeText(getActivity(), "3", Toast.LENGTH_LONG)
+					// .show();
 
 				}
 			});
-
 			return vv;
 		}
 	}
@@ -942,7 +1024,7 @@ public class Myupdates extends Fragment {
 		String dateformat = "";
 		try {
 			datef = sdf.parse(date);
-			sdf.applyPattern("E,MMMM dd,yyyy");
+			sdf.applyPattern("E, MMMM dd,yyyy");
 			dateformat = sdf.format(datef);
 		} catch (ParseException e) {
 			e.printStackTrace();

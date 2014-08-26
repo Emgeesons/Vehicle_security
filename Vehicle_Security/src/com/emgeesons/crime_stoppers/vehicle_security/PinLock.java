@@ -183,7 +183,10 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 		dbb.execSQL("UPDATE profile SET user_id ='',fName='',lName='',email='',mobileNumber='',dob='',gender='',licenseNo='',street='',address='',postcode='',dtModified='',fbId='',fbToken='',contact_name='',contact_number='',pin='',squs='',sans='',spoints=''");
 
 		Intent next = new Intent(getApplicationContext(), LoginActivity.class);
+		next.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TASK);
 		startActivity(next);
+		// finish();
 	}
 
 	private class checkp extends AsyncTask<Void, Void, Void> {
@@ -193,7 +196,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(PinLock.this);
-			pDialog.setMessage("Verifying Pin");
+			pDialog.setMessage("Verifying Pin..");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -204,7 +207,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 		protected Void doInBackground(Void... params) {
 
 			DefaultHttpClient httpClient = new DefaultHttpClient();
-
+			HttpEntity resEntity;
 			ResponseHandler<String> resonseHandler = new BasicResponseHandler();
 			HttpPost postMethod = new HttpPost(pass_url);
 			System.out.println(pass_url);
@@ -248,7 +251,19 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
+
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {

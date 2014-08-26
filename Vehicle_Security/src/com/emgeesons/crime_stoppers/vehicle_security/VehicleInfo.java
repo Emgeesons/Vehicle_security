@@ -76,7 +76,7 @@ public class VehicleInfo extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		getSupportActionBar().setTitle(
-				Html.fromHtml("<font color='#FFFFFF'>My Vehicle </font>"));
+				Html.fromHtml("<font color='#FFFFFF'>My Vehicles </font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		getSupportActionBar().setBackgroundDrawable(
 				new ColorDrawable(Color.parseColor("#060606")));
@@ -409,15 +409,18 @@ public class VehicleInfo extends BaseActivity {
 			// ids.setText(String.valueOf(vehicles.get(position).getvehicle_id()));
 			make.setText(vehicles.get(position).getvehicle_make() + " "
 					+ vehicles.get(position).getvehicle_model());
-			reg.setText(vehicles.get(position).getvehicle_reg());
+			reg.setText("Reg No:-" + " "
+					+ vehicles.get(position).getvehicle_reg());
 			if (vehicles.get(position).getvehicle_type()
 					.equalsIgnoreCase("Car")) {
 				icon.setImageResource(R.drawable.ic_car);
 			} else if (vehicles.get(position).getvehicle_type()
 					.equalsIgnoreCase("Bicycle")) {
+				reg.setText("Serial No:-" + " "
+						+ vehicles.get(position).getvehicle_reg());
 				icon.setImageResource(R.drawable.ic_cycle);
 			} else if (vehicles.get(position).getvehicle_type()
-					.equalsIgnoreCase("MotorCycle")) {
+					.equalsIgnoreCase("Motorcycle")) {
 				icon.setImageResource(R.drawable.ic_bike);
 			} else {
 
@@ -468,7 +471,7 @@ public class VehicleInfo extends BaseActivity {
 		protected Void doInBackground(Void... params) {
 
 			JSONArray jsonMainArr;
-
+			HttpEntity resEntity;
 			HttpClient httpclient = new DefaultHttpClient();
 			httpclient.getParams().setParameter(
 					CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
@@ -523,7 +526,19 @@ public class VehicleInfo extends BaseActivity {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {

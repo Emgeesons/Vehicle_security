@@ -53,7 +53,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_centerHorizontal="true"
                         android:gravity="center"
-                        android:text="I&apos;m Parking Here"
+                        android:text="I&apos;m parking here"
                         android:textColor="@color/blue_text"
                         android:textSize="@dimen/medium_text" />
 
@@ -93,7 +93,7 @@
                         android:layout_weight="1"
                         android:gravity="center"
                         android:text="Find my vehicle"
-                        android:textColor="@color/blue_text"
+                        android:textColor="@color/gry"
                         android:textSize="@dimen/medium_text" />
                 </RelativeLayout>
             </LinearLayout>
@@ -138,7 +138,7 @@
                 android:layout_alignLeft="@+id/textView1"
                 android:layout_below="@+id/textView1"
                 android:layout_marginTop="5dp"
-                android:text="suspicious activity or possible stolen vehicle"
+                android:text="Suspicious Activity or Possible Stolen Vehicle"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/smaller_text" />
 
@@ -175,7 +175,7 @@
                 android:layout_alignLeft="@+id/textView1"
                 android:layout_below="@+id/textView1"
                 android:layout_marginTop="5dp"
-                android:text="theft or vandalism"
+                android:text="Theft or Vandalism"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/smaller_text" />
 
@@ -228,7 +228,7 @@
                 android:layout_alignLeft="@+id/textView1"
                 android:layout_below="@+id/textView1"
                 android:layout_marginTop="5sp"
-                android:text="Crime Stoppers, South Australia"
+                android:text="Crime Stoppers South Australia"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/smaller_text" />
 
@@ -249,17 +249,6 @@
             android:layout_weight="1"
             android:background="@color/blue" >
 
-            <TextView
-                android:id="@+id/textView1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="24dp"
-                android:layout_toRightOf="@+id/imageView1"
-                android:text="Updates"
-                android:textColor="@color/white"
-                android:textSize="@dimen/big_text" />
-
             <ImageView
                 android:id="@+id/imageView1"
                 android:layout_width="wrap_content"
@@ -275,8 +264,8 @@
                 android:layout_height="35dp"
                 android:layout_alignParentRight="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="16dp" 
-                android:background="@drawable/red">
+                android:layout_marginRight="16dp"
+                android:background="@drawable/red" >
 
                 <TextView
                     android:id="@+id/no"
@@ -287,8 +276,29 @@
                     android:text="0"
                     android:textColor="@color/white"
                     android:textSize="@dimen/medium_text" />
-
             </RelativeLayout>
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/imageView1"
+                android:layout_marginLeft="25dp"
+                android:layout_toRightOf="@+id/imageView1"
+                android:text="Updates"
+                android:textColor="@color/white"
+                android:textSize="@dimen/big_text" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/textView1"
+                android:layout_below="@+id/textView1"
+                android:text="Track Activity and Stay Informed"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/white_trs1"
+                android:textSize="@dimen/smaller_text" />
         </RelativeLayout>
     </LinearLayout>
 

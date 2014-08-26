@@ -101,6 +101,7 @@ public class VehicleProfile extends BaseActivity {
 	SharedPreferences atPrefs;
 	double LATITUDE;
 	double LONGITUDE;
+	Connection_Detector cd = new Connection_Detector(this);
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -203,19 +204,7 @@ public class VehicleProfile extends BaseActivity {
 			vpic.setImageResource(R.drawable.ic_other);
 		}
 
-		if (!info.status.isEmpty()) {
-			ImageView s = (ImageView) findViewById(R.id.imageView1);
-			s.setVisibility(View.VISIBLE);
-			status.setVisibility(View.VISIBLE);
-			status.setText(info.status);
-			title.setTextColor(getResources().getColor(R.color.yellow));
-
-		} else {
-			ImageView s = (ImageView) findViewById(R.id.imageView1);
-			s.setVisibility(View.GONE);
-			status.setVisibility(View.GONE);
-		}
-
+		statuscheck();
 		if (info.body.isEmpty()
 				&& type.getText().toString().equalsIgnoreCase("Car")) {
 			TextView b = (TextView) findViewById(R.id.body);
@@ -252,9 +241,9 @@ public class VehicleProfile extends BaseActivity {
 		} else {
 			ins.setVisibility(View.VISIBLE);
 			// change status text
-			if (status.getText().toString().contains("Add Insurance")) {
-				status.setText("Add Vehicle Photos");
-			}
+			// if (status.getText().toString().contains("Add Insurance")) {
+			// status.setText("Add Vehicle Photos");
+			// }
 			addins.setBackgroundResource(R.drawable.box_whiteb);
 			addins.setText("Edit Insurance");
 			call = "second";
@@ -278,11 +267,18 @@ public class VehicleProfile extends BaseActivity {
 		if (folder.exists()) {
 
 			no = folder.listFiles();
+			if (no.length == 4) {
+				imagepath = no[3].getAbsolutePath();
+				File file = new File(imagepath);
+				file.delete();
+			}
+			no = folder.listFiles();
 			if (no.length == 3) {
 
 				addpic.setVisibility(View.GONE);
 
 			}
+
 			for (int i = 0; i < no.length; i++) {
 				if (no[i].isFile()) {
 					System.out.println("File " + no[i]);
@@ -297,6 +293,7 @@ public class VehicleProfile extends BaseActivity {
 			}
 
 		}
+
 		// refresh ui
 		final Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
@@ -440,6 +437,28 @@ public class VehicleProfile extends BaseActivity {
 				builder.show();
 			}
 		});
+
+	}
+
+	private void statuscheck() {
+		// TODO Auto-generated method stub
+		info = new Data();
+		info.vehicleInfo(getApplicationContext(), id);
+		if (!info.status.isEmpty()) {
+
+			ImageView s = (ImageView) findViewById(R.id.imageView1);
+			s.setVisibility(View.VISIBLE);
+			status.setVisibility(View.VISIBLE);
+			status.setText(info.status);
+			title.setTextColor(getResources().getColor(R.color.yellow));
+
+		} else {
+			ImageView s = (ImageView) findViewById(R.id.imageView1);
+			s.setVisibility(View.GONE);
+			status.setVisibility(View.GONE);
+			title.setTextColor(getResources().getColor(R.color.black));
+
+		}
 
 	}
 
@@ -690,7 +709,7 @@ public class VehicleProfile extends BaseActivity {
 		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
-
+			HttpEntity resEntity;
 			JSONArray jsonMainArr;
 			final SharedPreferences atPrefs;
 			atPrefs = PreferenceManager
@@ -756,7 +775,18 @@ public class VehicleProfile extends BaseActivity {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -892,9 +922,10 @@ public class VehicleProfile extends BaseActivity {
 	}
 
 	private class sendd extends AsyncTask<Void, Void, Void> {
-		String success, mess, response, user;
+		String success, mess, response, user, status, photo_url;
 		Button next;
 		ProgressDialog pDialog;
+		JSONArray jsonMainArr;
 
 		@Override
 		protected void onPreExecute() {
@@ -928,8 +959,18 @@ public class VehicleProfile extends BaseActivity {
 			try {
 				JSONObject profile = new JSONObject(names);
 				success = profile.getString("status");
+				mess = profile.getString("status");
+
 				if (success.equalsIgnoreCase("success")) {
-					String res = profile.getString("response");
+					jsonMainArr = profile.getJSONArray("response");
+					photo_url = jsonMainArr.getJSONObject(0).getString(
+							"photo_url");
+					status = jsonMainArr.getJSONObject(0).getString(
+							"vehicle_status");
+					SQLiteDatabase dbbb = db.getReadableDatabase();
+					dbbb.execSQL("UPDATE vehicle_info SET vehicle_status = '"
+							+ status + "'WHERE vehicle_id='" + id + "'");
+					String res = photo_url;
 					int pos = res.lastIndexOf("/");
 					names = res.substring(pos + 1);
 					Log.i("name", names);
@@ -944,14 +985,52 @@ public class VehicleProfile extends BaseActivity {
 					}
 
 					checkpic();
+					statuscheck();
 				} else if (!success.equalsIgnoreCase("success")) {
 					runOnUiThread(new Runnable() {
 
 						public void run() {
+							File file = new File(imagepath);
+							file.delete();
+							ImageView[] IMGS = { pic1, pic2, pic3 };
+							if (folder.exists()) {
+
+								no = folder.listFiles();
+								if (no.length == 3) {
+
+									addpic.setVisibility(View.GONE);
+
+								}
+								Log.i("nopic", String.valueOf(nopic));
+								switch (nopic) {
+
+								case 1:
+									nopic = 1;
+									pic1.setVisibility(View.GONE);
+									break;
+								case 2:
+									nopic = nopic - 1;
+									pic2.setVisibility(View.GONE);
+									break;
+								case 3:
+									nopic = nopic - 1;
+									pic3.setVisibility(View.GONE);
+									addpic.setVisibility(View.VISIBLE);
+									break;
+								case 4:
+									nopic = nopic - 1;
+									pic3.setVisibility(View.GONE);
+									addpic.setVisibility(View.VISIBLE);
+									break;
+
+								default:
+									break;
+								}
+							}
 							final AlertDialog Dialog = new AlertDialog.Builder(
 									VehicleProfile.this).create();
 							Dialog.setTitle(success);
-							// Dialog.setMessage(mess);
+							Dialog.setMessage(mess);
 							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
 									"OK",
 									new DialogInterface.OnClickListener() {
@@ -971,7 +1050,6 @@ public class VehicleProfile extends BaseActivity {
 			}
 
 		}
-
 	}
 
 	// sending profile pic
@@ -1006,8 +1084,35 @@ public class VehicleProfile extends BaseActivity {
 
 		httppost.setEntity(mpEntity);
 		System.out.println(httppost.getRequestLine());
-		HttpResponse response = httpclient.execute(httppost);
-		HttpEntity resEntity = response.getEntity();
+		HttpResponse response = null;
+		try {
+			response = httpclient.execute(httppost);
+		} catch (Exception e) {
+			runOnUiThread(new Runnable() {
+
+				public void run() {
+					System.out.println("net");
+					cd.showNoInternetPopup();
+				}
+			});
+			return;
+		}
+
+		HttpEntity resEntity;
+		try {
+			resEntity = response.getEntity();
+		} catch (Exception e) {
+			// TODO: handle exception
+			runOnUiThread(new Runnable() {
+
+				public void run() {
+					System.out.println("net");
+					cd.showNoInternetPopup();
+				}
+			});
+			return;
+		}
+
 		System.out.println(response.getStatusLine());
 
 		if (resEntity != null) {
@@ -1029,7 +1134,7 @@ public class VehicleProfile extends BaseActivity {
 			o.inJustDecodeBounds = true;
 			BitmapFactory.decodeFile(path, o);
 			// The new size we want to scale to
-			final int REQUIRED_SIZE = 600;
+			final int REQUIRED_SIZE = 400;
 
 			// Find the correct scale value. It should be the power of 2.
 			int scale = 1;
@@ -1094,7 +1199,7 @@ public class VehicleProfile extends BaseActivity {
 
 		@Override
 		protected Void doInBackground(Void... params) {
-
+			HttpEntity resEntity;
 			JSONArray jsonMainArr;
 			atPrefs = PreferenceManager
 					.getDefaultSharedPreferences(VehicleProfile.this);
@@ -1138,7 +1243,19 @@ public class VehicleProfile extends BaseActivity {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			HttpEntity resEntity = response.getEntity();
+
+			try {
+				resEntity = response.getEntity();
+			} catch (Exception e) {
+				// TODO: handle exception
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						cd.showNoInternetPopup();
+					}
+				});
+				return null;
+			}
 			System.out.println(response.getStatusLine());
 			if (resEntity != null) {
 				try {
@@ -1208,7 +1325,7 @@ public class VehicleProfile extends BaseActivity {
 							db = new DatabaseHandler(VehicleProfile.this);
 							PersonalData data = new PersonalData(user_id,
 									fName, lName, email, mobileNumber, dob,
-									gender, licenseNo, street, suburb,
+									gender, licenseNo, address, suburb,
 									postcode, dtModified, fbId, fbToken, cname,
 									cnumber, pin, sques, sans, points);
 

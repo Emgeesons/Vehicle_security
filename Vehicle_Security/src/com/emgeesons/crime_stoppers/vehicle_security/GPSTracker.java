@@ -163,7 +163,7 @@ public class GPSTracker implements LocationListener {
 		alertDialog
 				.setMessage("Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services");
 
-		alertDialog.setPositiveButton("Setting",
+		alertDialog.setPositiveButton("Settings",
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
 						String callcheck = "callcheck";
