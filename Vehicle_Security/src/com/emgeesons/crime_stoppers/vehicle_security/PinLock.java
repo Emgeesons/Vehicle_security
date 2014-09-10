@@ -11,9 +11,6 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.ssl.SSLSocketFactory;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.BasicResponseHandler;
@@ -24,13 +21,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.facebook.Session;
-import com.urbanairship.push.PushManager;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnCancelListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
@@ -39,7 +35,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.text.format.Time;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -50,13 +45,16 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.facebook.Session;
+import com.urbanairship.push.PushManager;
+
 public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 	Button check;
 	TextView enterpin, forgot, Sign;
 	EditText pin1, pin2, pin3, pin4;
-	boolean bpin1, bpin2, bpin3, bpin4;
+	boolean bpin1, bpin2, bpin3, bpin4, checks;
 	Connection_Detector cd = new Connection_Detector(this);
-	Boolean IsInternetPresent;
+	boolean IsInternetPresent;
 	private AsyncTask<Void, Void, Void> checkpass;
 	String pass_url = Data.url + "verifyPin.php";
 	ProgressDialog pDialog;
@@ -65,6 +63,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String time, reponse;
+	HttpClient httpclient;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -139,8 +138,8 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 
 					if (bpin1 == true && bpin2 == true && bpin3 == true
 							&& bpin4 == true) {
-
-						checkpass = new checkp().execute();
+						checks = true;
+						checkpass = new checkp(PinLock.this).execute();
 
 					}
 
@@ -192,13 +191,36 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 	private class checkp extends AsyncTask<Void, Void, Void> {
 		String success, mess, response, id, pin, qus;
 
+		public checkp(Context ctx) {
+			pDialog = new ProgressDialog(PinLock.this);
+			pDialog.setMessage("Updating ");
+			pDialog.setCancelable(true);
+			pDialog.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					// when dialog close or back button press
+					Thread thread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								checks = false;
+								httpclient.getConnectionManager().shutdown();
+								Log.i("close", "close");
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					thread.start();
+				}
+			});
+
+		}
+
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			pDialog = new ProgressDialog(PinLock.this);
-			pDialog.setMessage("Verifying Pin..");
-			pDialog.setIndeterminate(false);
-			pDialog.setCancelable(true);
+
 			pDialog.show();
 		}
 
@@ -235,7 +257,6 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 				mpEntity.addPart("userId", new StringBody(info.user_id));
 
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -244,17 +265,24 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 			HttpResponse response = null;
 			try {
 				response = httpclient.execute(httppost);
-			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (Exception e) {
+				runOnUiThread(new Runnable() {
+
+					public void run() {
+						if (checks == false) {
+							Log.i("close", "close");
+							checks = true;
+						} else {
+							cd.showNoInternetPopup();
+						}
+					}
+				});
+				return null;
 			}
 			try {
 				resEntity = response.getEntity();
 			} catch (Exception e) {
-				// TODO: handle exception
+
 				runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -277,10 +305,8 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 				} catch (JSONException e) {
 					System.out.println("JSONException");
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -296,8 +322,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 									.putString(
 											"time",
 											String.valueOf(System
-													.currentTimeMillis()
-													+ (30 * 60 * 1000)))
+													.currentTimeMillis()))
 									.commit();
 							finish();
 
@@ -345,7 +370,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 										public void onClick(
 												DialogInterface dialog,
 												int which) {
-											pDialog.dismiss();
+											dialog.dismiss();
 										}
 									});
 							Dialog.setCancelable(true);
@@ -426,18 +451,23 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 		return false;
 	}
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.pin_lock, menu);
-		return true;
-	}
+	//
+	// @Override
+	// public boolean onCreateOptionsMenu(Menu menu) {
+	// getMenuInflater().inflate(R.menu.pin_lock, menu);
+	// return true;
+	// }
 
 	@Override
 	public void onBackPressed() {
-		super.onBackPressed();
-		super.onStop();
-		moveTaskToBack(true);
-		android.os.Process.killProcess(android.os.Process.myPid());
+		// super.onBackPressed();
+		// // super.onStop();
+		// // moveTaskToBack(true);
+		// // android.os.Process.killProcess(android.os.Process.myPid());
+		// Intent startMain = new Intent(Intent.ACTION_MAIN);
+		// startMain.addCategory(Intent.CATEGORY_HOME);
+		// startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		// startActivity(startMain);
 	}
 
 }

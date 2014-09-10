@@ -700,7 +700,7 @@ public class VehicleProfile extends BaseActivity {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(VehicleProfile.this);
-			pDialog.setMessage("Deleting ");
+			pDialog.setMessage("Deleting...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -931,7 +931,7 @@ public class VehicleProfile extends BaseActivity {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(VehicleProfile.this);
-			pDialog.setMessage("Updating ");
+			pDialog.setMessage("Updating...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();

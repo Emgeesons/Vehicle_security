@@ -423,7 +423,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(Addvehicle.this);
-			pDialog.setMessage("Adding Vehicle");
+			pDialog.setMessage("Adding Vehicle...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();
@@ -523,7 +523,6 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 					vid = jsonMainArr.getJSONObject(0).getString("vehicle_id");
 					status= jsonMainArr.getJSONObject(0).getString("vehicle_status");
 				} catch (JSONException e) {
-					System.out.println("JSONException");
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

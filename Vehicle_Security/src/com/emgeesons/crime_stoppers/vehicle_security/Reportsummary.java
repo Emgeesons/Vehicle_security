@@ -34,7 +34,7 @@ import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.nostra13.universalimageloader.core.assist.QueueProcessingType;
 import com.nostra13.universalimageloader.core.display.RoundedBitmapDisplayer;
 
-public class Reportsummary extends SherlockActivity {
+public class Reportsummary extends BaseActivity {
 	String vehicle_type, make, model, body_type, engine_no, chassis, colour,
 			acc, reg, icom, ipno, iexp, insurance_company_number, location,
 			selected_date, selected_time, report_type, comments, spic1, spic2,
@@ -57,7 +57,7 @@ public class Reportsummary extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.reportsummary);
+		// setContentView(R.layout.reportsummary);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'> Report Summary</font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -93,87 +93,82 @@ public class Reportsummary extends SherlockActivity {
 		sharedpreferences = getSharedPreferences(Data.MyPREFERENCES,
 				Context.MODE_PRIVATE);
 		String vid = sharedpreferences.getString(Data.vid, "notcall");
-//		if (vid.isEmpty() || !vid.equalsIgnoreCase("notcall")) {
-//			location = sharedpreferences.getString(Data.location, "");
-//			comments = sharedpreferences.getString(Data.comm, "");
-//			report_type = sharedpreferences.getString(Data.rtype, "");
-//			File f = new File(sharedpreferences.getString(Data.p1, ""));
-//			Uri imageUri1 = Uri.fromFile(f);
-//			spic1 = imageUri1.toString().replaceAll("%20", " ");
-//			File f2 = new File(sharedpreferences.getString(Data.p2, ""));
-//			Uri imageUri2 = Uri.fromFile(f2);
-//			spic2 = imageUri2.toString().replaceAll("%20", " ");
-//			File f3 = new File(sharedpreferences.getString(Data.p3, ""));
-//			Uri imageUri3 = Uri.fromFile(f3);
-//			spic3 = imageUri3.toString().replaceAll("%20", " ");
-//			String date = sharedpreferences.getString(Data.time, "");
-//			String[] datespilt = date.split("\\*");
-//			selected_time = datespilt[1];
-//			selected_date = datespilt[0];
-//			info = new Data();
-//			info.vehicleInfo(getApplicationContext(), vid);
-//			vehicle_type = (info.type);
-//			make = (info.make);
-//			model = (info.vmodel);
-//			engine_no = (info.eng);
-//			body_type = (info.body);
-//			chassis = (info.vin);
-//			colour = (info.color);
-//			acc = (info.acc);
-//			reg = (info.reg);
-//			icom = info.iname;
-//			ipno = info.ipolicy;
-//			iexp = info.exp;
-//			insurance_company_number = info.inum;
-//			state = info.state;
-//
-//		} else {
+		// if (vid.isEmpty() || !vid.equalsIgnoreCase("notcall")) {
+		// location = sharedpreferences.getString(Data.location, "");
+		// comments = sharedpreferences.getString(Data.comm, "");
+		// report_type = sharedpreferences.getString(Data.rtype, "");
+		// File f = new File(sharedpreferences.getString(Data.p1, ""));
+		// Uri imageUri1 = Uri.fromFile(f);
+		// spic1 = imageUri1.toString().replaceAll("%20", " ");
+		// File f2 = new File(sharedpreferences.getString(Data.p2, ""));
+		// Uri imageUri2 = Uri.fromFile(f2);
+		// spic2 = imageUri2.toString().replaceAll("%20", " ");
+		// File f3 = new File(sharedpreferences.getString(Data.p3, ""));
+		// Uri imageUri3 = Uri.fromFile(f3);
+		// spic3 = imageUri3.toString().replaceAll("%20", " ");
+		// String date = sharedpreferences.getString(Data.time, "");
+		// String[] datespilt = date.split("\\*");
+		// selected_time = datespilt[1];
+		// selected_date = datespilt[0];
+		// info = new Data();
+		// info.vehicleInfo(getApplicationContext(), vid);
+		// vehicle_type = (info.type);
+		// make = (info.make);
+		// model = (info.vmodel);
+		// engine_no = (info.eng);
+		// body_type = (info.body);
+		// chassis = (info.vin);
+		// colour = (info.color);
+		// acc = (info.acc);
+		// reg = (info.reg);
+		// icom = info.iname;
+		// ipno = info.ipolicy;
+		// iexp = info.exp;
+		// insurance_company_number = info.inum;
+		// state = info.state;
+		//
+		// } else {
 
-			try {
+		try {
 
-				JSONArray array = new JSONArray(jsonArray);
-				vehicle_type = array.getJSONObject(0).getString("vehicle_type");
-				make = array.getJSONObject(0).getString("make");
-				model = array.getJSONObject(0).getString("model");
-				body_type = array.getJSONObject(0).getString("body_type");
-				engine_no = array.getJSONObject(0).getString("engine_no");
-				chassis = array.getJSONObject(0).getString("vin_chassis_no");
-				colour = array.getJSONObject(0).getString("colour");
-				acc = array.getJSONObject(0).getString(
-						"accessories_unique_features");
-				reg = array.getJSONObject(0)
-						.getString("registration_serial_no");
-				icom = array.getJSONObject(0).getString(
-						"insurance_company_name");
-				ipno = array.getJSONObject(0).getString("insurance_policy_no");
-				iexp = array.getJSONObject(0)
-						.getString("insurance_expiry_date");
-				insurance_company_number = array.getJSONObject(0).getString(
-						"insurance_company_number");
-				location = array.getJSONObject(0).getString("location");
-				selected_date = array.getJSONObject(0).getString(
-						"selected_date");
-				selected_time = array.getJSONObject(0).getString(
-						"selected_time");
-				report_type = array.getJSONObject(0).getString("report_type");
-				comments = array.getJSONObject(0).getString("comments");
-				state = array.getJSONObject(0).getString("state");
-				// spic1 =
-				// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
-				// spic2 =
-				// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
-				// spic3 = "";
-				spic1 = array.getJSONObject(0).getString("photo1");
-				spic2 = array.getJSONObject(0).getString("photo2");
-				spic3 = array.getJSONObject(0).getString("photo3");
-				String[] datespilt = selected_time.split("\\:");
-				selected_time = datespilt[0] + ":" + datespilt[1];
+			JSONArray array = new JSONArray(jsonArray);
+			vehicle_type = array.getJSONObject(0).getString("vehicle_type");
+			make = array.getJSONObject(0).getString("make");
+			model = array.getJSONObject(0).getString("model");
+			body_type = array.getJSONObject(0).getString("body_type");
+			engine_no = array.getJSONObject(0).getString("engine_no");
+			chassis = array.getJSONObject(0).getString("vin_chassis_no");
+			colour = array.getJSONObject(0).getString("colour");
+			acc = array.getJSONObject(0).getString(
+					"accessories_unique_features");
+			reg = array.getJSONObject(0).getString("registration_serial_no");
+			icom = array.getJSONObject(0).getString("insurance_company_name");
+			ipno = array.getJSONObject(0).getString("insurance_policy_no");
+			iexp = array.getJSONObject(0).getString("insurance_expiry_date");
+			insurance_company_number = array.getJSONObject(0).getString(
+					"insurance_company_number");
+			location = array.getJSONObject(0).getString("location");
+			selected_date = array.getJSONObject(0).getString("selected_date");
+			selected_time = array.getJSONObject(0).getString("selected_time");
+			report_type = array.getJSONObject(0).getString("report_type");
+			comments = array.getJSONObject(0).getString("comments");
+			state = array.getJSONObject(0).getString("state");
+			// spic1 =
+			// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
+			// spic2 =
+			// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
+			// spic3 = "";
+			spic1 = array.getJSONObject(0).getString("photo1");
+			spic2 = array.getJSONObject(0).getString("photo2");
+			spic3 = array.getJSONObject(0).getString("photo3");
+			String[] datespilt = selected_time.split("\\:");
+			selected_time = datespilt[0] + ":" + datespilt[1];
 
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-//		}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		// }
 		pic1 = (ImageView) findViewById(R.id.pic1);
 		pic2 = (ImageView) findViewById(R.id.pic2);
 		pic3 = (ImageView) findViewById(R.id.pic3);
@@ -205,11 +200,11 @@ public class Reportsummary extends SherlockActivity {
 		num = (TextView) findViewById(R.id.vnum);
 		name.setText(make + " " + model);
 		if (vehicle_type.equalsIgnoreCase("Bicycle")) {
-			regs.setText("Serial Number:" + " " + reg);
-		}else {
-			regs.setText("Registration Number:" + " " + reg);
+			regs.setText("Ser No:" + " " + reg);
+		} else {
+			regs.setText("Reg No:" + " " + reg);
 		}
-		
+
 		rtype.setText(report_type);
 		date.setText(dateformate(selected_date));
 		time.setText(selected_time);
@@ -388,5 +383,12 @@ public class Reportsummary extends SherlockActivity {
 		mStrings.clear();
 
 		super.onBackPressed();
+	}
+
+	@Override
+	protected int getLayoutResourceId() {
+		// TODO Auto-generated method stub
+		return R.layout.reportsummary;
+
 	}
 }

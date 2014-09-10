@@ -175,7 +175,7 @@
                 android:layout_alignLeft="@+id/textView1"
                 android:layout_below="@+id/textView1"
                 android:layout_marginTop="5dp"
-                android:text="Theft or Vandalism"
+                android:text="Theft or Serious Vandalism"
                 android:textColor="@color/light_black"
                 android:textSize="@dimen/smaller_text" />
 

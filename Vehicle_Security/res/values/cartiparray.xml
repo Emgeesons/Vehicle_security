@@ -2,7 +2,7 @@
 <resources>
 
     <string-array name="car_tip">
-        <item>does this parking spot have a good My Wheels user rating?</item>
+        <item>does this parking spot have a good MyWheels user rating?</item>
         <item>well lit spot?</item>
         <item>spot in full view of people?</item>
         <item>windows closed and doors locked?</item>

@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.SherlockActivity;
 
@@ -17,6 +18,7 @@ public abstract class BaseActivity extends SherlockActivity {
 	Data info;
 	static String check = "check";
 	static String callcheck = "callcheck";
+	static String reboot = "reboot";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +27,12 @@ public abstract class BaseActivity extends SherlockActivity {
 		info = new Data();
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(BaseActivity.this);
+		if (!atPrefs.getBoolean(info.checkllogin, true)) {
+			atPrefs.edit()
+					.putString("time",
+							String.valueOf(System.currentTimeMillis()))
+					.commit();
+		}
 
 		// String ch = atPrefs.getString(info.lockcheck, "true");
 		// Log.i("con", ch);
@@ -63,14 +71,20 @@ public abstract class BaseActivity extends SherlockActivity {
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		// pin check 
-		// time @30min
+		// pin check
+		// time @15min
+
 		String time = atPrefs.getString("time", "");
 		String times = String.valueOf(System.currentTimeMillis());
-		double t = Double.valueOf(time);
-		double tw = Double.valueOf(times);
+		// double t = Double.valueOf(time);
+		// double tw = Double.valueOf(times);
+		long t = Long.valueOf(time);
+		long tw = System.currentTimeMillis();
 		String ch = atPrefs.getString(check, "true");
+		atPrefs.edit().putString(reboot, ch).commit();
 		String chh = atPrefs.getString(callcheck, "true");
+//		Toast.makeText(getApplicationContext(), "onresume" + " " + ch,
+//				Toast.LENGTH_LONG).show();
 		Log.i("con", ch);
 		Log.i("cons", chh);
 		Log.i("call form", getClass().getName());
@@ -78,15 +92,30 @@ public abstract class BaseActivity extends SherlockActivity {
 
 			if (chh.equalsIgnoreCase("true")) {
 				// when we open maps,pic dont show pin
+//				Toast.makeText(getApplicationContext(), "PinLock false",
+//						Toast.LENGTH_LONG).show();
 				atPrefs.edit().putString(callcheck, "false").commit();
 				return;
 			} else {
+//				Toast.makeText(getApplicationContext(), "PinLock",
+//						Toast.LENGTH_LONG).show();
+				if (!atPrefs.getBoolean(info.checkllogin, true)) {
+					boolean s = tw > t;
+//					Toast.makeText(getApplicationContext(),
+//							"PinLock" + " " + s, Toast.LENGTH_LONG).show();
+					long d = Math.abs(tw - t);
+					Log.i("math", String.valueOf(d));
+					if (Math.abs(tw - t) > 900000) {
+//						Toast.makeText(getApplicationContext(),
+//								"PinLock enter", Toast.LENGTH_LONG).show();
+						Intent ne = new Intent(getApplicationContext(),
+								PinLock.class);
+						startActivity(ne);
+					} else {
+//						Toast.makeText(getApplicationContext(), "PinLock else",
+//								Toast.LENGTH_LONG).show();
+					}
 
-				if (!atPrefs.getBoolean(info.checkllogin, true) && tw > t) {
-					Intent ne = new Intent(getApplicationContext(),
-							PinLock.class);
-					
-					startActivity(ne);
 				}
 
 			}

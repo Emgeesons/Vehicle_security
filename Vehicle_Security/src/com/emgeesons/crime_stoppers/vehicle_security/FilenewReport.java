@@ -56,6 +56,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.text.Editable;
@@ -80,12 +81,6 @@ import android.widget.TimePicker.OnTimeChangedListener;
 import android.widget.Toast;
 
 import com.actionbarsherlock.view.MenuItem;
-import com.facebook.FacebookRequestError;
-import com.facebook.HttpMethod;
-import com.facebook.Request;
-import com.facebook.RequestAsyncTask;
-import com.facebook.Response;
-import com.facebook.Session;
 import com.facebook.android.Facebook;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -111,7 +106,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 	TextView date, type;
 	boolean exp_col;
 	int map_height;
-	final static CharSequence[] typeReport = { "Theft", "Vandalism" };
+	final static CharSequence[] typeReport = { "Theft", "Serious Vandalism" };
 	int tReport = -1;
 	static int buffKey = 0;
 	// fordate and time
@@ -132,7 +127,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 	Dialog dialog;
 	RelativeLayout details, adddetails;
 	Button go;
-	boolean btype;
+	boolean btype, checks;
 	Data info;
 	int nopic;
 	Bitmap photo;
@@ -154,11 +149,15 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 	SharedPreferences sharedpreferences;
 	String ampm;
 	HttpClient httpclient;
+	private AsyncTask<Void, Void, Void> sends;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		// setContentView(R.layout.filenewreport_activity);
+		// StrictMode.ThreadPolicy policy = new
+		// StrictMode.ThreadPolicy.Builder().permitAll().build();
+		// StrictMode.setThreadPolicy(policy);
 		getSupportActionBar().setTitle(
 				Html.fromHtml("<font color='#FFFFFF'>File New Report </font>"));
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -189,7 +188,6 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			success = folder.mkdir();
 		}
 		if (success) {
-			// Do something on success
 		} else {
 
 		}
@@ -291,7 +289,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		datevalue = years + "-" + months + "-" + dates;
 		ctimevalue = timevalue;
 		cdatevalue = datevalue;
-		System.out.println(cdatevalue + "," + ctimevalue);
+		// System.out.println(cdatevalue + "," + ctimevalue);
 		date.setText((info.getdateformate(datevalue + "-" + timevalue)));
 		height = getWindowManager().getDefaultDisplay().getHeight();
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -332,7 +330,8 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 						// Share.class);
 						// startActivity(share);
 						// finish();
-						new sendd().execute();
+						checks = true;
+						new sendd(FilenewReport.this).execute();
 					}
 
 				}
@@ -509,71 +508,72 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 	}
 
-	private void publishStory() {
-		Session session = Session.getActiveSession();
-
-		if (session != null) {
-
-			// Check for publish permissions
-			// List<String> permissions = session.getPermissions();
-			// if (!isSubsetOf(PERMISSIONS, permissions)) {
-			// pendingPublishReauthorization = true;
-			// Session.NewPermissionsRequest newPermissionsRequest = new
-			// Session.NewPermissionsRequest(
-			// this, PERMISSIONS);
-			// session.requestNewPublishPermissions(newPermissionsRequest);
-			// return;
-			// }
-
-			Bundle postParams = new Bundle();
-			postParams.putString("message", "TEsttttttttttttttt");
-			postParams.putString("name", "Facebook SDK for Android");
-			// postParams.putString("caption",
-			// "Build great social apps and get more installs.");
-			// postParams
-			// .putString(
-			// "description",
-			// "The Facebook SDK for Android makes it easier and faster to develop Facebook integrated Android apps.");
-			// postParams.putString("link",
-			// "https://developers.facebook.com/android");
-			postParams
-					.putString("picture",
-							"https://raw.github.com/fbsamples/ios-3.x-howtos/master/Images/iossdk_logo.png");
-
-			Request.Callback callback = new Request.Callback() {
-				public void onCompleted(Response response) {
-					JSONObject graphResponse = response.getGraphObject()
-							.getInnerJSONObject();
-					String postId = null;
-					try {
-						postId = graphResponse.getString("id");
-					} catch (JSONException e) {
-						Log.i("TAG", "JSON error " + e.getMessage());
-					}
-					FacebookRequestError error = response.getError();
-					if (error != null) {
-						Toast.makeText(getApplicationContext(),
-								error.getErrorMessage(), Toast.LENGTH_SHORT)
-								.show();
-					} else {
-						Toast.makeText(getApplicationContext(), postId,
-								Toast.LENGTH_LONG).show();
-					}
-				}
-			};
-
-			Request request = new Request(session, "me/feed", postParams,
-					HttpMethod.POST, callback);
-
-			RequestAsyncTask task = new RequestAsyncTask(request);
-			task.execute();
-		} else {
-
-			session = Session.openActiveSessionFromCache(FilenewReport.this);
-			publishStory();
-		}
-
-	}
+	// private void publishStory() {
+	// Session session = Session.getActiveSession();
+	//
+	// if (session != null) {
+	//
+	// // Check for publish permissions
+	// // List<String> permissions = session.getPermissions();
+	// // if (!isSubsetOf(PERMISSIONS, permissions)) {
+	// // pendingPublishReauthorization = true;
+	// // Session.NewPermissionsRequest newPermissionsRequest = new
+	// // Session.NewPermissionsRequest(
+	// // this, PERMISSIONS);
+	// // session.requestNewPublishPermissions(newPermissionsRequest);
+	// // return;
+	// // }
+	//
+	// Bundle postParams = new Bundle();
+	// postParams.putString("message", "TEsttttttttttttttt");
+	// postParams.putString("name", "Facebook SDK for Android");
+	// // postParams.putString("caption",
+	// // "Build great social apps and get more installs.");
+	// // postParams
+	// // .putString(
+	// // "description",
+	// //
+	// "The Facebook SDK for Android makes it easier and faster to develop Facebook integrated Android apps.");
+	// // postParams.putString("link",
+	// // "https://developers.facebook.com/android");
+	// postParams
+	// .putString("picture",
+	// "https://raw.github.com/fbsamples/ios-3.x-howtos/master/Images/iossdk_logo.png");
+	//
+	// Request.Callback callback = new Request.Callback() {
+	// public void onCompleted(Response response) {
+	// JSONObject graphResponse = response.getGraphObject()
+	// .getInnerJSONObject();
+	// String postId = null;
+	// try {
+	// postId = graphResponse.getString("id");
+	// } catch (JSONException e) {
+	// Log.i("TAG", "JSON error " + e.getMessage());
+	// }
+	// FacebookRequestError error = response.getError();
+	// if (error != null) {
+	// Toast.makeText(getApplicationContext(),
+	// error.getErrorMessage(), Toast.LENGTH_SHORT)
+	// .show();
+	// } else {
+	// Toast.makeText(getApplicationContext(), postId,
+	// Toast.LENGTH_LONG).show();
+	// }
+	// }
+	// };
+	//
+	// Request request = new Request(session, "me/feed", postParams,
+	// HttpMethod.POST, callback);
+	//
+	// RequestAsyncTask task = new RequestAsyncTask(request);
+	// task.execute();
+	// } else {
+	//
+	// session = Session.openActiveSessionFromCache(FilenewReport.this);
+	// publishStory();
+	// }
+	//
+	// }
 
 	private void checkpic() {
 		if (pic1.getVisibility() == View.VISIBLE
@@ -684,34 +684,49 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		String success, mess, response, user;
 		Button next;
 		ProgressDialog pDialog;
+		private volatile boolean running = true;
+
+		public sendd(Context ctx) {
+			pDialog = new ProgressDialog(FilenewReport.this);
+			pDialog.setMessage("Updating ");
+			pDialog.setCancelable(true);
+			pDialog.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					Thread thread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								checks = false;
+								httpclient.getConnectionManager().shutdown();
+								Log.i("close", "close");
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					thread.start();
+				}
+			});
+
+		}
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			pDialog = new ProgressDialog(FilenewReport.this);
-			pDialog.setMessage("Updating ");
-			pDialog.setIndeterminate(false);
-			pDialog.setCancelable(true);
-			pDialog.setOnCancelListener(new OnCancelListener() {
-
-				@Override
-				public void onCancel(DialogInterface dialog) {
-					// TODO Auto-generated method stub
-					runOnUiThread(new Runnable() {
-						public void run() {
-
-							httpclient.getConnectionManager().shutdown();
-						}
-					});
-				}
-			});
 
 			pDialog.show();
 		}
 
+		// @Override
+		// protected void onCancelled() {
+		// running = false;
+		// }
+
 		@SuppressLint("NewApi")
 		@Override
 		protected Void doInBackground(Void... params) {
+			
 			try {
 				sendPost(file_url, imagepath);
 			} catch (ClientProtocolException e) {
@@ -721,9 +736,9 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			} catch (JSONException e) {
 				e.printStackTrace();
 			} catch (Exception e) {
-				// TODO: handle exception
 			}
 
+			
 			return null;
 
 		}
@@ -803,8 +818,14 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			runOnUiThread(new Runnable() {
 
 				public void run() {
-					System.out.println("net");
-					cd.showNoInternetPopup();
+					// System.out.println("net");
+					if (checks == false) {
+						Log.i("close", "close");
+						checks = true;
+					} else {
+						cd.showNoInternetPopup();
+					}
+
 				}
 			});
 			return;
@@ -814,7 +835,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		System.out.println(response.getStatusLine());
 		if (resEntity != null) {
 			reponse = EntityUtils.toString(resEntity);
-			System.out.println(reponse);
+//			System.out.println(reponse);
 			JSONObject profile = new JSONObject(reponse);
 			String success = profile.getString("status");
 			mess = profile.getString("message");
@@ -1055,13 +1076,10 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			olat = gps.getLatitude();
 			olon = gps.getLongitude();
 			position = new LatLng(LATITUDE, LONGITUDE);
-			// Toast.makeText(getApplicationContext(), String.valueOf(position),
-			// Toast.LENGTH_LONG).show();
 			map.getUiSettings().setZoomControlsEnabled(false);
 			map.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 15));
 			new update().execute();
-
-			// when map is move
+			// when map is moving
 			map.setOnCameraChangeListener(new OnCameraChangeListener() {
 				public void onCameraChange(CameraPosition arg0) {
 
@@ -1072,9 +1090,6 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 					slon = arg0.target.longitude;
 					new update().execute();
 					onchange();
-
-					// pos = String.valueOf(arg0.target.latitude) + " "
-					// + String.valueOf(arg0.target.longitude);
 
 				}
 			});

@@ -27,6 +27,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -135,7 +136,7 @@ public class Otherupdates extends Fragment {
 			LONGITUDE = 0.0;
 			Toast.makeText(
 					getActivity(),
-					"Please allow My Wheels to access Your location . Go back and enable it ",
+					"Please allow MyWheels to access Your location . Go back and enable it ",
 					Toast.LENGTH_LONG).show();
 			pos = "";
 		}
@@ -358,6 +359,7 @@ public class Otherupdates extends Fragment {
 					previousTotal = 0;
 					loading = true;
 				} else {
+
 					mListAdapter.notifyDataSetChanged();
 
 				}
@@ -374,18 +376,17 @@ public class Otherupdates extends Fragment {
 
 		@Override
 		public Object getItem(int position) {
-			return null;
+			return position;
 		}
 
 		@Override
 		public long getItemId(int position) {
-			return 0;
+			return position;
 		}
 
 		@Override
 		public int getViewTypeCount() {
-
-			return getCount();
+			return 100000;
 		}
 
 		@Override
@@ -405,7 +406,7 @@ public class Otherupdates extends Fragment {
 			final ImageView pic3;
 			ImageView ovtype, sloc;
 			ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
-			int j = 0, x = 0;
+			// int j = 0, x = 0;
 			if (convertView == null) {
 				vv = getActivity().getLayoutInflater().inflate(
 						R.layout.other_item, null);
@@ -435,10 +436,10 @@ public class Otherupdates extends Fragment {
 					+ testimonialData.get(position).getmodel());
 			if (testimonialData.get(position).gettype()
 					.equalsIgnoreCase("report")) {
-				oreg.setText("Registration Number:" + " "
+				oreg.setText("Reg No:" + " "
 						+ testimonialData.get(position).getReg());
 			} else {
-				oreg.setText("Serial Number:" + " "
+				oreg.setText("Ser No:" + " "
 						+ testimonialData.get(position).getReg());
 			}
 
@@ -453,7 +454,7 @@ public class Otherupdates extends Fragment {
 			} else if (testimonialData.get(position).getVtype()
 					.equalsIgnoreCase("Bicycle")) {
 				ovtype.setImageResource(R.drawable.ic_cycle);
-				oreg.setText("Serial Number:" + " "
+				oreg.setText("Ser No:" + " "
 						+ testimonialData.get(position).getReg());
 			} else if (testimonialData.get(position).getVtype()
 					.equalsIgnoreCase("MotorCycle")) {
@@ -466,6 +467,7 @@ public class Otherupdates extends Fragment {
 			// }
 			spottype.setText(testimonialData.get(position).getsstat());
 
+			// System.out.println(position);
 			name.setText(testimonialData.get(position).getfname());
 			// for next row pos*no of photo
 			// if (!(position == 0)) {
@@ -625,11 +627,16 @@ public class Otherupdates extends Fragment {
 
 	private class getvinfo extends AsyncTask<Void, Void, Void> {
 		String success, mess, response, qus;
+		ProgressDialog pDialog;
 
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			pBar.setVisibility(View.VISIBLE);
+			pDialog = new ProgressDialog(getActivity());
+			pDialog.setMessage("Info...");
+			pDialog.setIndeterminate(false);
+			pDialog.setCancelable(true);
+			pDialog.show();
 
 		}
 
@@ -788,7 +795,7 @@ public class Otherupdates extends Fragment {
 							String[] datespilt = vtime.split("\\:");
 							selected_time = datespilt[0] + ":" + datespilt[1];
 							name.setText(vmake + " " + vmodel);
-							reg.setText("Registration Number:" + " " + vreg);
+							reg.setText("Reg No:" + " " + vreg);
 							type.setText(rtype);
 							date.setText(dateformate(vdate));
 							time.setText(selected_time);
@@ -919,7 +926,7 @@ public class Otherupdates extends Fragment {
 
 		@Override
 		protected void onPostExecute(Void notUsed) {
-			pBar.setVisibility(View.GONE);
+			pDialog.dismiss();
 		}
 	}
 
@@ -942,6 +949,17 @@ public class Otherupdates extends Fragment {
 		}
 
 		@Override
+		public int getViewTypeCount() {
+			return 1000;
+		}
+
+		@Override
+		public int getItemViewType(int position) {
+
+			return position;
+		}
+
+		@Override
 		public View getView(final int position, View convertView,
 				ViewGroup parent) {
 			View vv;
@@ -950,7 +968,7 @@ public class Otherupdates extends Fragment {
 			final ImageView pic2;
 			final ImageView pic3, locicon;
 			ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
-			int j = 0, x = 0;
+			// int j = 0, x = 0;
 			if (convertView == null) {
 				vv = getActivity().getLayoutInflater().inflate(
 						R.layout.updatelistitem, null);
@@ -1108,7 +1126,7 @@ public class Otherupdates extends Fragment {
 
 				}
 			});
-
+			Log.i("pos", String.valueOf(position));
 			return vv;
 		}
 	}
@@ -1307,7 +1325,9 @@ public class Otherupdates extends Fragment {
 			rsize++;
 
 		}
-		System.out.println(labels.size());
+
+		System.out.println("Report size " + "  " + rsize);
+
 		for (int i = 0; i < jsonarrs.length(); i++) {
 			String sightings_id = (jsonarrs.getJSONObject(i)
 					.getString("sightings_id"));
@@ -1355,7 +1375,8 @@ public class Otherupdates extends Fragment {
 			labels.add(med);
 			ssize++;
 		}
-		System.out.println(labels.size());
+		System.out.println("Sighting size " + "  " + ssize);
+		System.out.println("labels" + "  " + labels.size());
 		return labels;
 	}
 
@@ -1374,10 +1395,7 @@ public class Otherupdates extends Fragment {
 				String _location, String _selected_date, String _selected_time,
 				String _report_type, String _comments, String _photo1,
 				String _photo2, String _photo3, String _status,
-				String svehicle_colour, String _type, String _stat
-
-		) {
-
+				String svehicle_colour, String _type, String _stat) {
 			this._report_id = _report_id;
 			this._first_name = _first_name;
 			this._vehicle_type = _vehicle_type;
@@ -1501,6 +1519,10 @@ public class Otherupdates extends Fragment {
 			}
 			if (!loading
 					&& (totalItemCount - visibleItemCount) <= (firstVisibleItem + visibleThreshold)) {
+
+				if (vinfo != null) {
+					vinfo.cancel(true);
+				}
 				IsInternetPresent = cd.isConnectingToInternet();
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();

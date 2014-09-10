@@ -18,7 +18,8 @@ public class downlaod {
 	String dir;
 	File sdRoot;
 
-	public void DownloadFromUrl(String DownloadUrl, String fileName,String Folder,String dirs) {
+	public void DownloadFromUrl(String DownloadUrl, String fileName,
+			String Folder, String dirs) {
 		sdRoot = Environment.getExternalStorageDirectory();
 		// cr8 folder
 		File folder = new File(sdRoot + Folder);
@@ -46,8 +47,7 @@ public class downlaod {
 
 			long startTime = System.currentTimeMillis();
 			Log.d("DownloadManager", "download begining");
-			Log.d("DownloadManager", "download url:" + url);
-			Log.d("DownloadManager", "downloaded file name:" + fileName);
+			// Log.d("DownloadManager", "download url:" + url);
 
 			/* Open a connection to that URL. */
 			URLConnection ucon = url.openConnection();
@@ -72,13 +72,14 @@ public class downlaod {
 			fos.write(baf.toByteArray());
 			fos.flush();
 			fos.close();
+			Log.d("DownloadManager", "downloaded file name:" + fileName);
 			Log.d("DownloadManager",
 					"download ready in"
 							+ ((System.currentTimeMillis() - startTime) / 1000)
 							+ " sec");
 
 		} catch (IOException e) {
-			Log.d("DownloadManager", "Error: " + e);
+//			Log.d("DownloadManager", "Error: " + e);
 		}
 
 	}

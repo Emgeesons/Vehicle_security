@@ -2,7 +2,7 @@
 <resources>
 
     <string-array name="motor_tip">
-        <item>what\’s the My Wheels User Rating here?</item>
+        <item>what\’s the MyWheels User Rating here?</item>
         <item>well lit spot?</item>
         <item>spot in full view of people?</item>
         <item>steering and ignition locked and taking the key?</item>

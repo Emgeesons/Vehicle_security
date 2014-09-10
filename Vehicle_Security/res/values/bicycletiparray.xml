@@ -2,7 +2,7 @@
 <resources>
 
     <string-array name="bicycle_tip">
-        <item>what\’s the My Wheels User Rating here?</item>
+        <item>what\’s the MyWheels User Rating here?</item>
         <item>well lit spot?</item>
         <item>spot in full view of people?</item>
         <item>got a good quality lock – cable or D-lock, padlock and chain??</item>

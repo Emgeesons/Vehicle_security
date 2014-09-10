@@ -37,6 +37,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.DialogInterface.OnCancelListener;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -92,7 +93,6 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	static LatLng currlocation;
 	private GoogleMap map;
 	int height;
-	String pos;
 	RelativeLayout mapview, marker;
 	TextView marker_label;
 	LocationManager locationManager;
@@ -102,17 +102,16 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	TextView date, type;
 	// ImageView expan;
 	ImageView addpic;
-	boolean exp_col;
+	boolean exp_col, checks;
 	int map_height;
-	final static CharSequence[] typeSighting = { "Theft", "Vandalism",
+	final static CharSequence[] typeSighting = { "Theft", "Serious Vandalism",
 			"Suspicious Activity" };
 	int tSighting = -1;
 	Data info;
 	static int buffKey = 0;
-	String datevalue, timevalue;
+	String datevalue, timevalue, pos;
 	int years, months, dates, Hrs, min;
-	String ctimevalue, cdatevalue;
-	String dir, imgPath, reponse, points;
+	String ctimevalue, cdatevalue,dir, imgPath, reponse, points,ampm;
 	String[] names;
 	private String imagepath = null;
 	File sdRoot;
@@ -129,7 +128,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	ProgressDialog pDialog;
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
-	String ampm;
+	HttpClient httpclient;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -175,7 +174,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 
 			if (types.equalsIgnoreCase("Theft")) {
 				tSighting = 0;
-			} else if (types.equalsIgnoreCase("Vandalism")) {
+			} else if (types.equalsIgnoreCase("Serious Vandalism")) {
 				tSighting = 1;
 			} else if (types.equalsIgnoreCase("Suspicious Activity")) {
 				tSighting = 2;
@@ -507,8 +506,8 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 						if (breg == true || bcolor == true || bmake == true
 								|| bmodel == true) {
 							map.getMyLocation();
-
-							new sendd().execute();
+							checks = true;
+							new sendd(ReportSighting.this).execute();
 						}
 
 					}
@@ -630,13 +629,35 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		String success, mess, response, user;
 		Button next;
 
+		public sendd(Context ctx) {
+			pDialog = new ProgressDialog(ReportSighting.this);
+			pDialog.setMessage("Updating ");
+			pDialog.setCancelable(true);
+			pDialog.setOnCancelListener(new OnCancelListener() {
+				@Override
+				public void onCancel(DialogInterface dialog) {
+					// when dialog close or back button press
+					Thread thread = new Thread(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								checks = false;
+								httpclient.getConnectionManager().shutdown();
+								Log.i("close", "close");
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+					});
+					thread.start();
+				}
+			});
+
+		}
+
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			pDialog = new ProgressDialog(ReportSighting.this);
-			pDialog.setMessage("Updating ");
-			pDialog.setIndeterminate(false);
-			pDialog.setCancelable(true);
 			pDialog.show();
 		}
 
@@ -669,7 +690,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	public void sendPost(String url, String imagePath) throws IOException,
 			ClientProtocolException, JSONException {
 		final String mess;
-		HttpClient httpclient = new DefaultHttpClient();
+		httpclient = new DefaultHttpClient();
 		httpclient.getParams().setParameter(
 				CoreProtocolPNames.PROTOCOL_VERSION, HttpVersion.HTTP_1_1);
 
@@ -735,8 +756,13 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 			runOnUiThread(new Runnable() {
 
 				public void run() {
-					System.out.println("net");
-					cd.showNoInternetPopup();
+					// System.out.println("net");
+					if (checks == false) {
+						Log.i("close", "close");
+						checks = true;
+					} else {
+						cd.showNoInternetPopup();
+					}
 				}
 			});
 			return;
@@ -749,8 +775,10 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 			runOnUiThread(new Runnable() {
 
 				public void run() {
-					System.out.println("net");
+					// System.out.println("net");
+
 					cd.showNoInternetPopup();
+
 				}
 			});
 			return;
@@ -844,7 +872,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 															getApplicationContext(),
 															MainActivity.class);
 													startActivity(next);
-//													finish();
+													// finish();
 												}
 											})
 									.setPositiveButton(

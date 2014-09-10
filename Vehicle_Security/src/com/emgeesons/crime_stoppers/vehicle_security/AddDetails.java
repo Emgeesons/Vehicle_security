@@ -164,17 +164,14 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 			try {
 				response = httpclient.execute(httppost);
 			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			HttpEntity resEntity;
 			try {
 				resEntity = response.getEntity();
 			} catch (Exception e) {
-				// TODO: handle exception
 				runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -195,12 +192,9 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 					p = jsonMainArr.getJSONObject(0)
 							.getInt("profile_completed");
 				} catch (JSONException e) {
-					System.out.println("JSONException");
 				} catch (ParseException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -270,6 +264,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 											pDialog.dismiss();
 										}
 									});
+						
 							Dialog.setCancelable(true);
 							Dialog.show();
 						}

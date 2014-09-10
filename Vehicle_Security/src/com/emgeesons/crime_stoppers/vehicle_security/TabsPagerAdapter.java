@@ -15,16 +15,13 @@ public class TabsPagerAdapter extends FragmentPagerAdapter {
 		Fragment f = null;
 		switch (index) {
 		case 0:
-			// Top Rated fragment activity
-			
+
 			return new Otherupdates();
 		case 1:
-			// Games fragment activity
+
 			f = Myupdates.newInstance();
-//			return new Myupdates();
-			// case 2:
-			// // Movies fragment activity
-			// return new MoviesFragment();
+			// return new Myupdates();
+
 		}
 
 		return f;

@@ -26,19 +26,23 @@ import org.json.JSONObject;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RatingBar;
 import android.widget.RatingBar.OnRatingBarChangeListener;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.SherlockFragment;
@@ -58,6 +62,7 @@ public class Feedback extends SherlockFragment {
 	TextView ratetext;
 	Data info;
 	String reponse;
+	RelativeLayout feed;
 
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
@@ -68,11 +73,22 @@ public class Feedback extends SherlockFragment {
 		rate = (RatingBar) view.findViewById(R.id.ratingBar1);
 		send = (Button) view.findViewById(R.id.send);
 		ratetext = (TextView) view.findViewById(R.id.rate);
+		feed = (RelativeLayout) view.findViewById(R.id.feed);
+		feed.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				InputMethodManager imm = (InputMethodManager) getActivity()
+						.getSystemService(Context.INPUT_METHOD_SERVICE);
+				imm.hideSoftInputFromWindow(getActivity().getWindow()
+						.getCurrentFocus().getWindowToken(), 0);
+
+			}
+		});
 		rate.setOnRatingBarChangeListener(new OnRatingBarChangeListener() {
 			public void onRatingChanged(RatingBar ratingBar, float rating,
 					boolean fromUser) {
 				rates = rating;
-
 				ratetext.setTextColor(getResources().getColor(R.color.black));
 
 			}
@@ -153,7 +169,6 @@ public class Feedback extends SherlockFragment {
 						.toString()));
 
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -163,16 +178,13 @@ public class Feedback extends SherlockFragment {
 			try {
 				response = httpclient.execute(httppost);
 			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			try {
 				resEntity = response.getEntity();
 			} catch (Exception e) {
-				// TODO: handle exception
 				getActivity().runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -211,13 +223,10 @@ public class Feedback extends SherlockFragment {
 						success = profile.getString("status");
 						mess = profile.getString("message");
 					} catch (JSONException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (ParseException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -229,7 +238,7 @@ public class Feedback extends SherlockFragment {
 						public void run() {
 							final AlertDialog Dialog = new AlertDialog.Builder(
 									getActivity()).create();
-							Dialog.setTitle("Thank You");
+							Dialog.setTitle("Successful");
 							Dialog.setMessage(mess);
 							Dialog.setButton(DialogInterface.BUTTON_NEUTRAL,
 									"OK",

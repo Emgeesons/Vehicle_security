@@ -70,7 +70,12 @@ public class Updates extends SherlockFragmentActivity implements
 				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
 				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
 		ImageLoader.getInstance().init(config);
-
+		if (!atPrefs.getBoolean(info.checkllogin, true)) {
+			atPrefs.edit()
+					.putString("time",
+							String.valueOf(System.currentTimeMillis()))
+					.commit();
+		}
 		// Adding Tabs
 		for (String tab_name : tabs) {
 			actionBar.addTab(actionBar.newTab().setText(tab_name)
@@ -219,7 +224,7 @@ public class Updates extends SherlockFragmentActivity implements
 					.get();
 			atPrefs.edit().putString("check", String.valueOf(foregroud))
 					.commit();
-			Log.i("onStop", String.valueOf(foregroud));
+			// Log.i("onStop", String.valueOf(foregroud));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -236,28 +241,44 @@ public class Updates extends SherlockFragmentActivity implements
 		// TODO Auto-generated method stub
 		super.onResume();
 		// pin check
-		// time @30min
+		// time @15min
 		String time = atPrefs.getString("time", "");
-		String times = String.valueOf(System.currentTimeMillis());
-		double t = Double.valueOf(time);
-		double tw = Double.valueOf(times);
+		// String times = String.valueOf(System.currentTimeMillis());
+		long t = Long.valueOf(time);
+		long tw = System.currentTimeMillis();
 		String ch = atPrefs.getString("check", "true");
 		String chh = atPrefs.getString("callcheck", "true");
-		Log.i("con", ch);
-		Log.i("cons", chh);
-		Log.i("call form", getClass().getName());
+		// Log.i("con", ch);
+		// Log.i("cons", chh);
+		// Log.i("call form", getClass().getName());
 		if (ch.equalsIgnoreCase("false")) {
-
 			if (chh.equalsIgnoreCase("true")) {
 				// when we open maps,pic dont show pin
+				// Toast.makeText(getApplicationContext(), "PinLock false",
+				// Toast.LENGTH_LONG).show();
 				atPrefs.edit().putString("callcheck", "false").commit();
 				return;
 			} else {
+				// Toast.makeText(getApplicationContext(), "PinLock",
+				// Toast.LENGTH_LONG).show();
+				if (!atPrefs.getBoolean(info.checkllogin, true)) {
+					boolean s = tw > t;
+					// Toast.makeText(getApplicationContext(),
+					// "PinLock" + " " + s, Toast.LENGTH_LONG).show();
+					long d = Math.abs(tw - t);
+					Log.i("math", String.valueOf(d));
+					if (Math.abs(tw - t) > 900000) {
+						// Toast.makeText(getApplicationContext(),
+						// "PinLock enter", Toast.LENGTH_LONG).show();
+						Intent ne = new Intent(getApplicationContext(),
+								PinLock.class);
+						startActivity(ne);
+					} else {
+						// Toast.makeText(getApplicationContext(),
+						// "PinLock else",
+						// Toast.LENGTH_LONG).show();
+					}
 
-				if (!atPrefs.getBoolean(info.checkllogin, true) && tw > t) {
-					Intent ne = new Intent(getApplicationContext(),
-							PinLock.class);
-					startActivity(ne);
 				}
 
 			}
@@ -273,7 +294,7 @@ public class Updates extends SherlockFragmentActivity implements
 		try {
 			boolean foregroud = new ForegroundCheckTask().execute(Updates.this)
 					.get();
-			Log.i("onPause", String.valueOf(foregroud));
+			// Log.i("onPause", String.valueOf(foregroud));
 		} catch (InterruptedException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

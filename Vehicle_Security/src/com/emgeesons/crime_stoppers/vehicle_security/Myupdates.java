@@ -443,7 +443,7 @@ public class Myupdates extends Fragment {
 		rrtime = (TextView) rootView.findViewById(R.id.rtime);
 		rrloc = (TextView) rootView.findViewById(R.id.rloc);
 		rname.setText(make + " " + model);
-		rreg.setText("Registration Number:" + " " + rno);
+		rreg.setText("Reg No:" + " " + rno);
 		rtype.setText(report_type);
 		rdate.setText(dateformate(selected_date));
 		rtime.setText(selected_time);
@@ -549,7 +549,7 @@ public class Myupdates extends Fragment {
 	public void onchange() {
 
 		name.setText(make + " " + model);
-		reg.setText("Registration Number:" + " " + rno);
+		reg.setText("Reg No:" + " " + rno);
 		type.setText(report_type);
 		if (!selected_date.isEmpty()) {
 			date.setText(dateformate(selected_date));
@@ -568,7 +568,7 @@ public class Myupdates extends Fragment {
 			vtype.setImageResource(R.drawable.ic_car);
 		} else if (vehicle_type.equalsIgnoreCase("Bicycle")) {
 			vtype.setImageResource(R.drawable.ic_cycle);
-			reg.setText("Serial Number:" + " " + rno);
+			reg.setText("Ser No:" + " " + rno);
 		} else if (vehicle_type.equalsIgnoreCase("MotorCycle")) {
 			vtype.setImageResource(R.drawable.ic_bike);
 		} else {
@@ -857,7 +857,7 @@ public class Myupdates extends Fragment {
 			final ImageView pic2;
 			final ImageView pic3;
 			ImageLoadingListener animateFirstListener = new AnimateFirstDisplayListener();
-			int j = 0, x = 0;
+			// int j = 0, x = 0;
 			if (convertView == null) {
 				vv = getActivity().getLayoutInflater().inflate(
 						R.layout.updatelistitem, null);
@@ -910,9 +910,9 @@ public class Myupdates extends Fragment {
 				e.printStackTrace();
 			}
 			// for next row pos*no of photo
-//			if (!(position == 0)) {
-//				j = position * 3;
-//			}
+			// if (!(position == 0)) {
+			// j = position * 3;
+			// }
 			if (comm.getText().toString().isEmpty()) {
 				comm.setVisibility(View.GONE);
 			}
@@ -959,22 +959,22 @@ public class Myupdates extends Fragment {
 						.findViewById(R.id.rline);
 				rline.setVisibility(View.VISIBLE);
 			}
-//			for (int i = 0; i < imageUrls.length; i++) {
-//				Updates.mStrings.add(imageUrls[i]);
-//
-//			}
-//			ImageView arr[] = { pic1, pic2, pic3 };
-//			for (int i = j; i < j + 3; i++) {
-//
-//				Updates.imageLoader.displayImage(Updates.mStrings.get(i),
-//						arr[x], options, animateFirstListener);
-//				arr[x].setVisibility(View.VISIBLE);
-//				if (Updates.mStrings.get(i).isEmpty()) {
-//					arr[x].setVisibility(View.GONE);
-//				}
-//				x++;
-//
-//			}
+			// for (int i = 0; i < imageUrls.length; i++) {
+			// Updates.mStrings.add(imageUrls[i]);
+			//
+			// }
+			// ImageView arr[] = { pic1, pic2, pic3 };
+			// for (int i = j; i < j + 3; i++) {
+			//
+			// Updates.imageLoader.displayImage(Updates.mStrings.get(i),
+			// arr[x], options, animateFirstListener);
+			// arr[x].setVisibility(View.VISIBLE);
+			// if (Updates.mStrings.get(i).isEmpty()) {
+			// arr[x].setVisibility(View.GONE);
+			// }
+			// x++;
+			//
+			// }
 
 			pic1.setOnClickListener(new OnClickListener() {
 

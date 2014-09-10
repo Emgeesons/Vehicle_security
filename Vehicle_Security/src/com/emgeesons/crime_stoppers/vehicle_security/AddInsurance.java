@@ -411,7 +411,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(AddInsurance.this);
-			pDialog.setMessage("Adding Insurance");
+			pDialog.setMessage("Adding Insurance...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();

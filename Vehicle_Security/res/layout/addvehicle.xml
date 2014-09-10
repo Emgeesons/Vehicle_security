@@ -86,7 +86,7 @@
             android:layout_marginTop="10dp"
             android:background="@drawable/box_gry"
             android:ems="10"
-            android:hint="  body type"
+            android:hint="  body type*"
             android:paddingLeft="10dp"
             android:paddingTop="10dp"
             android:singleLine="true"
@@ -118,8 +118,8 @@
             android:background="@drawable/box_gry"
             android:ems="10"
             android:hint="  state of registration "
-            android:paddingLeft="10dp"
             android:maxLength="3"
+            android:paddingLeft="10dp"
             android:singleLine="true" >
         </EditText>
 

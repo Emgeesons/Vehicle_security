@@ -244,7 +244,7 @@ public class ProfileScreen extends BaseActivity {
 				final AlertDialog Dialog = new AlertDialog.Builder(
 						ProfileScreen.this).create();
 				Dialog.setTitle("Samaritan Points");
-				Dialog.setMessage("Earn Samaritan Points against your activites like Report Sighting and Parking Feedback to gain priority listing when you loose your vehicle");
+				Dialog.setMessage("Earn Samaritan points against your activities like Report Sighting and Parking Feedback in order to gain priority listing and other benefits");
 				Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
 						new DialogInterface.OnClickListener() {
 							public void onClick(DialogInterface dialog,
@@ -438,7 +438,7 @@ public class ProfileScreen extends BaseActivity {
 			newprogress = 100;
 			profile_comp.setText("Your profile is complete");
 			// progress.setVisibility(View.GONE);
-		 status.setVisibility(View.GONE);
+			status.setVisibility(View.GONE);
 			// profile_comp.setVisibility(View.GONE);
 
 		}
@@ -670,7 +670,7 @@ public class ProfileScreen extends BaseActivity {
 		protected void onPreExecute() {
 			super.onPreExecute();
 			pDialog = new ProgressDialog(ProfileScreen.this);
-			pDialog.setMessage("Updating ");
+			pDialog.setMessage("Updating...");
 			pDialog.setIndeterminate(false);
 			pDialog.setCancelable(true);
 			pDialog.show();

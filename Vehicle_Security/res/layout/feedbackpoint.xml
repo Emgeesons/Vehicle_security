@@ -27,7 +27,7 @@
             android:layout_below="@+id/imageView1"
             android:layout_marginTop="10dp"
             android:gravity="center_horizontal"
-            android:text="Thank you for your review .You  earned yourself 20 good Samaritan points!!!"
+            android:text="Thank you for your review .You  earned yourself 20 Good Samaritan points!!!"
             android:textSize="@dimen/big_text" />
 
         <TextView
@@ -37,8 +37,8 @@
             android:layout_alignParentLeft="true"
             android:layout_alignParentRight="true"
             android:layout_below="@+id/textView1"
-            android:gravity="center_horizontal"
             android:layout_marginTop="16dp"
+            android:gravity="center_horizontal"
             android:text="Thank you for your review .You  earned yourself 20 good Samaritan points!!!"
             android:textSize="@dimen/big_text"
             android:textStyle="bold" />
@@ -61,12 +61,11 @@
             android:layout_height="wrap_content"
             android:layout_alignBottom="@+id/textView3"
             android:layout_alignLeft="@+id/imageView1"
-            android:layout_marginLeft="51dp"
             android:layout_marginBottom="15dp"
+            android:layout_marginLeft="51dp"
             android:text="+"
             android:textColor="@color/white"
             android:textSize="30sp" />
-
     </RelativeLayout>
 
     <LinearLayout

@@ -132,12 +132,11 @@ public class HomescreenActivity extends SherlockFragment implements
 		db = new DatabaseHandler(getActivity());
 		String time = atPrefs.getString("time", "");
 		double curtime = System.currentTimeMillis();
-
 		if (time.isEmpty()) {
 			atPrefs.edit()
 					.putString(
 							"time",
-							String.valueOf(System.currentTimeMillis() + 30 * 60 * 1000))
+							String.valueOf(System.currentTimeMillis()))
 					.commit();
 		}
 		// else {
@@ -475,7 +474,7 @@ public class HomescreenActivity extends SherlockFragment implements
 					} else {
 						Toast.makeText(
 								getActivity(),
-								"Please allow My Wheels to access Your location . Turn it ON from Location Services",
+								"Please allow MyWheels to access Your location . Turn it ON from Location Services",
 								Toast.LENGTH_LONG).show();
 					}
 				}
@@ -768,12 +767,12 @@ public class HomescreenActivity extends SherlockFragment implements
 		SherlockFragmentActivity a = getSherlockActivity();
 		if (a != null && map != null) {
 			try {
-				Log.i("LOGTAG", "Removing map fragment");
+//				Log.i("LOGTAG", "Removing map fragment");
 				a.getSupportFragmentManager().beginTransaction()
 						.remove(fragment).commit();
 				fragment = null;
 			} catch (IllegalStateException e) {
-				Log.i("LOGTAG", "IllegalStateException on exit");
+//				Log.i("LOGTAG", "IllegalStateException on exit");
 			}
 		}
 		super.onDestroyView();
@@ -1192,7 +1191,7 @@ public class HomescreenActivity extends SherlockFragment implements
 						getActivity());
 				builder.setTitle("Location Access Required")
 						.setMessage(
-								"Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services")
+								"Please allow MyWheels access to your location to correctly identify your location. Turn it on from Location Services")
 						.setCancelable(false)
 						.setNegativeButton("Cancel",
 								new DialogInterface.OnClickListener() {
@@ -1325,7 +1324,7 @@ public class HomescreenActivity extends SherlockFragment implements
 						} else {
 							Toast.makeText(
 									getActivity(),
-									"Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services",
+									"Please allow MyWheels access to your location to correctly identify your location. Turn it on from Location Services",
 									Toast.LENGTH_LONG).show();
 						}
 					}
@@ -1433,7 +1432,7 @@ public class HomescreenActivity extends SherlockFragment implements
 						} else {
 							Toast.makeText(
 									getActivity(),
-									"Please allow My Wheels to access Your location . Turn it ON from Location Services",
+									"Please allow MyWheels to access Your location . Turn it ON from Location Services",
 									Toast.LENGTH_LONG).show();
 						}
 					}

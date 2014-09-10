@@ -83,7 +83,7 @@ public class ReportSubmit extends BaseActivity {
 			public void onClick(View arg0) {
 				// TODO Auto-generated method stub
 				Intent call = new Intent(Intent.ACTION_CALL);
-				call.setData(Uri.parse("tel:" + "1800333000"));
+				call.setData(Uri.parse("tel:" + "131444"));
 				startActivity(call);
 			}
 		});

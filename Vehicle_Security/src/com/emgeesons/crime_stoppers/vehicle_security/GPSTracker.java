@@ -72,7 +72,7 @@ public class GPSTracker implements LocationListener {
 							LocationManager.NETWORK_PROVIDER,
 							MIN_TIME_BW_UPDATES,
 							MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-					Log.d("Network", "Network");
+//					Log.d("Network", "Network");
 					if (locationManager != null) {
 						location = locationManager
 								.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -89,7 +89,7 @@ public class GPSTracker implements LocationListener {
 								LocationManager.GPS_PROVIDER,
 								MIN_TIME_BW_UPDATES,
 								MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-						Log.d("GPS Enabled", "GPS Enabled");
+//						Log.d("GPS Enabled", "GPS Enabled");
 						if (locationManager != null) {
 							location = locationManager
 									.getLastKnownLocation(LocationManager.GPS_PROVIDER);
@@ -161,7 +161,7 @@ public class GPSTracker implements LocationListener {
 
 		alertDialog.setTitle("Location Access Required");
 		alertDialog
-				.setMessage("Please allow My Wheels access to your location to correctly identify your location. Turn it on from Location Services");
+				.setMessage("Please allow MyWheels access to your location to correctly identify your location. Turn it on from Location Services");
 
 		alertDialog.setPositiveButton("Settings",
 				new DialogInterface.OnClickListener() {
@@ -197,13 +197,13 @@ public class GPSTracker implements LocationListener {
 
 	@Override
 	public void onProviderDisabled(String provider) {
-		System.out.println("off");
+//		System.out.println("off");
 
 	}
 
 	@Override
 	public void onProviderEnabled(String provider) {
-		System.out.println("oon");
+//		System.out.println("oon");
 
 	}
 

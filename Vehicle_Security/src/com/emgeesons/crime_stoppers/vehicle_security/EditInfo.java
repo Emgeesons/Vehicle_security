@@ -668,7 +668,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 					mess = profile.getString("message");
 
 				} catch (JSONException e) {
-					System.out.println("JSONException");
+//					System.out.println("JSONException");
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();

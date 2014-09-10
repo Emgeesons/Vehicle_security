@@ -24,9 +24,11 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.text.Html;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Toast;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
@@ -113,6 +115,21 @@ public class MainActivity extends SherlockFragmentActivity implements
 		if (savedInstanceState == null) {
 			selectItem(0);
 		}
+		if (!atPrefs.getBoolean(info.checkllogin, true)) {
+			// atPrefs.edit()
+			// .putString(
+			// "time",
+			// String.valueOf(System.currentTimeMillis()
+			// + (5000))).commit();
+			// Log.i("save time ", String.valueOf(System.currentTimeMillis()));
+		}
+	}
+
+	@Override
+	public View onCreateView(View parent, String name, Context context,
+			AttributeSet attrs) {
+		// TODO Auto-generated method stub
+		return super.onCreateView(parent, name, context, attrs);
 	}
 
 	@Override
@@ -200,11 +217,11 @@ public class MainActivity extends SherlockFragmentActivity implements
 		case 4:
 
 			String message;
-			message = "Check out My Wheel by Crime Stoppers, South Australia. Download it from - https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
+			message = "Check out MyWheels by Crime Stoppers, South Australia. Download it from - https://play.google.com/store/apps/details?id=com.emgeesons.crime_stoppers.vehicle_security";
 			Intent share = new Intent(Intent.ACTION_SEND);
 			share.setType("text/plain");
 			share.putExtra(Intent.EXTRA_TEXT, message);
-			startActivity(Intent.createChooser(share, "Share My Wheels"));
+			startActivity(Intent.createChooser(share, "Share MyWheels"));
 			atPrefs.edit().putString(callcheck, "True").commit();
 			// selectItem(0);
 			break;
@@ -222,8 +239,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 					MainActivity.this);
 			builder.setMessage("Are you sure you want to Logout ?")
 					.setCancelable(false)
-					.setMessage(
-							"Are you sure you want to logout?")
+					.setMessage("Are you sure you want to logout?")
 					.setNegativeButton("Cancel",
 							new DialogInterface.OnClickListener() {
 
@@ -339,28 +355,50 @@ public class MainActivity extends SherlockFragmentActivity implements
 	protected void onResume() {
 		// TODO Auto-generated method stub
 		super.onResume();
-		// time @10min
+		// time @15min
 		String time = atPrefs.getString("time", "");
-		String times = String.valueOf(System.currentTimeMillis());
-		double t = Double.valueOf(time);
-		double tw = Double.valueOf(times);
-		// boolean foregroud = new ForegroundCheckTask().execute(
-		// getApplicationContext()).get();
-		// Log.i("onResume", String.valueOf(foregroud));
+		// String times = String.valueOf(System.currentTimeMillis());
+		/*
+		 * double t = Double.valueOf(time); double tw = Double.valueOf(times);
+		 */
+		long t = Long.valueOf(time);
+		long tw = System.currentTimeMillis();
+		Log.d("cur time", String.valueOf(tw));
+		Log.d(" prev time", String.valueOf(t));
 		String ch = atPrefs.getString(check, "true");
 		String chh = atPrefs.getString(callcheck, "true");
+		// Toast.makeText(getApplicationContext(), "onresume" + " " + ch,
+		// Toast.LENGTH_LONG).show();
 		Log.i("con", ch);
 		Log.i("conn", chh);
 		if (ch.equalsIgnoreCase("false")) {
 			if (chh.equalsIgnoreCase("true")) {
 				// when we open maps,pic dont show pin
+				// Toast.makeText(getApplicationContext(), "PinLock false",
+				// Toast.LENGTH_LONG).show();
 				atPrefs.edit().putString(callcheck, "false").commit();
 				return;
 			} else {
-				if (!atPrefs.getBoolean(info.checkllogin, true) && tw > t) {
-					Intent ne = new Intent(getApplicationContext(),
-							PinLock.class);
-					startActivity(ne);
+				// Toast.makeText(getApplicationContext(), "PinLock",
+				// Toast.LENGTH_LONG).show();
+				if (!atPrefs.getBoolean(info.checkllogin, true)) {
+					boolean s = tw > t;
+					// Toast.makeText(getApplicationContext(),
+					// "PinLock" + " " + s, Toast.LENGTH_LONG).show();
+					long d = Math.abs(tw - t);
+					Log.i("math", String.valueOf(d));
+					if (Math.abs(tw - t) > 900000) {
+						// Toast.makeText(getApplicationContext(),
+						// "PinLock enter", Toast.LENGTH_LONG).show();
+						Intent ne = new Intent(getApplicationContext(),
+								PinLock.class);
+						startActivity(ne);
+					} else {
+						// Toast.makeText(getApplicationContext(),
+						// "PinLock else",
+						// Toast.LENGTH_LONG).show();
+					}
+
 				}
 
 			}
@@ -370,17 +408,21 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	protected void onPause() {
-		// TODO Auto-generated method stub
 		super.onPause();
+		if (!atPrefs.getBoolean(info.checkllogin, true)) {
+			atPrefs.edit()
+					.putString("time",
+							String.valueOf(System.currentTimeMillis()))
+					.commit();
+			Log.i("pause ", "pause ");
+		}
 		try {
 			boolean foregroud = new ForegroundCheckTask().execute(
 					getApplicationContext()).get();
 			Log.i("onPause", String.valueOf(foregroud));
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ExecutionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

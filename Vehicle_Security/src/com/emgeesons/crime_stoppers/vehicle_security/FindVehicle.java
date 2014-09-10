@@ -11,12 +11,9 @@ import org.apache.http.HttpVersion;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.CoreProtocolPNames;
 import org.apache.http.util.EntityUtils;
@@ -156,7 +153,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
 					final Dialog dialog = new Dialog(FindVehicle.this);
 					dialog.setContentView(R.layout.feedbackdialog);
-					dialog.setTitle("Safely Tracked your way back!");
+					dialog.setTitle("Safely tracked your way");
 					TextView post, skip;
 					final RatingBar ratebar;
 
@@ -278,7 +275,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 
 				@Override
 				public void onMapLoaded() {
-					// TODO Auto-generated method stub
+
 					googleMap.getUiSettings().setZoomControlsEnabled(false);
 					LatLngBounds.Builder builder = new LatLngBounds.Builder();
 
@@ -570,7 +567,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 					.newLatLngZoom(position, 15));
 			Toast.makeText(
 					getApplicationContext(),
-					"Please allow My Wheels to access Your location . Turn it ON from Location Services",
+					"Please allow MyWheels to access Your location . Turn it ON from Location Services",
 					Toast.LENGTH_LONG).show();
 			addmarker();
 		}

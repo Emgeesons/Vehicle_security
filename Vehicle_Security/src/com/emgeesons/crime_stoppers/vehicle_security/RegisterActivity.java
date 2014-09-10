@@ -635,7 +635,6 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 						.getText().toString()));
 
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 
@@ -645,16 +644,13 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 			try {
 				response = httpclient.execute(httppost);
 			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			try {
 				resEntity = response.getEntity();
 			} catch (Exception e) {
-				// TODO: handle exception
 				runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -669,10 +665,8 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 				try {
 					reponse = EntityUtils.toString(resEntity);
 				} catch (ParseException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				}
 
@@ -684,7 +678,6 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 					mess = profile.getString("message");
 					id = jsonMainArr.getJSONObject(0).getString("user_id");
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -725,8 +718,8 @@ public class RegisterActivity extends SherlockActivity implements TextWatcher,
 							PushManager.shared().setIntentReceiver(
 									IntentReceiver.class);
 							String apid = PushManager.shared().getAPID();
-							Logger.info("My Application onCreate - App APID: "
-									+ apid);
+							// Logger.info("My Application onCreate - App APID: "
+							// + apid);
 							Intent next = new Intent(RegisterActivity.this,
 									MainActivity.class);
 							startActivity(next);
