@@ -143,6 +143,7 @@ public class Otherupdates extends Fragment {
 		return rootView;
 	}
 
+	// address from lat and lon
 	String getaddress() {
 		Geocoder geocoder = new Geocoder(getActivity(), Locale.ENGLISH);
 
@@ -283,7 +284,7 @@ public class Otherupdates extends Fragment {
 						public void run() {
 							pBar.setVisibility(View.GONE);
 							try {
-
+								// add data to list
 								testimonialData = getContactData();
 							} catch (JSONException e) {
 								e.printStackTrace();
@@ -348,6 +349,7 @@ public class Otherupdates extends Fragment {
 		@Override
 		protected void onPostExecute(Void notUsed) {
 			pBar.setVisibility(View.GONE);
+			// check size coz we are using paging
 			if (labels.size() == 0) {
 				noupdate.setVisibility(View.VISIBLE);
 				data.setVisibility(View.GONE);
@@ -368,6 +370,7 @@ public class Otherupdates extends Fragment {
 		}
 	}
 
+	// temp fix for images getViewTypeCount
 	private class listAdapter extends BaseAdapter {
 		@Override
 		public int getCount() {
@@ -386,7 +389,7 @@ public class Otherupdates extends Fragment {
 
 		@Override
 		public int getViewTypeCount() {
-			return 100000;
+			return 10000;
 		}
 
 		@Override
@@ -495,7 +498,7 @@ public class Otherupdates extends Fragment {
 						animateFirstListener);
 				pic1.setVisibility(View.VISIBLE);
 				pic1.setTag(imageUrls[0]);
-
+				// show images
 				if (!imageUrls[1].isEmpty()
 						&& !imageUrls[1].equalsIgnoreCase("")) {
 					Updates.imageLoader.displayImage(imageUrls[1], pic2,
@@ -551,6 +554,7 @@ public class Otherupdates extends Fragment {
 						.findViewById(R.id.rline);
 				rline.setVisibility(View.VISIBLE);
 			}
+			// image click
 			pic1.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -589,6 +593,7 @@ public class Otherupdates extends Fragment {
 
 				}
 			});
+			// row is clicked
 			vv.setOnClickListener(new OnClickListener() {
 
 				@Override

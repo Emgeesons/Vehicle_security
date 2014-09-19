@@ -22,7 +22,7 @@ import com.nostra13.universalimageloader.core.listener.SimpleImageLoadingListene
 public class Fullimage extends Activity {
 	DisplayImageOptions options;
 	protected ImageLoader imageLoader = ImageLoader.getInstance();
-	// for zoomin/out
+	// for zooming/out
 	TouchImageView imageView;
 
 	@Override
@@ -37,8 +37,7 @@ public class Fullimage extends Activity {
 
 		final ProgressBar spinner = (ProgressBar) findViewById(R.id.loading);
 		options = new DisplayImageOptions.Builder()
-
-		.resetViewBeforeLoading(true).cacheOnDisk(true)
+				.resetViewBeforeLoading(true).cacheOnDisk(true)
 				.imageScaleType(ImageScaleType.EXACTLY)
 				.bitmapConfig(Bitmap.Config.RGB_565).considerExifParams(true)
 				.displayer(new FadeInBitmapDisplayer(300)).build();

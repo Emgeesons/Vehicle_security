@@ -203,6 +203,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 					runOnUiThread(new Runnable() {
 
 						public void run() {
+							// add data into database
 							SQLiteDatabase dbbb = db.getReadableDatabase();
 							dbbb.execSQL("UPDATE profile SET licenseNo = '"
 									+ lnumber.getText().toString()
@@ -210,6 +211,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 									+ address.getText().toString()
 									+ "',postcode = '"
 									+ postcode.getText().toString() + "'");
+							// change progress value
 							atPrefs.edit()
 									.putInt(SplashscreenActivity.progress, p)
 									.commit();
@@ -264,7 +266,7 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 											pDialog.dismiss();
 										}
 									});
-						
+
 							Dialog.setCancelable(true);
 							Dialog.show();
 						}
@@ -297,6 +299,8 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
+					// verify all field
+
 					// if (lnumber.getText().toString().length() < 6) {
 					// lnumber.setHintTextColor(getResources().getColor(
 					// R.color.red));
@@ -340,6 +344,8 @@ public class AddDetails extends BaseActivity implements TextWatcher {
 	@Override
 	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
 			int arg3) {
+		// change text color
+
 		// lnumber.setTextColor(getResources().getColor(R.color.black));
 		address.setTextColor(getResources().getColor(R.color.black));
 		postcode.setTextColor(getResources().getColor(R.color.black));

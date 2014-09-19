@@ -119,6 +119,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 		id = intent.getStringExtra("id");
 		call = intent.getStringExtra("call");
 		info.vehicleInfo(getApplicationContext(), id);
+		// load array list as per type
 		if (type.equalsIgnoreCase("Bicycle")) {
 			cnametype = getResources().getStringArray(R.array.bicycleins_comp);
 			cnotype = getResources().getStringArray(R.array.bicycleins_no);
@@ -132,7 +133,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 			cnametype = getResources().getStringArray(R.array.car_comp);
 			cnotype = getResources().getStringArray(R.array.car_no);
 		}
-
+		// check insurance array and assign number for pop up list
 		if (!call.equalsIgnoreCase("first")) {
 			// tname = true;
 			if (info.iname.equalsIgnoreCase("1Cover")) {
@@ -240,6 +241,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 				tname = 30;
 
 			}
+			// last for other text
 			if (tname == 34 || tname == 30) {
 				other_name.setVisibility(View.VISIBLE);
 				cname.setText(cnametype[tname]);
@@ -248,13 +250,12 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 				other_name.setVisibility(View.GONE);
 				cname.setText(cnametype[tname]);
 			}
-//			if (!type.equalsIgnoreCase("other")) {
-//				number.setText(cnotype[tname]);
-//			} else {
-				number.setText(info.inum);
-//			}
+			// if (!type.equalsIgnoreCase("other")) {
+			// number.setText(cnotype[tname]);
+			// } else {
+			number.setText(info.inum);
+			// }
 
-			
 			policy.setText(info.ipolicy);
 			if (info.exp.contains("0000-00-00")
 					|| info.exp.equalsIgnoreCase("null")) {
@@ -350,6 +351,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
+					// Verify all data
 					if (policy.getText().toString().trim().length() < 3) {
 
 						policy.setTextColor(getResources()
@@ -377,7 +379,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 					if (bpolicy == true && bother_name == true
 							&& bother_name == true) {
 						if (!(expdate == null)) {
-
+							// set notification at 8am
 							String date[] = expdate.split("-");
 							int year = Integer.valueOf(date[0]);
 							int month = Integer.valueOf(date[1]);
@@ -529,6 +531,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 					runOnUiThread(new Runnable() {
 
 						public void run() {
+							// update database
 							SQLiteDatabase dbbb = db.getReadableDatabase();
 							dbbb.execSQL("UPDATE vehicle_info SET vehicle_insname = '"
 									+ name
@@ -682,7 +685,7 @@ public class AddInsurance extends BaseActivity implements TextWatcher {
 	@Override
 	public void beforeTextChanged(CharSequence arg0, int arg1, int arg2,
 			int arg3) {
-		// TODO Auto-generated method stub
+		// change text color
 		other_name.setTextColor(getResources().getColor(R.color.black));
 		policy.setTextColor(getResources().getColor(R.color.black));
 

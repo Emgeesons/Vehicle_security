@@ -11,6 +11,7 @@ public class Myapplication extends Application {
 
 	@Override
 	public void onCreate() {
+		// needed for urban airship
 		AirshipConfigOptions options = AirshipConfigOptions
 				.loadDefaultOptions(Myapplication.this);
 		UAirship.takeOff(this, options);

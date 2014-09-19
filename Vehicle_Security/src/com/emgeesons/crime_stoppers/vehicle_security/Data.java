@@ -22,9 +22,9 @@ public class Data {
 	DatabaseHandler db;
 	SQLiteDatabase dbb;
 	String manufacturer, model, Version;
-//	static String url = "http://emgeesonsdevelopment.in/crimestoppers/mobile2.0/";
-	 static String url = "https://www.mywheels.biz/mobile2.0/";
-//k@k.com
+	// static String url =
+	// "http://emgeesonsdevelopment.in/crimestoppers/mobile2.0/";
+	static String url = "https://www.mywheels.biz/mobile2.0/";
 	String user_id, fName, lName, email, mobileNumber, dob, gender, licenseNo,
 			street, address, postcode, dtModified, fbId, fbToken, contact_name,
 			contact_number, pin, sans, type, make, vmodel, reg, body, eng, vin,
@@ -59,6 +59,7 @@ public class Data {
 
 	}
 
+	// cal age from dob
 	public int getAge(int years, int months, int day) {
 
 		GregorianCalendar cal = new GregorianCalendar();
@@ -94,6 +95,7 @@ public class Data {
 		return dateformat;
 	}
 
+	// reg qus map
 	public int qusvalues(String qus) {
 		if (qus.equalsIgnoreCase("What's your Passport Number ?")) {
 			return 0;
@@ -123,6 +125,7 @@ public class Data {
 
 	}
 
+	// user info
 	public void showInfo(Context _context) {
 
 		db = new DatabaseHandler(_context);
@@ -183,7 +186,6 @@ public class Data {
 	}
 
 	// vehicle info
-
 	public void vehicleInfo(Context _context, String id) {
 
 		db = new DatabaseHandler(_context);

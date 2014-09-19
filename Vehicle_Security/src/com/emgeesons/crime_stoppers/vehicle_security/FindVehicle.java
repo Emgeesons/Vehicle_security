@@ -136,20 +136,21 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		} else {
 			comm.setText(comments);
 		}
+		// register location service
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
 				30000, 100, this);
 		locationManager.requestLocationUpdates(
 				LocationManager.NETWORK_PROVIDER, 30000, 100, this);
 		position = new LatLng(Double.valueOf(lat), Double.valueOf(lon));
-
+		// check gps
 		gpscheck();
 
 		findrel.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View arg0) {
-
+				// if user login show dialog otherwise change values
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
 					final Dialog dialog = new Dialog(FindVehicle.this);
 					dialog.setContentView(R.layout.feedbackdialog);
@@ -204,10 +205,8 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 										|| ratepts.equalsIgnoreCase("0.0")) {
 									AlertDialog.Builder alertDialog = new AlertDialog.Builder(
 											FindVehicle.this);
-
 									alertDialog
 											.setMessage("Please provide rating for the parking spot");
-
 									alertDialog
 											.setPositiveButton(
 													"Ok",
@@ -218,7 +217,6 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 															dialog.cancel();
 														}
 													});
-
 									alertDialog.show();
 
 								} else {
@@ -261,16 +259,8 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		markerOptions.title(getaddress());
 		googleMap.addMarker(markerOptions);
 
-		// googleMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds,
-		// 20));
-		// googleMap
-		// .animateCamera(CameraUpdateFactory.newLatLng(position));
-		// googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-		// position, 15));
-		// Log.d("marker", "asd");
-		// }
-		// });
 		if (i == 0) {
+			// show 2 markers with proper zoom
 			googleMap.setOnMapLoadedCallback(new OnMapLoadedCallback() {
 
 				@Override
@@ -464,6 +454,8 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 							dialog.setCancelable(false);
 							dialog.show();
 							SQLiteDatabase dbbb = db.getReadableDatabase();
+							// if no vehicles are added update data at share
+							// pref
 							if (vehicles.size() == 0) {
 								atPrefs.edit()
 										.putString(info.glatitude,
@@ -587,38 +579,9 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		googleMap.clear();
 		googleMap.addMarker(markerOptionss);
 
-		// CameraPosition cameraPosition = new CameraPosition.Builder()
-		// .target(midPoint(curLATITUDE, curLONGITUDE,
-		// Double.valueOf(lat), Double.valueOf(lon))).zoom(5)
-		// .build();
-		// googleMap.animateCamera(CameraUpdateFactory
-		// .newCameraPosition(cameraPosition));
-
-		// googleMap.animateCamera(CameraUpdateFactory.newLatLng(curpos));
-		// googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(curpos, 15));
-		// }
-		// });
 		addmarker();
 
 	}
-
-	// private double angleBteweenCoordinate(double lat1, double long1,
-	// double lat2, double long2) {
-	//
-	// double dLon = (long2 - long1);
-	//
-	// double y = Math.sin(dLon) * Math.cos(lat2);
-	// double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1)
-	// * Math.cos(lat2) * Math.cos(dLon);
-	//
-	// double brng = Math.atan2(y, x);
-	//
-	// brng = Math.toDegrees(brng);
-	// brng = (brng + 360) % 360;
-	// brng = 360 - brng;
-	//
-	// return brng;
-	// }
 
 	private LatLng midPoint(double lat1, double long1, double lat2, double long2) {
 
@@ -660,6 +623,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 		return address;
 	}
 
+	// get address
 	String curgetaddress() {
 		Geocoder geocoder = new Geocoder(FindVehicle.this, Locale.ENGLISH);
 
@@ -704,6 +668,7 @@ public class FindVehicle extends BaseActivity implements LocationListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getSupportMenuInflater().inflate(R.menu.find_vehicle, menu);
+		// open maps with directions
 		menu.add("Directions").setTitle("Directions")
 				.setOnMenuItemClickListener(new OnMenuItemClickListener() {
 

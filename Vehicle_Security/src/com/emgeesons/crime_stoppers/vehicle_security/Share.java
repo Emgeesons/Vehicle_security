@@ -93,6 +93,8 @@ public class Share extends BaseActivity {
 		//
 		// }
 
+		// update old values coz when twitter login is clicked its redirect and
+		// open new act
 		if (!sharepreferences.getString("facebook", "").isEmpty()) {
 			fbtext.setText(sharepreferences.getString("facebook", "appfb"));
 			twtext.setText(sharepreferences.getString("twitter", "apptw"));
@@ -114,7 +116,7 @@ public class Share extends BaseActivity {
 				editor.remove("tw").commit();
 				Intent next = new Intent(getApplicationContext(),
 						ReportSubmit.class);
-				// sometime it remain in stackF
+				// sometime it remain in stack
 				next.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 						| Intent.FLAG_ACTIVITY_CLEAR_TASK);
 				startActivity(next);
@@ -164,7 +166,7 @@ public class Share extends BaseActivity {
 			@Override
 			public void onClick(View arg0) {
 				// twitter post
-
+				// nothing is selected
 				if (!tw.isChecked() && !fb.isChecked()) {
 
 					AlertDialog.Builder alertDialog = new AlertDialog.Builder(
@@ -187,7 +189,6 @@ public class Share extends BaseActivity {
 
 				} else {
 					Editor editor = sharepreferences.edit();
-
 					editor.remove("facebook").commit();
 					editor.remove("twitter").commit();
 					editor.remove("fb").commit();
@@ -209,8 +210,9 @@ public class Share extends BaseActivity {
 								.openActiveSessionFromCache(Share.this);
 						Bundle postParams = new Bundle();
 						postParams.putString("message", fbtext.getText()
-								.toString() + " " + "#MyWheels");
+								.toString());
 						postParams.putString("name", "My Wheels");
+						// share photo
 						if (!fphoto.equalsIgnoreCase("fphoto")) {
 							postParams.putString("picture", fphoto);
 							postParams
@@ -257,6 +259,8 @@ public class Share extends BaseActivity {
 				// ReportSubmit.class);
 				// startActivity(next);
 				// finish();
+
+				// open new act ,check which one come 1st fb or tiwtter
 				gotonext();
 				// Toast.makeText(getApplicationContext(), "Tweet successfully",
 				// Toast.LENGTH_SHORT).show();
@@ -284,6 +288,7 @@ public class Share extends BaseActivity {
 					// StatusUpdate ad = new StatusUpdate(
 					String as = twtext.getText().toString() + " " + "#MyWheels";
 					StatusUpdate status = new StatusUpdate(as);
+					// share photo
 					if (!tphoto.equalsIgnoreCase("tphoto")) {
 						System.out.println("photo");
 						File imageFile = new File(tphoto);

@@ -159,6 +159,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 		// body.setVisibility(View.GONE);
 		// tvech = 4;
 		// }
+
 		if (body.getVisibility() == View.VISIBLE) {
 			btype = true;
 			if (info.body.equalsIgnoreCase("Micro/Compact")) {
@@ -215,6 +216,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 										.getListView().getCheckedItemPosition();
 
 								tvech = buffKey;
+								// change hint as per type
 								if (type.getText().toString()
 										.equalsIgnoreCase("Other")) {
 									type_other.setVisibility(View.VISIBLE);
@@ -631,7 +633,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 					runOnUiThread(new Runnable() {
 
 						public void run() {
-
+							// update database
 							SQLiteDatabase dbbb = db.getReadableDatabase();
 							dbbb.execSQL("UPDATE vehicle_info SET vehicle_id = '"
 									+ id
@@ -659,8 +661,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 
 							dbbb.execSQL("UPDATE Vehicle_park SET type = '"
 									+ types + "',model = '"
-									+ model.getText().toString()
-									+ "',mark = '"
+									+ model.getText().toString() + "',mark = '"
 									+ make.getText().toString()
 									+ "'WHERE vid='" + id + "'");
 
@@ -743,6 +744,7 @@ public class Editvehicle extends BaseActivity implements TextWatcher {
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
+		// change text color
 		make.setTextColor(getResources().getColor(R.color.black));
 		model.setTextColor(getResources().getColor(R.color.black));
 		reg.setTextColor(getResources().getColor(R.color.black));

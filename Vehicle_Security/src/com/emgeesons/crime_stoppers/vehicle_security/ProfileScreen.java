@@ -182,7 +182,7 @@ public class ProfileScreen extends BaseActivity {
 		}
 		dir = "My Wheel/";
 		setimage();
-		// refresh ui
+		// refresh ui while loading image
 		final Handler handler = new Handler();
 		handler.postDelayed(new Runnable() {
 			@Override
@@ -277,28 +277,8 @@ public class ProfileScreen extends BaseActivity {
 		// get all images from folder
 		getFromSdcard();
 
-		// new Handler().postDelayed(new Runnable() {
-		// public void run() {
-		//
-		// if (count < f.size()) {
-		//
-		// Drawable d = (Drawable) Drawable.createFromPath(f
-		// .get(count));
-		//
-		// bg.setImageDrawable(d);
-		//
-		// count++; // <<< increment counter here
-		// } else {
-		// // reset counter here
-		// count = 0;
-		// }
-		//
-		// }
-		// }, 1000);
-
 		// change images
 
-		// if (f.size() == 0) {
 		height = getWindowManager().getDefaultDisplay().getHeight();
 		int image_hs = height * 30 / 100;
 		RelativeLayout.LayoutParams parmss = new RelativeLayout.LayoutParams(
@@ -306,33 +286,6 @@ public class ProfileScreen extends BaseActivity {
 		bg.setLayoutParams(parmss);
 		bg.setImageResource(R.drawable.default_profile_bg);
 		bg.setScaleType(ScaleType.FIT_XY);
-
-		// } else {
-		//
-		// final Handler handlers = new Handler();
-		// Runnable runnable = new Runnable() {
-		//
-		// public void run() {
-		// Drawable d = (Drawable) Drawable.createFromPath(f
-		// .get(count));
-		// // int image_hs = height * 30 / 100;
-		// // RelativeLayout.LayoutParams parmss = new
-		// // RelativeLayout.LayoutParams(
-		// // LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
-		// // bg.setLayoutParams(parmss);
-		// bg.setImageDrawable(d);
-		// count++;
-		//
-		// if (count > f.size() - 1) {
-		//
-		// count = 0;
-		// }
-		//
-		// handlers.postDelayed(this, 3000); // for interval...
-		// }
-		// };
-		// handlers.post(runnable);
-		// }
 
 		profilepic.setOnClickListener(new OnClickListener() {
 
@@ -348,7 +301,7 @@ public class ProfileScreen extends BaseActivity {
 					public void onClick(DialogInterface dialog, int item) {
 						atPrefs.edit().putString(callcheck, "True").commit();
 						if (items[item].equals("Take Photo")) {
-
+							// Choose from camera
 							final Intent intent = new Intent(
 									MediaStore.ACTION_IMAGE_CAPTURE);
 							intent.putExtra(MediaStore.EXTRA_OUTPUT,
@@ -371,7 +324,7 @@ public class ProfileScreen extends BaseActivity {
 			}
 		});
 		newprogress = atPrefs.getInt(SplashscreenActivity.progress, 0);
-
+		// condition as per progress points
 		if (newprogress <= 30) {
 			progress.setProgressDrawable(getResources().getDrawable(
 					R.drawable.startbar));
@@ -442,22 +395,10 @@ public class ProfileScreen extends BaseActivity {
 			// profile_comp.setVisibility(View.GONE);
 
 		}
-		// if (newprogress > 50) {
-		// if (info.licenseNo.isEmpty()) {
-		// profile_comp.setText("Your profile is  " + newprogress + " % "
-		// + "Complete");
-		// status.setText("Complete your profile and add information about your vehicle now");
-		//
-		// } else {
-		// profile_comp.setText("Your profile is  " + newprogress + " % "
-		// + "Complete");
-		// status.setText("Add information about your vehicle now");
-		// }
-		//
-		// }
 
 	}
 
+	// get all image from my wheel folder
 	public void getFromSdcard() {
 		File file = null;
 		for (int i = 0; i < vehicles.size(); i++) {
@@ -475,6 +416,7 @@ public class ProfileScreen extends BaseActivity {
 
 	}
 
+	// set profile pic
 	private void setimage() {
 		names = atPrefs.getString(SplashscreenActivity.profile_pic,
 				"profilePic.png");
@@ -494,6 +436,7 @@ public class ProfileScreen extends BaseActivity {
 		}
 	}
 
+	// animation for progress bar
 	public class ProgressBarAnimation extends Animation {
 		private ProgressBar progressBar;
 		private float from;
@@ -532,7 +475,7 @@ public class ProfileScreen extends BaseActivity {
 
 		case 2:
 			if (resultCode == RESULT_OK) {
-
+				// for camera
 				imagepath = getImagePath();
 				Bitmap photo = (Bitmap) decodeFile(imagepath);
 				int rotate = 0;
@@ -700,6 +643,7 @@ public class ProfileScreen extends BaseActivity {
 				success = profile.getString("status");
 				// mess = profile.getString("message");
 				if (success.equalsIgnoreCase("success")) {
+					// rename pic name
 					String res = profile.getString("response");
 					int pos = res.lastIndexOf("/");
 					names = res.substring(pos + 1);

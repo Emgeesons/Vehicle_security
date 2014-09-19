@@ -31,9 +31,10 @@ public class Connection_Detector {
 		return false;
 	}
 
+	// internet popup
 	public void showNoInternetPopup() {
 		pDialog = new AlertDialog.Builder(_context).create();
-//		 pDialog.setTitle("Location Access Required");
+		// pDialog.setTitle("Location Access Required");
 		pDialog.setMessage("Please make sure you are connected to the internet and try again.");
 		pDialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
 				new DialogInterface.OnClickListener() {

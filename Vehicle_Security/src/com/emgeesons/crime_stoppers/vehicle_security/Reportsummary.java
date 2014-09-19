@@ -84,7 +84,6 @@ public class Reportsummary extends BaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent call = new Intent(Intent.ACTION_CALL);
 				call.setData(Uri.parse("tel:" + "131444"));
 				startActivity(call);
@@ -93,41 +92,6 @@ public class Reportsummary extends BaseActivity {
 		sharedpreferences = getSharedPreferences(Data.MyPREFERENCES,
 				Context.MODE_PRIVATE);
 		String vid = sharedpreferences.getString(Data.vid, "notcall");
-		// if (vid.isEmpty() || !vid.equalsIgnoreCase("notcall")) {
-		// location = sharedpreferences.getString(Data.location, "");
-		// comments = sharedpreferences.getString(Data.comm, "");
-		// report_type = sharedpreferences.getString(Data.rtype, "");
-		// File f = new File(sharedpreferences.getString(Data.p1, ""));
-		// Uri imageUri1 = Uri.fromFile(f);
-		// spic1 = imageUri1.toString().replaceAll("%20", " ");
-		// File f2 = new File(sharedpreferences.getString(Data.p2, ""));
-		// Uri imageUri2 = Uri.fromFile(f2);
-		// spic2 = imageUri2.toString().replaceAll("%20", " ");
-		// File f3 = new File(sharedpreferences.getString(Data.p3, ""));
-		// Uri imageUri3 = Uri.fromFile(f3);
-		// spic3 = imageUri3.toString().replaceAll("%20", " ");
-		// String date = sharedpreferences.getString(Data.time, "");
-		// String[] datespilt = date.split("\\*");
-		// selected_time = datespilt[1];
-		// selected_date = datespilt[0];
-		// info = new Data();
-		// info.vehicleInfo(getApplicationContext(), vid);
-		// vehicle_type = (info.type);
-		// make = (info.make);
-		// model = (info.vmodel);
-		// engine_no = (info.eng);
-		// body_type = (info.body);
-		// chassis = (info.vin);
-		// colour = (info.color);
-		// acc = (info.acc);
-		// reg = (info.reg);
-		// icom = info.iname;
-		// ipno = info.ipolicy;
-		// iexp = info.exp;
-		// insurance_company_number = info.inum;
-		// state = info.state;
-		//
-		// } else {
 
 		try {
 
@@ -153,11 +117,7 @@ public class Reportsummary extends BaseActivity {
 			report_type = array.getJSONObject(0).getString("report_type");
 			comments = array.getJSONObject(0).getString("comments");
 			state = array.getJSONObject(0).getString("state");
-			// spic1 =
-			// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
-			// spic2 =
-			// "http://emgeesonsdevelopment.in/crimestoppers/mobile1.0/vehiclePics/24/1.png";
-			// spic3 = "";
+
 			spic1 = array.getJSONObject(0).getString("photo1");
 			spic2 = array.getJSONObject(0).getString("photo2");
 			spic3 = array.getJSONObject(0).getString("photo3");
@@ -165,10 +125,8 @@ public class Reportsummary extends BaseActivity {
 			selected_time = datespilt[0] + ":" + datespilt[1];
 
 		} catch (JSONException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		// }
 		pic1 = (ImageView) findViewById(R.id.pic1);
 		pic2 = (ImageView) findViewById(R.id.pic2);
 		pic3 = (ImageView) findViewById(R.id.pic3);
@@ -181,10 +139,7 @@ public class Reportsummary extends BaseActivity {
 		locations = (TextView) findViewById(R.id.location);
 		vtype = (ImageView) findViewById(R.id.vtypeimage);
 		adv = (RelativeLayout) findViewById(R.id.adv);
-
-		//
 		comment = (TextView) findViewById(R.id.comm);
-		//
 		type = (TextView) findViewById(R.id.vtype);
 		tmake = (TextView) findViewById(R.id.vmake);
 		tmodel = (TextView) findViewById(R.id.vmodel);
@@ -306,7 +261,6 @@ public class Reportsummary extends BaseActivity {
 
 				@Override
 				public void onClick(View arg0) {
-					// TODO Auto-generated method stub
 					Intent call = new Intent(Intent.ACTION_CALL);
 					call.setData(Uri.parse("tel:" + insurance_company_number));
 					startActivity(call);
@@ -323,7 +277,6 @@ public class Reportsummary extends BaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Reportsummary.this, Fullimage.class);
 				intent.putExtra("IMAGES", mStrings.get(0));
 				startActivity(intent);
@@ -333,7 +286,6 @@ public class Reportsummary extends BaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Reportsummary.this, Fullimage.class);
 				intent.putExtra("IMAGES", mStrings.get(1));
 				startActivity(intent);
@@ -344,7 +296,6 @@ public class Reportsummary extends BaseActivity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intent = new Intent(Reportsummary.this, Fullimage.class);
 				intent.putExtra("IMAGES", mStrings.get(2));
 				startActivity(intent);
@@ -387,7 +338,6 @@ public class Reportsummary extends BaseActivity {
 
 	@Override
 	protected int getLayoutResourceId() {
-		// TODO Auto-generated method stub
 		return R.layout.reportsummary;
 
 	}

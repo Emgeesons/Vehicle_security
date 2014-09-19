@@ -157,6 +157,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 		}
 		info = new Data();
 		secqus = getResources().getStringArray(R.array.sec_qus);
+		// check login, if yes then take data from database
 		if (!atPrefs.getBoolean(info.checkllogin, true)) {
 			info.showInfo(getApplicationContext());
 			id = info.user_id;
@@ -194,7 +195,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 			address.setText(info.street);
 			postcode.setText(info.postcode);
 			tqus = info.qusvalues(info.squs);
-
+			// last(9) is for other
 			if (tqus == 9) {
 
 				otherqus.setVisibility(View.VISIBLE);
@@ -343,7 +344,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		case DATE_DIALOG_ID:
-			// set time picker as current date
+			// set time picker as current date, max 13yrs
 			DatePickerDialog dialog = new DatePickerDialog(this,
 					datePickerListener, years, months, date);
 			Calendar calendars = Calendar.getInstance();
@@ -405,6 +406,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
+					// data validation
 					if (fname.getText().toString().trim().length() < 2) {
 
 						fname.setTextColor(getResources().getColor(R.color.red));
@@ -585,6 +587,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 						new StringBody(String.valueOf(LATITUDE)));
 				mpEntity.addPart("longitude",
 						new StringBody(String.valueOf(LONGITUDE)));
+				//map as per selection
 				switch (buffKey) {
 				case 0:
 					qus = "What's your Passport Number ?";
@@ -668,7 +671,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 					mess = profile.getString("message");
 
 				} catch (JSONException e) {
-//					System.out.println("JSONException");
+					// System.out.println("JSONException");
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -781,7 +784,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 	@Override
 	public void afterTextChanged(Editable s) {
 		// go next
-
+		// for edit text cursor
 		if (pin1.hasFocus() && pin1.getText().toString().length() == 1) {
 			pin2.requestFocus();
 
@@ -843,7 +846,7 @@ public class EditInfo extends BaseActivity implements TextWatcher,
 
 		if (keyCode == KeyEvent.KEYCODE_DEL) {
 			try {
-
+				// edit text back button move cursor backward
 				if (pin4.hasFocus()) {
 					// pin4.setText("");
 					pin3.requestFocus();

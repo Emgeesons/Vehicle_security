@@ -191,7 +191,7 @@ public class VehicleProfile extends BaseActivity {
 		} else {
 			reg.setText("Registration no:" + info.reg);
 		}
-
+		// change img as per type
 		if (type.getText().toString().equalsIgnoreCase("Car")) {
 			vpic.setImageResource(R.drawable.ic_car);
 		} else if (type.getText().toString().equalsIgnoreCase("Bicycle")) {

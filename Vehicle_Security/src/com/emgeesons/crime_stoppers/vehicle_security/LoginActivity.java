@@ -199,25 +199,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		//
 		// }
 		LoginButton authButton = (LoginButton) findViewById(R.id.facebook);
-		// authButton.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View arg0) {
-		// // TODO Auto-generated method stub
-		// final Handler handler = new Handler();
-		// Runnable runnable = new Runnable() {
-		//
-		// @Override
-		// public void run() {
-		// // TODO Auto-generated method stub
-		// main.setVisibility(View.GONE);
-		// skip.setVisibility(View.GONE);
-		// handler.postDelayed(this, 10000);
-		// }
-		// };
-		// handler.post(runnable);
-		// }
-		// });
+		
 
 		authButton.setOnErrorListener(new OnErrorListener() {
 
@@ -227,7 +209,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 			}
 		});
-		// set permission list, Don't foeget to add email
+		// set permission list, Don't forget to add email
 
 		authButton.setReadPermissions(Arrays.asList("public_profile", "email",
 				"user_birthday"));
@@ -304,7 +286,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 			super.onBackPressed();
 		}
-
+		// handle back button
 		if (login_main.getVisibility() == View.VISIBLE) {
 			login_main.setVisibility(View.GONE);
 			login_main.startAnimation(slide_out_right);
@@ -331,67 +313,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 	};
 
-	// Login listener
-	// final OnLoginListener onLoginListener = new OnLoginListener() {
-	//
-	// @Override
-	// public void onFail(String reason) {
-	// Toast.makeText(getApplicationContext(), reason, Toast.LENGTH_LONG)
-	// .show();
-	// Log.w(TAG, "Failed to login");
-	// }
-	//
-	// @Override
-	// public void onException(Throwable throwable) {
-	// Toast.makeText(getApplicationContext(), throwable.toString(),
-	// Toast.LENGTH_LONG).show();
-	// Log.e(TAG, "Bad thing happened", throwable);
-	// }
-	//
-	// @Override
-	// public void onThinking() {
-	// // show progress bar or something to the user while login is
-	// // happening
-	// Toast.makeText(getApplicationContext(), "Thinking".toString(),
-	// Toast.LENGTH_LONG).show();
-	// }
-	//
-	// @Override
-	// public void onLogin() {
-	// // change the state of the button or do whatever you want
-	// mSimpleFacebook.getProfile(onProfileListener);
-	// // Intent next = new Intent(getApplicationContext(),
-	// // HomescreenActivity.class);
-	// // startActivity(next);
-	//
-	// // Toast.makeText(getApplicationContext(), "UIState".toString(),
-	// // Toast.LENGTH_LONG).show();
-	//
-	// }
-	//
-	// @Override
-	// public void onNotAcceptingPermissions(Permission.Type type) {
-	// // toast(String.format("You didn't accept %s permissions",
-	// // type.name()));
-	// }
-	// };
-	//
-	// final OnProfileListener onProfileListener = new OnProfileListener() {
-	// @Override
-	// public void onComplete(Profile profile) {
-	//
-	// System.out.println(profile.getId() + profile.getHometown()
-	// + profile.getBirthday() + profile.getGender()
-	// + profile.getLocation() + profile.getPicture());
-	// Log.i(TAG, "My profile id = " + profile.getId());
-	// }
-	//
-	// /*
-	// * You can override other methods here: onThinking(), onFail(String
-	// * reason), onException(Throwable throwable)
-	// */
-	// };
-
+	// login screen
 	private void Loginact() {
 		TextView cancel, forgot;
 		Button login;
@@ -478,6 +400,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 		return true;
 	}
 
+	// forgot screen
 	void forgotact() {
 		TextView cancel;
 		Button Proceed;
@@ -1226,6 +1149,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 												+ time
 												+ "'WHERE vehicle_id ='"
 												+ vid + "'");
+										// set notification
 										NotificationAlarm
 												.CancelAlarm(LoginActivity.this);
 										NotificationAlarm
@@ -1242,6 +1166,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 							Thread thread = new Thread(new Runnable() {
 								@Override
 								public void run() {
+									// downlaod profile pic
 									sdRoot = Environment
 											.getExternalStorageDirectory();
 									dir = "My Wheel/";
@@ -1289,7 +1214,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 								PushManager.shared().setAlias(
 										String.valueOf(user_id));
 
-								// Tags
+								// set Tags for urban airship
 								HashSet<String> tags = new HashSet<String>();
 								tags.add(fName);
 								tags.add(lName);
@@ -1630,6 +1555,7 @@ public class LoginActivity extends Activity implements TextWatcher,
 								sdRoot = Environment
 										.getExternalStorageDirectory();
 								dir = "My Wheel/";
+								// download profile image
 								String dowlaod = "/My Wheel";
 								File photo = new File(sdRoot, dir + photoname);
 								if (photo.exists()) {
@@ -1652,12 +1578,13 @@ public class LoginActivity extends Activity implements TextWatcher,
 
 							}
 						});
+						// register with urban airship
 						AirshipConfigOptions options = AirshipConfigOptions
 								.loadDefaultOptions(LoginActivity.this);
 						UAirship.takeOff(getApplication(), options);
 						PushManager.shared().setAlias(String.valueOf(user_id));
 
-						// Tags
+						// set Tags for urban airship
 						HashSet<String> tags = new HashSet<String>();
 						tags.add(fName);
 						tags.add(lName);

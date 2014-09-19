@@ -111,7 +111,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	static int buffKey = 0;
 	String datevalue, timevalue, pos;
 	int years, months, dates, Hrs, min;
-	String ctimevalue, cdatevalue,dir, imgPath, reponse, points,ampm;
+	String ctimevalue, cdatevalue, dir, imgPath, reponse, points, ampm;
 	String[] names;
 	private String imagepath = null;
 	File sdRoot;
@@ -272,26 +272,6 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 		date.setText((info.getdateformate(datevalue + "-" + timevalue)));
 		checkpic();
 		picclick();
-		// expand.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View arg0) {
-		// if (exp_col) {
-		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-		// LayoutParams.WRAP_CONTENT,
-		// LayoutParams.MATCH_PARENT);
-		// mapview.setLayoutParams(parms);
-		// expand.setImageResource(R.drawable.ic_close_map);
-		// exp_col = false;
-		// } else {
-		// exp_col = true;
-		// expand.setImageResource(R.drawable.ic_expand_map);
-		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-		// LayoutParams.WRAP_CONTENT, map_height);
-		// mapview.setLayoutParams(parms);
-		// }
-		// }
-		// });
 
 		// fields
 		type.setOnClickListener(new OnClickListener() {
@@ -384,6 +364,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 								+ timevalue)));
 						String d = String.valueOf(yearss + "-" + monthss + "-"
 								+ datess);
+						// selected time should not be greater then cur time
 						if (datevalue.compareTo(d) == 0
 								&& ((Hrs > Hrss || Hrs == Hrss && min > mins) && ampms
 										.equalsIgnoreCase(ampm))) {
@@ -797,6 +778,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				runOnUiThread(new Runnable() {
 
 					public void run() {
+						// show dialog if user login
 						if (!atPrefs.getBoolean(info.checkllogin, true)) {
 							final Dialog dialog = new Dialog(
 									ReportSighting.this);
@@ -866,8 +848,6 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 												public void onClick(
 														DialogInterface dialog,
 														int which) {
-													// TODO Auto-generated
-													// method stub
 													Intent next = new Intent(
 															getApplicationContext(),
 															MainActivity.class);
@@ -1125,47 +1105,10 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 				}
 			});
 
-			// map.setOnMapClickListener(new OnMapClickListener() {
-			//
-			// @Override
-			// public void onMapClick(LatLng latLng) {
-			//
-			// // Creating a marker
-			// MarkerOptions markerOptions = new MarkerOptions();
-			//
-			// // Setting the position for the marker
-			// markerOptions.position(latLng);
-			//
-			// // Setting the title for the marker.
-			// // This will be displayed on taping the marker
-			// markerOptions.title(latLng.latitude + " : "
-			// + latLng.longitude);
-			//
-			// // Clears the previously touched position
-			// map.clear();
-			//
-			// // Animating to the touched position
-			// map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-			//
-			// // Placing a marker on the touched position
-			// map.addMarker(markerOptions);
-			// }
-			// });
-			// map.addMarker(new MarkerOptions().position(currlocation).title(
-			// "Current location"));
-			// map.moveCamera(CameraUpdateFactory.newLatLngZoom(currlocation,
-			// 12));
-			// // Zoom in, animating the camera.
-			// map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
 		} else {
 
 			// Ask user to enable GPS/network in settings
 
-			// give popup for 1st time
-			// if (!IsAlertDialogShown) {
-			// return;
-			// }
 			map.setOnCameraChangeListener(new OnCameraChangeListener() {
 				public void onCameraChange(CameraPosition arg0) {
 
@@ -1176,9 +1119,6 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 					slon = arg0.target.longitude;
 					new update().execute();
 					onchange();
-
-					// pos = String.valueOf(arg0.target.latitude) + " "
-					// + String.valueOf(arg0.target.longitude);
 
 				}
 			});
@@ -1266,6 +1206,7 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 	private BroadcastReceiver mlocation = new BroadcastReceiver() {
 		public void onReceive(Context context, Intent intent) {
 			if (this != null) {
+				// when wifi is turn on while app is running
 				gpscheck();
 			}
 		}
@@ -1333,7 +1274,6 @@ public class ReportSighting extends BaseActivity implements LocationListener,
 
 	@Override
 	public void onLocationChanged(Location location) {
-
 		gpscheck();
 
 	}

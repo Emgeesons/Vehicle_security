@@ -67,6 +67,7 @@ public class CarPark extends BaseActivity {
 		vid = intent.getStringExtra("id");
 		tips = (RelativeLayout) findViewById(R.id.tipsrel);
 		try {
+			// get 2 decimal only
 			s = String.format("%.2f", Double.valueOf(Rate));
 		} catch (Exception e) {
 		}
@@ -100,7 +101,7 @@ public class CarPark extends BaseActivity {
 		}
 
 		ratebar.setRating(Float.valueOf(Rate));
-
+		// load array as per type
 		if (type.equalsIgnoreCase("Bicycle")) {
 			checkdata = getResources().getStringArray(R.array.bicycle_tip);
 		} else if (type.equalsIgnoreCase("car")) {
@@ -114,7 +115,7 @@ public class CarPark extends BaseActivity {
 		checkadapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_list_item_1, checkdata);
 		alreadyUsed = new Vector<String>();
-
+		// use to avoid string repeatation
 		for (int i = 0; i < 3; i++) {
 			String as = String.valueOf(getnumber());
 			if (alreadyUsed.contains(as)) {
@@ -140,6 +141,8 @@ public class CarPark extends BaseActivity {
 				dbb = db.openDataBase();
 				dbb = db.getReadableDatabase();
 				SQLiteDatabase dbbb = db.getReadableDatabase();
+				// if no vehicle is added or guest user update to share pref
+				// otherwise update to database
 				if (vehicles.size() == 0) {
 					atPrefs.edit()
 							.putString(info.gcomm, comm.getText().toString())

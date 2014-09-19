@@ -266,27 +266,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 								dialog.dismiss();
 
 							}
-						}).setCancelable(false)
-
-				// .setPositiveButton("Ok", new
-				// DialogInterface.OnClickListener() {
-				// @Override
-				// public void onClick(DialogInterface dialog, int which) {
-				// qus.setText(secqus[buffKey]);
-				// qus.setTextColor(getResources().getColor(R.color.black));
-				// int selectedPosition = ((AlertDialog) dialog)
-				// .getListView().getCheckedItemPosition();
-				//
-				// tqus = buffKey;
-				// if (qus.getText().toString().equalsIgnoreCase("Other")) {
-				// otherqus.setVisibility(View.VISIBLE);
-				// } else {
-				// otherqus.setVisibility(View.GONE);
-				// }
-				//
-				// }
-				// })
-				;
+						}).setCancelable(false);
 
 				AlertDialog alert = builder.create();
 				alert.show();
@@ -308,6 +288,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 			pDialog.show();
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 			HttpEntity resEntity;
@@ -322,10 +303,8 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 			try {
 				info.device();
 				info.showInfo(getApplicationContext());
-
 				mpEntity.addPart("mobileNumber", new StringBody(number
 						.getText().toString()));
-
 				mpEntity.addPart("oldPin", new StringBody(oldpin));
 				mpEntity.addPart("userId", new StringBody(userid));
 				mpEntity.addPart("email", new StringBody(email));
@@ -400,7 +379,6 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 						.getText().toString()));
 
 			} catch (UnsupportedEncodingException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
 			httppost.setEntity(mpEntity);
@@ -409,17 +387,14 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 			try {
 				response = httpclient.execute(httppost);
 			} catch (ClientProtocolException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			} catch (IOException e1) {
-				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			
+
 			try {
 				resEntity = response.getEntity();
 			} catch (Exception e) {
-				// TODO: handle exception
 				runOnUiThread(new Runnable() {
 
 					public void run() {
@@ -433,19 +408,15 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 
 				try {
 					reponse = EntityUtils.toString(resEntity);
-
 					System.out.println(reponse);
 					JSONObject profile = new JSONObject(reponse);
 					success = profile.getString("status");
 					mess = profile.getString("message");
 				} catch (ParseException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (IOException e1) {
-					// TODO Auto-generated catch block
 					e1.printStackTrace();
 				} catch (JSONException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
@@ -454,6 +425,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 					runOnUiThread(new Runnable() {
 
 						public void run() {
+							// for escape char
 							quss = DatabaseUtils.sqlEscapeString(quss);
 
 							db = new DatabaseHandler(FbNewuser.this);
@@ -493,13 +465,13 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 							atPrefs.edit()
 									.putInt(SplashscreenActivity.progress, 30)
 									.commit();
+							// register with urban airship
 							AirshipConfigOptions options = AirshipConfigOptions
 									.loadDefaultOptions(FbNewuser.this);
 							UAirship.takeOff(getApplication(), options);
 							PushManager.shared().setAlias(
 									String.valueOf(userid));
-
-							// Tags
+							// set Tags @urban airship
 							HashSet<String> tags = new HashSet<String>();
 							tags.add(fname);
 							tags.add(lname);
@@ -603,6 +575,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 
 	@Override
 	protected void onDestroy() {
+		// if app is close before register success ,del seesion of fb
 		Session session = Session.getActiveSession();
 		if (session != null) {
 
@@ -629,6 +602,8 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 
 	@Override
 	protected void onStop() {
+		// if app is close before register ,del seesion of fb
+
 		Session session = Session.getActiveSession();
 		if (session != null) {
 
@@ -654,6 +629,8 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 
 	@Override
 	public void onBackPressed() {
+		// if app is close before register ,del seesion of fb
+
 		Session session = Session.getActiveSession();
 		if (session != null) {
 
@@ -726,7 +703,7 @@ public class FbNewuser extends SherlockActivity implements TextWatcher,
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
-
+		// change text color
 		number.setTextColor(getResources().getColor(R.color.black));
 		answer.setTextColor(getResources().getColor(R.color.black));
 		otherqus.setTextColor(getResources().getColor(R.color.black));

@@ -424,6 +424,7 @@ public class Myupdates extends Fragment {
 		}
 	}
 
+	// recover view
 	private void recoverfun() {
 		main.setVisibility(View.GONE);
 		Vrecover.setVisibility(View.VISIBLE);

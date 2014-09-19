@@ -26,7 +26,6 @@ public class Coachmark extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				Intent next = new Intent(getApplicationContext(),
 						ProfileScreen.class);
 				startActivity(next);
@@ -39,8 +38,6 @@ public class Coachmark extends Activity {
 
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
-
 				finish();
 			}
 		});

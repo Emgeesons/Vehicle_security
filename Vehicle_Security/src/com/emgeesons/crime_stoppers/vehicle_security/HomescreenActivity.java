@@ -132,10 +132,10 @@ public class HomescreenActivity extends SherlockFragment implements
 		db = new DatabaseHandler(getActivity());
 		String time = atPrefs.getString("time", "");
 		double curtime = System.currentTimeMillis();
+		// for everytime pin ,app 1st time open
 		if (time.isEmpty()) {
 			atPrefs.edit()
-					.putString(
-							"time",
+					.putString("time",
 							String.valueOf(System.currentTimeMillis()))
 					.commit();
 		}
@@ -257,7 +257,7 @@ public class HomescreenActivity extends SherlockFragment implements
 				"profilePic.png");
 		sdRoot = Environment.getExternalStorageDirectory();
 		dir = "My Wheel/";
-
+		// profile pic image
 		File f = new File(sdRoot, dir + names);
 		if (names.isEmpty()) {
 			profilepic.setImageResource(R.drawable.default_profile);
@@ -321,7 +321,6 @@ public class HomescreenActivity extends SherlockFragment implements
 		});
 
 		getSherlockActivity().getSupportActionBar().setCustomView(customNav);
-
 		locationManager = (LocationManager) getActivity().getSystemService(
 				Context.LOCATION_SERVICE);
 		getActivity()
@@ -472,6 +471,7 @@ public class HomescreenActivity extends SherlockFragment implements
 						details = new detail().execute();
 
 					} else {
+						// location is off
 						Toast.makeText(
 								getActivity(),
 								"Please allow MyWheels to access Your location . Turn it ON from Location Services",
@@ -485,6 +485,7 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	}
 
+	// for no of update ( red round)
 	static void checkupdate(Context con) {
 		if (con != null) {
 			RelativeLayout updates;
@@ -721,6 +722,7 @@ public class HomescreenActivity extends SherlockFragment implements
 		}
 	}
 
+	// when gps service turn on or off
 	private BroadcastReceiver mlocation = new BroadcastReceiver() {
 		public void onReceive(Context context, Intent intent) {
 			if (this != null) {
@@ -733,6 +735,7 @@ public class HomescreenActivity extends SherlockFragment implements
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		// remove reg location manger
 		getActivity().unregisterReceiver(mlocation);
 		locationManager.removeUpdates(this);
 
@@ -767,12 +770,12 @@ public class HomescreenActivity extends SherlockFragment implements
 		SherlockFragmentActivity a = getSherlockActivity();
 		if (a != null && map != null) {
 			try {
-//				Log.i("LOGTAG", "Removing map fragment");
+				// Log.i("LOGTAG", "Removing map fragment");
 				a.getSupportFragmentManager().beginTransaction()
 						.remove(fragment).commit();
 				fragment = null;
 			} catch (IllegalStateException e) {
-//				Log.i("LOGTAG", "IllegalStateException on exit");
+				// Log.i("LOGTAG", "IllegalStateException on exit");
 			}
 		}
 		super.onDestroyView();
@@ -916,272 +919,6 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	}
 
-	// get profile data
-
-	// private class getprofile extends AsyncTask<Void, Void, Void> {
-	// String success, mess, response;
-	// String user_id, fName, lName, email, mobileNumber, dob, gender,
-	// licenseNo, street, suburb, postcode, dtModified, fbId, fbToken,
-	// cname, cnumber, sques, sans, photourl, photoname, pin, points,
-	// exp;
-	// int profilecom;
-	//
-	// // vehicle
-	// int vid;
-	// String vtype, vmake, vmodel, reg, vstatus;
-	//
-	// @Override
-	// protected void onPreExecute() {
-	// super.onPreExecute();
-	// pDialog = new ProgressDialog(getActivity());
-	// pDialog.setMessage("Updating Info");
-	// pDialog.setIndeterminate(false);
-	// pDialog.setCancelable(true);
-	// pDialog.show();
-	// }
-	//
-	// @Override
-	// protected Void doInBackground(Void... params) {
-	//
-	// DefaultHttpClient httpClient = new DefaultHttpClient();
-	// ResponseHandler<String> resonseHandler = new BasicResponseHandler();
-	// HttpPost postMethod = new HttpPost(profile_url);
-	// JSONArray jsonMainArr;
-	//
-	// JSONObject json = new JSONObject();
-	// try {
-	// info.device();
-	// info.showInfo(getActivity());
-	// json.put("userId", info.user_id);
-	// json.put("make", info.manufacturer);
-	// json.put("os", "Android" + " " + info.Version);
-	// json.put("model", info.model);
-	// System.out.println("Element1-->" + json);
-	// postMethod.setHeader("Content-Type", "application/json");
-	// postMethod.setEntity(new ByteArrayEntity(json.toString()
-	// .getBytes("UTF8")));
-	// String response = httpClient
-	// .execute(postMethod, resonseHandler);
-	// Log.e("response :", response);
-	//
-	// JSONObject profile = new JSONObject(response);
-	// jsonMainArr = profile.getJSONArray("response");
-	// jsonVehicleArr = profile.getJSONArray("vehicles");
-	// success = profile.getString("status");
-	//
-	// mess = profile.getString("message");
-	// user_id = jsonMainArr.getJSONObject(0).getString("user_id");
-	// fName = jsonMainArr.getJSONObject(0).getString("first_name");
-	// lName = jsonMainArr.getJSONObject(0).getString("last_name");
-	// email = jsonMainArr.getJSONObject(0).getString("email");
-	// mobileNumber = jsonMainArr.getJSONObject(0).getString(
-	// "mobile_number");
-	// String[] datespilt = jsonMainArr.getJSONObject(0)
-	// .getString("dob").split("\\s+");
-	// dob = String.valueOf(datespilt[0]);
-	// gender = jsonMainArr.getJSONObject(0).getString("gender");
-	// licenseNo = jsonMainArr.getJSONObject(0)
-	// .getString("license_no");
-	// // street = jsonMainArr.getJSONObject(0).getString("street");
-	// // suburb = jsonMainArr.getJSONObject(0).getString("suburb");
-	// postcode = jsonMainArr.getJSONObject(0).getString("postcode");
-	// dtModified = jsonMainArr.getJSONObject(0).getString(
-	// "modified_at");
-	// fbId = jsonMainArr.getJSONObject(0).getString("fb_id");
-	// fbToken = jsonMainArr.getJSONObject(0).getString("fb_token");
-	// // cname = jsonMainArr.getJSONObject(0).getString(
-	// // "emergency_contact");
-	// // cnumber = jsonMainArr.getJSONObject(0).getString(
-	// // "emergency_contact_number");
-	// sques = jsonMainArr.getJSONObject(0).getString(
-	// "security_question");
-	// sans = jsonMainArr.getJSONObject(0)
-	// .getString("security_answer");
-	// profilecom = jsonMainArr.getJSONObject(0).getInt(
-	// "profile_completed");
-	// pin = jsonMainArr.getJSONObject(0).getString("pin");
-	// points = jsonMainArr.getJSONObject(0).getString(
-	// "samaritan_points");
-	// photourl = jsonMainArr.getJSONObject(0).getString("photo_url");
-	// int pos = photourl.lastIndexOf("/");
-	// photoname = photourl.substring(pos + 1);
-	//
-	// // vehicle info
-	//
-	// } catch (ClientProtocolException e) {
-	// System.out.println("ClientProtocolException");
-	// e.printStackTrace();
-	// } catch (IOException e) {
-	// System.out.println("IOException");
-	// e.printStackTrace();
-	// } catch (JSONException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// if (success.equals("success")) {
-	//
-	// getActivity().runOnUiThread(new Runnable() {
-	//
-	// public void run() {
-	// db = new DatabaseHandler(getActivity());
-	// PersonalData data = new PersonalData(user_id, fName,
-	// lName, email, mobileNumber, dob, gender,
-	// licenseNo, street, suburb, postcode,
-	// dtModified, fbId, fbToken, cname, cnumber, pin,
-	// sques, sans, points);
-	//
-	// db.updateprofileData(data);
-	// atPrefs.edit()
-	// .putInt(SplashscreenActivity.progress,
-	// profilecom).commit();
-	// atPrefs.edit().putBoolean(info.checkllogin, false)
-	// .commit();
-	//
-	// SQLiteDatabase dbb = db.getReadableDatabase();
-	// dbb.execSQL("delete from Vehicle_info");
-	// for (int i = 0; i < jsonVehicleArr.length(); i++) {
-	//
-	// try {
-	// vid = jsonVehicleArr.getJSONObject(i).getInt(
-	// "vehicle_id");
-	// vtype = jsonVehicleArr.getJSONObject(i)
-	// .getString("vehicle_type");
-	// vmake = jsonVehicleArr.getJSONObject(i)
-	// .getString("vehicle_make");
-	// vmodel = jsonVehicleArr.getJSONObject(i)
-	// .getString("vehicle_model");
-	// reg = jsonVehicleArr.getJSONObject(i)
-	// .getString("registration_serial_no");
-	// vstatus = jsonVehicleArr.getJSONObject(i)
-	// .getString("vehicle_status");
-	// exp = jsonVehicleArr.getJSONObject(i)
-	// .getString("insurance_expiry_date");
-	// String[] date = exp.split("\\s+");
-	// db = new DatabaseHandler(getActivity());
-	// VehicleData datas = new VehicleData(vid, vtype,
-	// vmake, vmodel, "", "", "", "", "", reg,
-	// "", "", date[0], vstatus, "");
-	// db.insertvehicleData(datas);
-	// if (date[0].equalsIgnoreCase("0000-00-00")) {
-	// } else {
-	// String toParse = date[0] + " " + 8 + ":"
-	// + 00;
-	// SimpleDateFormat formatter = new SimpleDateFormat(
-	// "yyyy-MM-dd h:m");
-	// Date dates = formatter.parse(toParse);
-	// long millis = dates.getTime();
-	// long time = millis - 604800000;
-	//
-	// dbb.execSQL("UPDATE vehicle_info SET vehicle_expmil = '"
-	// + time
-	// + "'WHERE vehicle_id ='"
-	// + vid + "'");
-	// NotificationAlarm
-	// .CancelAlarm(getActivity());
-	// NotificationAlarm.SetAlarm(getActivity());
-	// }
-	//
-	// } catch (JSONException e) {
-	// e.printStackTrace();
-	// } catch (java.text.ParseException e) {
-	// e.printStackTrace();
-	// }
-	//
-	// }
-	// Thread thread = new Thread(new Runnable() {
-	// @Override
-	// public void run() {
-	// sdRoot = Environment
-	// .getExternalStorageDirectory();
-	// dir = "My Wheel/";
-	// String dowlaod = "/My Wheel";
-	// File photo = new File(sdRoot, dir + photoname);
-	// if (photo.exists()) {
-	// atPrefs.edit()
-	// .putString(
-	// SplashscreenActivity.profile_pic,
-	// photoname).commit();
-	// } else {
-	// try {
-	// d.DownloadFromUrl(photourl, photoname,
-	// dowlaod, dir);
-	// atPrefs.edit()
-	// .putString(
-	// SplashscreenActivity.profile_pic,
-	// photoname).commit();
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// }
-	//
-	// }
-	// });
-	// thread.start();
-	// Intent nextscreen = new Intent(getActivity(),
-	// ProfileScreen.class);
-	// startActivity(nextscreen);
-	//
-	// getActivity().finish();
-	//
-	// }
-	// });
-	// }
-	// // response failure
-	// else if (success.equals("failure")) {
-	//
-	// getActivity().runOnUiThread(new Runnable() {
-	//
-	// public void run() {
-	// final AlertDialog Dialog = new AlertDialog.Builder(
-	// getActivity()).create();
-	// Dialog.setTitle("Incorrect Email");
-	// Dialog.setMessage(mess);
-	// Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-	// new DialogInterface.OnClickListener() {
-	// public void onClick(DialogInterface dialog,
-	// int which) {
-	// pDialog.dismiss();
-	// }
-	// });
-	// Dialog.setCancelable(true);
-	// Dialog.show();
-	// }
-	// });
-	//
-	// } else if (success.equals("error")) {
-	// getActivity().runOnUiThread(new Runnable() {
-	//
-	// public void run() {
-	// final AlertDialog Dialog = new AlertDialog.Builder(
-	// getActivity()).create();
-	// Dialog.setTitle("Error");
-	// Dialog.setMessage(mess);
-	// Dialog.setButton(DialogInterface.BUTTON_NEUTRAL, "OK",
-	// new DialogInterface.OnClickListener() {
-	// public void onClick(DialogInterface dialog,
-	// int which) {
-	// pDialog.dismiss();
-	// }
-	// });
-	//
-	// Dialog.setCancelable(true);
-	// Dialog.show();
-	// }
-	// });
-	//
-	// }
-	//
-	// return null;
-	//
-	// }
-	//
-	// @Override
-	// protected void onPostExecute(Void notUsed) {
-	// pDialog.dismiss();
-	//
-	// }
-	// }
-
 	public void showAlert() {
 		HomescreenActivity n = new HomescreenActivity();
 		if (n != null) {
@@ -1221,6 +958,7 @@ public class HomescreenActivity extends SherlockFragment implements
 		}
 	}
 
+	// for vehicle park
 	private void checkinfo() {
 
 		RelativeLayout parkrel;
@@ -1238,7 +976,7 @@ public class HomescreenActivity extends SherlockFragment implements
 				comm = cursor.getString(5);
 			} while (cursor.moveToNext());
 		}
-
+		// vehicle is parked
 		if (!lat.isEmpty()) {
 
 			tick.setVisibility(View.VISIBLE);
@@ -1444,6 +1182,7 @@ public class HomescreenActivity extends SherlockFragment implements
 
 	}
 
+	// check app comes from background or not
 	class ForegroundCheckTask extends AsyncTask<Context, Void, Boolean> {
 
 		@Override

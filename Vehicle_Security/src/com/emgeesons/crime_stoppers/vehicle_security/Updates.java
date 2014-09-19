@@ -59,6 +59,7 @@ public class Updates extends SherlockFragmentActivity implements
 		mAdapter = new TabsPagerAdapter(getSupportFragmentManager());
 		info = new Data();
 		atPrefs = PreferenceManager.getDefaultSharedPreferences(Updates.this);
+		// when update open reset update count
 		atPrefs.edit().putInt("updates", 0).commit();
 		HomescreenActivity.checkupdate(getApplicationContext());
 		viewPager.setAdapter(mAdapter);
@@ -70,6 +71,7 @@ public class Updates extends SherlockFragmentActivity implements
 				.diskCacheFileNameGenerator(new Md5FileNameGenerator())
 				.tasksProcessingOrder(QueueProcessingType.LIFO).build();
 		ImageLoader.getInstance().init(config);
+		// user login update time ,use for every time pin
 		if (!atPrefs.getBoolean(info.checkllogin, true)) {
 			atPrefs.edit()
 					.putString("time",
@@ -146,6 +148,7 @@ public class Updates extends SherlockFragmentActivity implements
 	public void onTabSelected(Tab tab, FragmentTransaction ft) {
 		// only login user
 		if (tab.getPosition() == 1) {
+			// if user not login and move to my update tab show popup
 			if (atPrefs.getBoolean(Data.checkllogin, true)) {
 
 				AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -248,35 +251,26 @@ public class Updates extends SherlockFragmentActivity implements
 		long tw = System.currentTimeMillis();
 		String ch = atPrefs.getString("check", "true");
 		String chh = atPrefs.getString("callcheck", "true");
-		// Log.i("con", ch);
-		// Log.i("cons", chh);
-		// Log.i("call form", getClass().getName());
+
 		if (ch.equalsIgnoreCase("false")) {
 			if (chh.equalsIgnoreCase("true")) {
-				// when we open maps,pic dont show pin
-				// Toast.makeText(getApplicationContext(), "PinLock false",
-				// Toast.LENGTH_LONG).show();
+
 				atPrefs.edit().putString("callcheck", "false").commit();
 				return;
 			} else {
-				// Toast.makeText(getApplicationContext(), "PinLock",
-				// Toast.LENGTH_LONG).show();
+				// app is open after 15 min?
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
 					boolean s = tw > t;
-					// Toast.makeText(getApplicationContext(),
-					// "PinLock" + " " + s, Toast.LENGTH_LONG).show();
+
 					long d = Math.abs(tw - t);
 					Log.i("math", String.valueOf(d));
 					if (Math.abs(tw - t) > 900000) {
-						// Toast.makeText(getApplicationContext(),
-						// "PinLock enter", Toast.LENGTH_LONG).show();
+
 						Intent ne = new Intent(getApplicationContext(),
 								PinLock.class);
 						startActivity(ne);
 					} else {
-						// Toast.makeText(getApplicationContext(),
-						// "PinLock else",
-						// Toast.LENGTH_LONG).show();
+
 					}
 
 				}

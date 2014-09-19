@@ -218,6 +218,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			details.setVisibility(View.VISIBLE);
 			adddetails.setVisibility(View.GONE);
 			for (int i = 0; i < vehicles.size(); i++) {
+				// add data into list
 				names.add(vehicles.get(i).getvehicle_make() + " "
 						+ vehicles.get(i).getvehicle_model());
 				nos.add(vehicles.get(i).getvehicle_id());
@@ -292,6 +293,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		// System.out.println(cdatevalue + "," + ctimevalue);
 		date.setText((info.getdateformate(datevalue + "-" + timevalue)));
 		height = getWindowManager().getDefaultDisplay().getHeight();
+		// register location service
 		locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
 		locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
@@ -341,27 +343,6 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			}
 		});
 
-		// expand.setOnClickListener(new OnClickListener() {
-		//
-		// @Override
-		// public void onClick(View arg0) {
-		// if (exp_col) {
-		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-		// LayoutParams.WRAP_CONTENT,
-		// LayoutParams.MATCH_PARENT);
-		// expand.setImageResource(R.drawable.ic_close_map);
-		// mapview.setLayoutParams(parms);
-		// exp_col = false;
-		// } else {
-		// exp_col = true;
-		// expand.setImageResource(R.drawable.ic_expand_map);
-		// RelativeLayout.LayoutParams parms = new RelativeLayout.LayoutParams(
-		// LayoutParams.WRAP_CONTENT, map_height);
-		//
-		// mapview.setLayoutParams(parms);
-		// }
-		// }
-		// });
 		type.setOnClickListener(new OnClickListener() {
 
 			@Override
@@ -508,73 +489,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 	}
 
-	// private void publishStory() {
-	// Session session = Session.getActiveSession();
-	//
-	// if (session != null) {
-	//
-	// // Check for publish permissions
-	// // List<String> permissions = session.getPermissions();
-	// // if (!isSubsetOf(PERMISSIONS, permissions)) {
-	// // pendingPublishReauthorization = true;
-	// // Session.NewPermissionsRequest newPermissionsRequest = new
-	// // Session.NewPermissionsRequest(
-	// // this, PERMISSIONS);
-	// // session.requestNewPublishPermissions(newPermissionsRequest);
-	// // return;
-	// // }
-	//
-	// Bundle postParams = new Bundle();
-	// postParams.putString("message", "TEsttttttttttttttt");
-	// postParams.putString("name", "Facebook SDK for Android");
-	// // postParams.putString("caption",
-	// // "Build great social apps and get more installs.");
-	// // postParams
-	// // .putString(
-	// // "description",
-	// //
-	// "The Facebook SDK for Android makes it easier and faster to develop Facebook integrated Android apps.");
-	// // postParams.putString("link",
-	// // "https://developers.facebook.com/android");
-	// postParams
-	// .putString("picture",
-	// "https://raw.github.com/fbsamples/ios-3.x-howtos/master/Images/iossdk_logo.png");
-	//
-	// Request.Callback callback = new Request.Callback() {
-	// public void onCompleted(Response response) {
-	// JSONObject graphResponse = response.getGraphObject()
-	// .getInnerJSONObject();
-	// String postId = null;
-	// try {
-	// postId = graphResponse.getString("id");
-	// } catch (JSONException e) {
-	// Log.i("TAG", "JSON error " + e.getMessage());
-	// }
-	// FacebookRequestError error = response.getError();
-	// if (error != null) {
-	// Toast.makeText(getApplicationContext(),
-	// error.getErrorMessage(), Toast.LENGTH_SHORT)
-	// .show();
-	// } else {
-	// Toast.makeText(getApplicationContext(), postId,
-	// Toast.LENGTH_LONG).show();
-	// }
-	// }
-	// };
-	//
-	// Request request = new Request(session, "me/feed", postParams,
-	// HttpMethod.POST, callback);
-	//
-	// RequestAsyncTask task = new RequestAsyncTask(request);
-	// task.execute();
-	// } else {
-	//
-	// session = Session.openActiveSessionFromCache(FilenewReport.this);
-	// publishStory();
-	// }
-	//
-	// }
-
+	// check/set no of picture present
 	private void checkpic() {
 		if (pic1.getVisibility() == View.VISIBLE
 				&& pic2.getVisibility() == View.GONE
@@ -597,6 +512,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 	}
 
+	// when click on pic
 	private void picclick() {
 		pic1.setOnClickListener(new OnClickListener() {
 
@@ -628,6 +544,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 	}
 
+	// set image to imageview
 	private void setpic() {
 		photo = (Bitmap) decodeFile(imagepath);
 		f.add(imagepath);
@@ -648,6 +565,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 	}
 
+	// open selector
 	private void clickd() {
 		final CharSequence[] items = { "Take Photo", "From Gallery", "Cancel" };
 		AlertDialog.Builder builder = new AlertDialog.Builder(
@@ -726,7 +644,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		@SuppressLint("NewApi")
 		@Override
 		protected Void doInBackground(Void... params) {
-			
+
 			try {
 				sendPost(file_url, imagepath);
 			} catch (ClientProtocolException e) {
@@ -738,7 +656,6 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 			} catch (Exception e) {
 			}
 
-			
 			return null;
 
 		}
@@ -768,7 +685,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		Editor editor = sharedpreferences.edit();
 
 		for (int i = 0; i < f.size(); i++) {
-
+			// no of picture
 			File file = new File(f.get(i));
 			editor.putString(im[i], f.get(i));
 			editor.commit();
@@ -835,7 +752,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 		System.out.println(response.getStatusLine());
 		if (resEntity != null) {
 			reponse = EntityUtils.toString(resEntity);
-//			System.out.println(reponse);
+			// System.out.println(reponse);
 			JSONObject profile = new JSONObject(reponse);
 			String success = profile.getString("status");
 			mess = profile.getString("message");
@@ -847,6 +764,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 					public void run() {
 						Intent share = new Intent(getApplicationContext(),
 								Share.class);
+						// image is added,use same image to share
 						if (!(f.size() == 0)) {
 							try {
 								tphotourl = f.get(0);
@@ -913,6 +831,7 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 				imagepath = getImagePath();
 				photo = (Bitmap) decodeFile(imagepath);
+				// adjust image orientation ,lan-> por
 				int rotate = 0;
 				try {
 					File imageFile = new File(imagepath);
@@ -956,13 +875,6 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 
 				imagepath = f.getAbsolutePath();
 				setpic();
-				// ch.add(imagepath);
-				// photo = (Bitmap) decodeFile(imagepath);
-				// CustomImageView image = new CustomImageView(
-				// getApplicationContext());
-				// image.setImageBitmap(photo);
-				// takenpic.addView(image);
-				// check();
 
 			}
 
@@ -1094,47 +1006,10 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 				}
 			});
 
-			// map.setOnMapClickListener(new OnMapClickListener() {
-			//
-			// @Override
-			// public void onMapClick(LatLng latLng) {
-			//
-			// // Creating a marker
-			// MarkerOptions markerOptions = new MarkerOptions();
-			//
-			// // Setting the position for the marker
-			// markerOptions.position(latLng);
-			//
-			// // Setting the title for the marker.
-			// // This will be displayed on taping the marker
-			// markerOptions.title(latLng.latitude + " : "
-			// + latLng.longitude);
-			//
-			// // Clears the previously touched position
-			// map.clear();
-			//
-			// // Animating to the touched position
-			// map.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-			//
-			// // Placing a marker on the touched position
-			// map.addMarker(markerOptions);
-			// }
-			// });
-			// map.addMarker(new MarkerOptions().position(currlocation).title(
-			// "Current location"));
-			// map.moveCamera(CameraUpdateFactory.newLatLngZoom(currlocation,
-			// 12));
-			// // Zoom in, animating the camera.
-			// map.animateCamera(CameraUpdateFactory.zoomTo(15), 2000, null);
-
 		} else {
 
 			// Ask user to enable GPS/network in settings
 
-			// give popup for 1st time
-			// if (!IsAlertDialogShown) {
-			// return;
-			// }
 			map.setOnCameraChangeListener(new OnCameraChangeListener() {
 				public void onCameraChange(CameraPosition arg0) {
 
@@ -1145,9 +1020,6 @@ public class FilenewReport extends BaseActivity implements TextWatcher,
 					slon = arg0.target.longitude;
 					new update().execute();
 					onchange();
-
-					// pos = String.valueOf(arg0.target.latitude) + " "
-					// + String.valueOf(arg0.target.longitude);
 
 				}
 			});

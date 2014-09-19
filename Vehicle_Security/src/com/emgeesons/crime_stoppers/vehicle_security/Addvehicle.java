@@ -123,6 +123,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 										.getListView().getCheckedItemPosition();
 
 								tvech = buffKey;
+								// change hint as per selection   
 								if (type.getText().toString()
 										.equalsIgnoreCase("Other")) {
 									type_other.setVisibility(View.VISIBLE);
@@ -226,6 +227,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 				if (IsInternetPresent == false) {
 					cd.showNoInternetPopup();
 				} else {
+					// check all field condition
 					if ((type.getText().toString().equalsIgnoreCase("Car") || type
 							.getText().toString()
 							.equalsIgnoreCase("MotorCycle"))
@@ -236,9 +238,9 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 								R.color.red));
 						bmake = false;
 					}
-					if ((type.getText().toString().equalsIgnoreCase("Car")
-							|| type.getText().toString()
-									.equalsIgnoreCase("MotorCycle") )
+					if ((type.getText().toString().equalsIgnoreCase("Car") || type
+							.getText().toString()
+							.equalsIgnoreCase("MotorCycle"))
 							&& model.getText().toString().length() < 2) {
 
 						model.setTextColor(getResources().getColor(R.color.red));
@@ -417,7 +419,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 
 	private class add extends AsyncTask<Void, Void, Void> {
 		String success, mess, response;
-		String vid, typevalue,status;
+		String vid, typevalue, status;
 
 		@Override
 		protected void onPreExecute() {
@@ -521,7 +523,8 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 					success = profile.getString("status");
 					mess = profile.getString("message");
 					vid = jsonMainArr.getJSONObject(0).getString("vehicle_id");
-					status= jsonMainArr.getJSONObject(0).getString("vehicle_status");
+					status = jsonMainArr.getJSONObject(0).getString(
+							"vehicle_status");
 				} catch (JSONException e) {
 				} catch (ParseException e) {
 					// TODO Auto-generated catch block
@@ -536,7 +539,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 					runOnUiThread(new Runnable() {
 
 						public void run() {
-
+							// update database
 							VehicleData data = new VehicleData(
 									Integer.valueOf(vid), typevalue, make
 											.getText().toString(), model
@@ -547,7 +550,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 											.getText().toString(), acc
 											.getText().toString(), reg
 											.getText().toString(), "", "", "",
-											status, "", "", state.getText().toString());
+									status, "", "", state.getText().toString());
 							// check = make
 							ParkingData datas = new ParkingData(vid, model
 									.getText().toString(), "", "", "", make
@@ -639,6 +642,7 @@ public class Addvehicle extends BaseActivity implements TextWatcher {
 	@Override
 	public void beforeTextChanged(CharSequence s, int start, int count,
 			int after) {
+		// change text color
 		make.setTextColor(getResources().getColor(R.color.black));
 		model.setTextColor(getResources().getColor(R.color.black));
 		reg.setTextColor(getResources().getColor(R.color.black));

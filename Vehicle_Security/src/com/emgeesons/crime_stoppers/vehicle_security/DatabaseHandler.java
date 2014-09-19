@@ -290,7 +290,6 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 	}
 
 	// vehicle info
-
 	public void insertvehicleData(VehicleData data) {
 		SQLiteDatabase db = this.getWritableDatabase();
 
@@ -312,16 +311,13 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		values.put(vehicle_expmil, data.getexpmil());
 		values.put(vehicle_insnum, data.getinumber());
 		values.put(vehicle_state, data.getstate());
-
 		// Inserting Row
-
 		db.insert(TABLE_Vehicle, null, values);
 		db.close(); // Closing database connection
 	}
 
 	public void updatevehicleData(VehicleData data, String id) {
 		SQLiteDatabase db = this.getWritableDatabase();
-
 		ContentValues values = new ContentValues();
 		values.put(vehicle_id, data.getvehicle_id());
 		values.put(vehicle_type, data.getvehicle_type());
@@ -379,7 +375,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 		return con;
 	}
 
-	// parking
+	// parking (park my vehicle)
 	public void inserparkData(ParkingData data) {
 		SQLiteDatabase db = this.getWritableDatabase();
 		ContentValues values = new ContentValues();

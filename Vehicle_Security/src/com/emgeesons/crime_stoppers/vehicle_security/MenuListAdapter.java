@@ -53,9 +53,9 @@ public class MenuListAdapter extends BaseAdapter {
 				false);
 		title = (TextView) itemView.findViewById(R.id.title);
 		icon = (ImageView) itemView.findViewById(R.id.icon);
-
+		// show line at pos 2 and 6
 		if (position == 2 || position == 6) {
- 
+
 			RelativeLayout s = (RelativeLayout) itemView
 					.findViewById(R.id.relativeLayout1);
 			s.setVisibility(View.VISIBLE);

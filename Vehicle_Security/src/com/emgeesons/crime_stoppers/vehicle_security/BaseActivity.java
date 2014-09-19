@@ -27,6 +27,7 @@ public abstract class BaseActivity extends SherlockActivity {
 		info = new Data();
 		atPrefs = PreferenceManager
 				.getDefaultSharedPreferences(BaseActivity.this);
+		// if user login then update time for everytime pin screen
 		if (!atPrefs.getBoolean(info.checkllogin, true)) {
 			atPrefs.edit()
 					.putString("time",
@@ -83,37 +84,43 @@ public abstract class BaseActivity extends SherlockActivity {
 		String ch = atPrefs.getString(check, "true");
 		atPrefs.edit().putString(reboot, ch).commit();
 		String chh = atPrefs.getString(callcheck, "true");
-//		Toast.makeText(getApplicationContext(), "onresume" + " " + ch,
-//				Toast.LENGTH_LONG).show();
+		// Toast.makeText(getApplicationContext(), "onresume" + " " + ch,
+		// Toast.LENGTH_LONG).show();
 		Log.i("con", ch);
 		Log.i("cons", chh);
 		Log.i("call form", getClass().getName());
+		// check if app open from background or not
 		if (ch.equalsIgnoreCase("false")) {
 
 			if (chh.equalsIgnoreCase("true")) {
 				// when we open maps,pic dont show pin
-//				Toast.makeText(getApplicationContext(), "PinLock false",
-//						Toast.LENGTH_LONG).show();
+				// Toast.makeText(getApplicationContext(), "PinLock false",
+				// Toast.LENGTH_LONG).show();
 				atPrefs.edit().putString(callcheck, "false").commit();
 				return;
 			} else {
-//				Toast.makeText(getApplicationContext(), "PinLock",
-//						Toast.LENGTH_LONG).show();
+				// app open from background
+
+				// Toast.makeText(getApplicationContext(), "PinLock",
+				// Toast.LENGTH_LONG).show();
 				if (!atPrefs.getBoolean(info.checkllogin, true)) {
 					boolean s = tw > t;
-//					Toast.makeText(getApplicationContext(),
-//							"PinLock" + " " + s, Toast.LENGTH_LONG).show();
+					// Toast.makeText(getApplicationContext(),
+					// "PinLock" + " " + s, Toast.LENGTH_LONG).show();
 					long d = Math.abs(tw - t);
 					Log.i("math", String.valueOf(d));
+					// check current time is more then prev time , limit is 15
+					// min
 					if (Math.abs(tw - t) > 900000) {
-//						Toast.makeText(getApplicationContext(),
-//								"PinLock enter", Toast.LENGTH_LONG).show();
+						// Toast.makeText(getApplicationContext(),
+						// "PinLock enter", Toast.LENGTH_LONG).show();
 						Intent ne = new Intent(getApplicationContext(),
 								PinLock.class);
 						startActivity(ne);
 					} else {
-//						Toast.makeText(getApplicationContext(), "PinLock else",
-//								Toast.LENGTH_LONG).show();
+						// Toast.makeText(getApplicationContext(),
+						// "PinLock else",
+						// Toast.LENGTH_LONG).show();
 					}
 
 				}

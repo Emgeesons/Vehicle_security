@@ -137,6 +137,7 @@ public class Tips extends BaseActivity {
 
 		}
 
+		@SuppressWarnings("deprecation")
 		@Override
 		protected Void doInBackground(Void... params) {
 			HttpEntity resEntity = null;
@@ -231,6 +232,7 @@ public class Tips extends BaseActivity {
 				runOnUiThread(new Runnable() {
 
 					public void run() {
+
 						if (size == 0) {
 							mListAdapter = new listAdapter();
 							data.setAdapter(mListAdapter);
@@ -305,7 +307,7 @@ public class Tips extends BaseActivity {
 
 	public List<TipData> getContactData() throws JSONException {
 		// labels = new ArrayList<TestimonialData>();
-
+		// add tips to list
 		for (int i = 0; i < jsonMainArr.length(); i++) {
 			String feedback = jsonMainArr.getJSONObject(i)
 					.getString("feedback");

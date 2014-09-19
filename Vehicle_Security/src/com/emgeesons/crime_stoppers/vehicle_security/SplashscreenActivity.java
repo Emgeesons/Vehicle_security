@@ -30,7 +30,7 @@ public class SplashscreenActivity extends Activity {
 		new Handler().postDelayed(new Runnable() {
 			@Override
 			public void run() {
-
+				// check user agree or not @Disclaimer screen
 				if (atPrefs.getBoolean(agree, true)) {
 					Intent next = new Intent(getApplicationContext(),
 							DisclaimerActivity.class);

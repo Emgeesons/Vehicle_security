@@ -149,6 +149,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 
 	}
 
+	// when logout reset all data
 	private void logout() {
 		PushManager.disablePush();
 		SplashscreenActivity.fblogin = true;
@@ -315,6 +316,7 @@ public class PinLock extends Activity implements TextWatcher, OnKeyListener {
 					runOnUiThread(new Runnable() {
 
 						public void run() {
+							// update time
 							atPrefs.edit()
 									.putString(BaseActivity.check, "true")
 									.commit();
